@@ -1,0 +1,93 @@
+{
+  "typescript": true,
+  "directories": {
+    "config": "config",
+    "public": "public",
+    "contracts": "contracts",
+    "providers": "providers",
+    "database": "database",
+    "migrations": "database/migrations",
+    "seeds": "database/seeders",
+    "resources": "resources",
+    "start": "start",
+    "tmp": "tmp",
+    "tests": "tests"
+  },
+  "exceptionHandlerNamespace": "App/Exceptions/Handler",
+  "preloads": [
+    {
+      "file": "./start/routes",
+      "optional": false,
+      "environment": [
+        "web",
+        "console",
+        "test"
+      ]
+    },
+    {
+      "file": "./start/kernel",
+      "optional": false,
+      "environment": [
+        "web",
+        "console",
+        "test"
+      ]
+    },
+    {
+      "file": "./start/events",
+      "optional": true,
+      "environment": [
+        "web"
+      ]
+    }
+  ],
+  "namespaces": {
+    "models": "App/Models",
+    "middleware": "App/Middleware",
+    "exceptions": "App/Exceptions",
+    "validators": "App/Validators",
+    "httpControllers": "App/Controllers/Http",
+    "eventListeners": "App/Listeners",
+    "redisListeners": "App/Listeners"
+  },
+  "aliases": {
+    "App": "app",
+    "Config": "config",
+    "Database": "database",
+    "Contracts": "contracts"
+  },
+  "metaFiles": [
+    {
+      "pattern": "public/**",
+      "reloadServer": false
+    }
+  ],
+  "commands": [
+    "./commands",
+    "@adonisjs/core/build/commands",
+    "@adonisjs/repl/build/commands"
+  ],
+  "commandsAliases": {},
+  "tests": {
+    "suites": [
+      {
+        "name": "functional",
+        "files": [
+          "tests/functional/**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ]
+  },
+  "providers": [
+    "./providers/AppProvider",
+    "@adonisjs/core",
+    "@adonisjs/session"
+  ],
+  "aceProviders": [
+    "@adonisjs/repl"
+  ],
+  "testProviders": [
+    "@japa/preset-adonis/TestsProvider"
+  ]
+}
