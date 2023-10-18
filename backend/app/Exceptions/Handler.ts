@@ -15,9 +15,21 @@
 
 import Logger from '@ioc:Adonis/Core/Logger'
 import HttpExceptionHandler from '@ioc:Adonis/Core/HttpExceptionHandler'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class ExceptionHandler extends HttpExceptionHandler {
   constructor() {
     super(Logger)
+  }
+
+  public async handle(error: any, ctx: HttpContextContract) {
+    if (error.code !== 'E_HTTP_EXPECTED') {
+      return super.handle(error, ctx)
+    }
+
+    ctx.response.fail(error.status, {
+      status: error.statusCode,
+      error: error.data ?? error.message,
+    })
   }
 }

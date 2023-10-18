@@ -20,6 +20,25 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
+
+Route.group(() => {
+  // API alive check.
+  Route.get('/', async () => {
+    return {
+      status: "alive"
+    }
+  })
+
+  // -- Groups
+  Route.resource("groups", "GroupController")
+    .only(["index", "show", "store", "update", "destroy"])
+    
+}).prefix("/api/v1")
+
+// Default handler, matches anything and says there's nothing.
+Route.any("*", ({ response }) => {
+  response.status(404).json({
+    status: "route_not_found"
+  })
 })
+

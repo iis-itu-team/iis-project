@@ -11,7 +11,9 @@
     "resources": "resources",
     "start": "start",
     "tmp": "tmp",
-    "tests": "tests"
+    "tests": "tests",
+    "utils": "utils",
+    "types": "types"
   },
   "exceptionHandlerNamespace": "App/Exceptions/Handler",
   "preloads": [
@@ -46,7 +48,7 @@
     "middleware": "App/Middleware",
     "exceptions": "App/Exceptions",
     "validators": "App/Validators",
-    "httpControllers": "App/Controllers/Http",
+    "httpControllers": "App/Controllers",
     "eventListeners": "App/Listeners",
     "redisListeners": "App/Listeners"
   },
@@ -54,7 +56,9 @@
     "App": "app",
     "Config": "config",
     "Database": "database",
-    "Contracts": "contracts"
+    "Contracts": "contracts",
+    "utils": "utils",
+    "types": "types"
   },
   "metaFiles": [
     {
@@ -65,7 +69,8 @@
   "commands": [
     "./commands",
     "@adonisjs/core/build/commands",
-    "@adonisjs/repl/build/commands"
+    "@adonisjs/repl/build/commands",
+    "@adonisjs/lucid/build/commands"
   ],
   "commandsAliases": {},
   "tests": {
@@ -82,7 +87,8 @@
   "providers": [
     "./providers/AppProvider",
     "@adonisjs/core",
-    "@adonisjs/session"
+    "@adonisjs/session",
+    "@adonisjs/lucid"
   ],
   "aceProviders": [
     "@adonisjs/repl"

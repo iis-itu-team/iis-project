@@ -8,6 +8,7 @@
     "build"
   ],
   "compilerOptions": {
+    "baseUrl": "./",
     "outDir": "build",
     "rootDir": "./",
     "sourceMap": true,
@@ -23,13 +24,20 @@
       ],
       "Database/*": [
         "./database/*"
+      ],
+      "utils/*": [
+        "./utils/*"
+      ],
+      "types/*": [
+        "./types/*"
       ]
     },
     "types": [
       "@adonisjs/core",
       "@adonisjs/repl",
       "@japa/preset-adonis/build/adonis-typings",
-      "@adonisjs/session"
+      "@adonisjs/session",
+      "@adonisjs/lucid"
     ]
   }
 }
