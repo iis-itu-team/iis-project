@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# try to find .env, if not found, copy .env.template
+
+DOT_ENV=$(realpath ".env")
+TEMPLATE=$(realpath ".env.template")
+
+if [[ ! -e "$TEMPLATE" ]]; then
+	echo ".env.template not found at path $TEMPLATE, can't do anything..." >> /dev/stderr
+	exit 1
+fi
+
+if [[ ! -e "$DOT_ENV" ]]; then
+	echo ".env not found at path $DOT_ENV, creating from template..."
+	cp "$TEMPLATE" "$DOT_ENV"
+	exit 0
+fi
+
+# get env variables in .env.template
+
+TEMPLATE_VARIABLES=$(cat "$TEMPLATE")
+
+# try to find each variable in .env
+
+OLD_IFS=$IFS
+
+for VAR in $TEMPLATE_VARIABLES; do
+	IFS="="; set -- $VAR
+
+	if [[ -z $(grep "$1" "$DOT_ENV") ]]; then
+		echo "added $VAR"
+		echo "$VAR" >> "$DOT_ENV"
+	fi
+done
+
+IFS=$OLD_IFS
+
+echo "Done."
+
