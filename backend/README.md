@@ -9,30 +9,43 @@ The iisoc social site API. Provide groups, threads, messages and more via a Rest
 - Docker
 
 ## ⚙️ Setup
-*replace `bun` with your installed package manager*
+*aka what to do after I clone this repo*
 
-Start database through a docker container
-`docker compose up -d`
-(`-d` to detach, aka run in background)
+*\* replace `bun` with your installed package manager*
 
-Install dependencies
+Install dependencies \
 `bun install`
 
-Copy the default .env file & configure
-`cp .env.example .env`
+Create a new `.env` from template \
+`../ensure-env` (bash script, only unix based systems, otherwise copy `.env.template` to `.env`)
 
-Generate `APP_KEY` (required by adonis session)
+Generate `APP_KEY` (required by adonis session) \
 `node ace generate:key`
 
 (Set `APP_KEY` in `.env`)
 
-Run migrations
+## 🌊 Workflow
+*aka what to do before I start working on something*
+
+Pull latest changes \
+`git pull`
+
+Append any new env variables from `.env.template` to `.env` \
+`../ensure-env` (bash script, only unix based systems, otherwise add env vars by hand from `.env.template` to `.env`)
+
+Install any new packages that may have been added \
+`bun install`
+
+Start docker containers with required services (postgre, iisoc) \
+`docker compose up -d` (or `docker-compose up -d`)
+
+Run any new migrations that may have been added \
 `node ace migration:run`
 
-Run the project with hot reload
+Start the dev server with hot reload \
 `bun dev`
 
-## Development notes
+## 🗒️ Development notes
 
 - Project structure should follow the default of what adonis expects, ex.: `App/Controllers`, `App/Services`, etc.
 
