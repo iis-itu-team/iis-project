@@ -29,7 +29,7 @@ Start docker containers with PSQL database
 `docker compose up -d`
 
 Create database (same name as `PG_DB_NAME`)
-`psql -h 127.0.0.1 -U postgres -W`
+`psql -h 127.0.0.1 -U postgres -W` (pass: `postgres`)
 `create database "iisoc";`
 
 ## 🌊 Workflow
