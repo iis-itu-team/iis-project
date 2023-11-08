@@ -7,6 +7,7 @@ The iisoc social site API. Provide groups, threads, messages and more via a Rest
 - Node runtime | bun runtime
 - Package manager (one of): `npm`, `yarn`, `pnpm`, `bun`
 - Docker
+- psql client `psql`
 
 ## ⚙️ Setup
 *aka what to do after I clone this repo*
@@ -23,6 +24,13 @@ Generate `APP_KEY` (required by adonis session) \
 `node ace generate:key`
 
 (Set `APP_KEY` in `.env`)
+
+Start docker containers with PSQL database
+`docker compose up -d`
+
+Create database (same name as `PG_DB_NAME`)
+`psql -h 127.0.0.1 -U postgres -W`
+`create database "iisoc";`
 
 ## 🌊 Workflow
 *aka what to do before I start working on something*
