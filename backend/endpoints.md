@@ -23,6 +23,9 @@ A successful call to `GET /groups` with `Data` of [Group](#group) would then ret
 ### Visibility
 `private`, `protected`, `public`
 
+### Role
+`admin`, `user`
+
 ### Group
 
 | Property | Type | Note |
@@ -30,6 +33,16 @@ A successful call to `GET /groups` with `Data` of [Group](#group) would then ret
 | `id` | string | |
 | `title` | string | |
 | `visibility` | [Visibility](#visibility) | |
+| `created_at` | DateTime | |
+| `updated_at` | DateTime | |
+
+### User
+
+| Property | Type | Note |
+| -- | -- | -- |
+| `id` | string | |
+| `nickname` | string | |
+| `role` | [Role](#role) | |
 | `created_at` | DateTime | |
 | `updated_at` | DateTime | |
 
@@ -153,3 +166,89 @@ A successful call to `GET /groups` with `Data` of [Group](#group) would then ret
 | Value | Meaning |
 | -- | -- |
 | `not_found` | Group not found |
+
+### Users
+
+#### Get users
+
+`GET` `/users`
+
+> HTTP status codes
+
+| Code | Data | Meaning |
+| -- | -- | -- |
+| 200 | [User](#user)[] | Returned users |
+
+#### Get user
+
+`GET` `/users/:userId`
+
+> URL params
+
+| Parameter | Type | Meaning |
+| -- | -- | -- |
+| `:userId` | string | User id. |
+
+> HTTP status codes
+
+| Code | Data | Meaning |
+| -- | -- | -- |
+| 200 | [User](#user) | Returned the user |
+| 404 | - | User not found |
+
+> JSON `status`
+
+| Value | Meaning |
+| -- | -- |
+| `not_found` | User not found |
+
+#### Update a user
+
+`PUT` `/users/:userId`
+
+> URL params
+
+| Parameter | Type | Meaning |
+| -- | -- | -- |
+| `:userId` | string | User id. |
+
+> JSON Body
+
+| Property | Type | Note | 
+| -- | -- | -- |
+| `nickname` | string | |
+| `role` | [Role](#role) | |
+
+> HTTP status codes
+
+| Code | Data | Meaning |
+| -- | -- | -- |
+| 200 | [User](#user) | Updated the user |
+
+> JSON `status`
+
+| Value | Meaning |
+| -- | -- |
+| `not_found` | User not found |
+
+#### Delete a user
+
+`DELETE` `/users/:userId`
+
+> URL params
+
+| Parameter | Type | Meaning |
+| -- | -- | -- |
+| `:userId` | string | User id. |
+
+> HTTP status codes
+
+| Code | Data | Meaning |
+| -- | -- | -- |
+| 200 | [User](#user) | Deleted the user |
+
+> JSON `status`
+
+| Value | Meaning |
+| -- | -- |
+| `not_found` | User not found |
