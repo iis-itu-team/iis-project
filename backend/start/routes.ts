@@ -32,7 +32,11 @@ Route.group(() => {
   // -- Groups
   Route.resource("groups", "GroupController")
     .only(["index", "show", "store", "update", "destroy"])
-    
+
+  // -- Users
+  Route.resource("users", "UserController")
+    .only(["index", "show", "update", "destroy"])
+
 }).prefix("/api/v1")
 
 // Default handler, matches anything and says there's nothing.

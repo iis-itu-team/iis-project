@@ -62,6 +62,6 @@ export default class GroupService {
             throw HttpException.notFound('group', groupId)
         }
 
-        return await group.delete()
+        await group.delete()
     }
 }
