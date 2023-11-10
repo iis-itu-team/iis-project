@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, HasMany, beforeCreate, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import generateId from "utils/generate-id"
 import { Visibility } from "types/visibility"
+import Thread from './Thread'
 
 export default class Group extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -17,6 +18,9 @@ export default class Group extends BaseModel {
 
   // TODO: Add when users are implemented
   // public adminId: string
+
+  @hasMany(() => Thread)
+  public threads: HasMany<typeof Thread>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
