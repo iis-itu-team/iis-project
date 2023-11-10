@@ -1,4 +1,5 @@
 export interface ResponseFormat<T> {
     status: string;
-    data: T;
+    data?: T;
+    error?: any;
 }

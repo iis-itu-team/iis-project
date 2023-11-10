@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import logo from "$lib/assets/logo.svg";
+	import logo from '$lib/assets/logo.svg';
+	import Breadcrumbs from './Breadcrumbs.svelte';
 
 	$: pageId = $page.route.id;
 </script>
