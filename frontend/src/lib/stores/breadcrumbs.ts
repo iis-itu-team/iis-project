@@ -2,8 +2,8 @@ import { writable } from "svelte/store";
 
 export interface Breadcrumb {
     text: string;
-    href: string;
-    selected: boolean;
+    href?: string;
+    selected?: boolean;
 }
 
 export const breadcrumbs = writable<Breadcrumb[]>([]);

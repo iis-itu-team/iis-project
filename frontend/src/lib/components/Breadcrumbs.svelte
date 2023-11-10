@@ -6,7 +6,11 @@
 	<div class="flex flex-row text-xl gap-x-2 p-10">
 		...:
 		{#each $breadcrumbs as crumb, id}
-			<a href={crumb.href} class:font-semibold={crumb.selected}>{crumb.text}</a>
+			{#if crumb.href}
+				<a href={crumb.href} class:font-semibold={crumb.selected}>{crumb.text}</a>
+			{:else}
+				<span class:font-semibold={crumb.selected}>{crumb.text}</span>
+			{/if}
 			{#if id != $breadcrumbs.length - 1}
 				<span>/</span>
 			{/if}
