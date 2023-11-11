@@ -30,20 +30,35 @@ Route.group(() => {
   })
 
   // -- Groups
+
   Route.resource("groups", "GroupController")
     .only(["index", "show", "store", "update", "destroy"])
 
   // -- Threads
+
   // Don't need the group id for these endpoints
   Route.resource("threads", "ThreadController")
     .only(["index", "show", "update", "destroy"])
-    .paramFor("threads", "thread_id")
 
   // /groups/:group_id/threads
   Route.resource("groups.threads", "ThreadController")
     .only(["index", "store"])
 
+  // -- Messages
+
+  // /groups/:group_id/threads/:thread_id/messages
+  Route.resource("groups.threads.messages", "MessageController")
+    .only(["index", "store"])
+
+  // /groups/:group_id/messages
+  Route.get("/groups/:group_id/messages", "MessageController.index")
+
+  // /messages
+  Route.resource("messages", "MessageController")
+    .only(["index", "destroy"])
+
   // -- Users
+
   Route.resource("users", "UserController")
     .only(["index", "show", "update", "destroy"])
 

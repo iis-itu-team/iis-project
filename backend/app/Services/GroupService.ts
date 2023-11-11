@@ -1,5 +1,7 @@
 import HttpException from "App/Exceptions/HttpException"
 import Group from "App/Models/Group"
+import Message from "App/Models/Message"
+import Thread from "App/Models/Thread"
 import { PaginationInput } from "types/pagination"
 import { PaginationResult } from "types/response-format"
 import { Visibility } from "types/visibility"
@@ -63,5 +65,15 @@ export default class GroupService {
         }
 
         await group.delete()
+
+        // delete all messages in this group
+        await Message.query()
+            .where("group_id", groupId)
+            .delete()
+
+        // delete all threads in this group
+        await Thread.query()
+            .where("group_id", groupId)
+            .delete()
     }
 }

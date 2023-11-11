@@ -1,5 +1,6 @@
 import HttpException from "App/Exceptions/HttpException"
 import Group from "App/Models/Group"
+import Message from "App/Models/Message"
 import Thread from "App/Models/Thread"
 import User from "App/Models/User"
 import { PaginationInput } from "types/pagination"
@@ -93,5 +94,10 @@ export default class ThreadService {
         }
 
         await thread.delete()
+
+        // delete all messages in this thread
+        await Message.query()
+            .where("thread_id", id)
+            .delete()
     }
 }
