@@ -11,6 +11,19 @@ const updateUserSchema = schema.create({
 export default class UserController {
     private readonly userService = new UserService()
 
+    public async login({ request, auth, response }) {
+        const { email, password } = request.all()
+    
+        try {
+          await auth.attempt(email, password)
+          return response.send({ message: 'Login successful' })
+        } catch (error) {
+          return response.status(401).send({ message: 'Invalid credentials' })
+        }
+      }
+
+    // TODO: public async register({ request, auth, response })
+
     public async index({ response }: HttpContextContract) {
         const users = await this.userService.listUsers()
 
