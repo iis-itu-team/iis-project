@@ -8,9 +8,9 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.string('id')
 
-      table.string('nickname')
-      table.string('email')
-      table.string('password')
+      table.string('nickname').notNullable()
+      table.string('email').notNullable()
+      table.string('password').notNullable()
 
       table.enum('role', Object.values(Role))
 

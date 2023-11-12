@@ -1,10 +1,11 @@
 
 <script>
+    // TODO: check if emails and passwords match
+    
     let password = ''
     let nickname = ''
     let email = ''
-    let message = ''
-  
+
     const register = async () => {
         try {
             const response = await fetch('http://127.0.0.1:9000/api/v1/register', {
@@ -12,7 +13,7 @@
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nickname, password, email}),
+                body: JSON.stringify({ nickname, email, password}),
             })
             const data = await response.json()
             alert(data.message)
@@ -28,17 +29,7 @@
         <p>Choose a uniqe nickname:</p>
         <input type="text" class="text-input" placeholder="Enter your Username" name="nickname" required>
     </div>
-    
-    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
-        <p>Create a password:</p>
-        <input type="password" class="text-input" placeholder="Enter your Password" name="password" required>
-    </div>
-    
-    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
-        <p>Verify password:</p>
-        <input type="password" class="text-input" placeholder="Enter your Password again" name="password" required>
-    </div>    
-    
+
     <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
         <p>Write your email:</p>
         <input type="email" class="text-input" placeholder="Enter your Email" name="email" required>
@@ -48,6 +39,16 @@
         <p>Verify email:</p>
         <input type="email" class="text-input" placeholder="Enter your Email again" name="email" required>
     </div>
+    
+    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
+        <p>Create a password:</p>
+        <input type="password" class="text-input" placeholder="Enter your Password" name="password" required minlength="5" maxlength="20">
+    </div>
+    
+    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
+        <p>Verify password:</p>
+        <input type="password" class="text-input" placeholder="Enter your Password again" name="password" required minlength="5" maxlength="20">
+    </div>    
     
     <div class="bg-primary  hover:bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center justify-center">
         <button type="submit" class="text-2xl">

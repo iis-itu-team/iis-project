@@ -12,13 +12,16 @@ const updateUserSchema = schema.create({
 export default class UserController {
     private readonly userService = new UserService()
 
-
     public async register({ request, response }) {
         const { nickname, password, email } = request.all()
 
-        const user = await User.create({ nickname, password, email })
-    
-        return response.status(201).send({ message: 'User registered successfully', nickname, password, email })
+        try {
+            const user = await User.create({ nickname, email, password })
+            return response.send({ message: 'New account was created successfully' })
+        } catch (error) {
+            console.log(error)
+            return response.status(401).send({ message: 'User cannot be created' })
+        }
     }
 
     public async login({ request, auth, response }) {
