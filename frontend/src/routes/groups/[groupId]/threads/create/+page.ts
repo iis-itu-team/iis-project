@@ -3,11 +3,11 @@ import type { Group } from '$lib/types/group';
 import type { ResponseFormat } from '$lib/types/response.js';
 
 export async function load({ params }) {
-    const groupId = params.id;
+    const groupId = params.groupId;
 
-    const groups = await client.get<ResponseFormat<Group>>(`/groups/${groupId}`);
+    const group = await client.get<ResponseFormat<Group>>(`/groups/${groupId}`);
 
     return {
-        group: groups.data.data
+        group: group.data.data
     }
 }

@@ -4,7 +4,7 @@ import type { ResponseFormat } from '$lib/types/response.js';
 import type { Thread } from '$lib/types/thread';
 
 export async function load({ params }) {
-    const groupId = params.id;
+    const groupId = params.groupId;
 
     const groups = await client.get<ResponseFormat<Group>>(`/groups/${groupId}`);
 

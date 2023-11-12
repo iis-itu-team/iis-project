@@ -28,8 +28,8 @@
 	<div class="flex flex-col gap-y-4">
 		{#each threads as thread}
 			<div class="bg-background-light rounded-xl p-4">
-				<span class="text-lg font-semibold hover:underline hover:cursor-pointer"
-					>{thread.title}</span
+				<a href={`/groups/${group.id}/threads/${thread.id}`} class="text-lg font-semibold hover:underline hover:cursor-pointer"
+					>{thread.title}</a
 				>
 				<!-- TODO: Load x last messages, show? message count? -->
 			</div>
