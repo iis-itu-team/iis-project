@@ -1,3 +1,4 @@
+import { ExtractModelRelations } from "@ioc:Adonis/Lucid/Orm"
 import HttpException from "App/Exceptions/HttpException"
 import Group from "App/Models/Group"
 import Message from "App/Models/Message"
@@ -16,10 +17,12 @@ export type ListMessagesInput = {
     threadId: string
     groupId: string
     ownerId: string
+
+    expand: string[]
 } & PaginationInput
 
 export default class MessageService {
-    public async listMessages({ ownerId, groupId, threadId, page, perPage }: ListMessagesInput) {
+    public async listMessages({ ownerId, groupId, threadId, page, perPage, expand }: ListMessagesInput) {
         const q = Message.query()
 
         if (threadId) {
@@ -33,6 +36,9 @@ export default class MessageService {
         if (ownerId) {
             q.andWhere("owner_id", ownerId)
         }
+
+        // preload expand fields
+        expand.forEach((e) => q.preload(e as ExtractModelRelations<Message>));
 
         const messages = await q.paginate(page ?? 1, perPage ?? 10)
 

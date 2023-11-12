@@ -5,7 +5,9 @@ import { schema } from "@ioc:Adonis/Core/Validator"
 const listMessagesSchema = schema.create({
     threadId: schema.string.optional(),
     groupId: schema.string.optional(),
-    ownerId: schema.string.optional()
+    ownerId: schema.string.optional(),
+
+    expand: schema.string.optional()
 })
 
 const createMessageSchema = schema.create({
@@ -31,7 +33,8 @@ export default class MessageController {
         const messages = await this.messageService.listMessages({
             threadId,
             groupId,
-            ownerId
+            ownerId,
+            expand: validated.expand?.split(",") ?? []
         })
 
         response.list(messages)

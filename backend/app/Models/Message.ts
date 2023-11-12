@@ -28,7 +28,9 @@ export default class Message extends BaseModel {
     @column({ columnName: "owner_id" })
     public ownerId: string
 
-    @belongsTo(() => User)
+    @belongsTo(() => User, {
+        foreignKey: "ownerId"
+    })
     public owner: BelongsTo<typeof User>
 
     @beforeCreate()
