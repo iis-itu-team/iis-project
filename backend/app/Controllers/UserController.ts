@@ -2,6 +2,7 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import UserService from "App/Services/UserService"
 import { schema } from "@ioc:Adonis/Core/Validator"
 import { Role } from "types/role"
+import User from "App/Models/User"
 
 const updateUserSchema = schema.create({
     nickname: schema.string.optional(),
@@ -11,18 +12,25 @@ const updateUserSchema = schema.create({
 export default class UserController {
     private readonly userService = new UserService()
 
+
+    public async register({ request, response }) {
+        const { nickname, password, email } = request.all()
+
+        const user = await User.create({ nickname, password, email })
+    
+        return response.status(201).send({ message: 'User registered successfully', nickname, password, email })
+    }
+
     public async login({ request, auth, response }) {
-        const { email, password } = request.all()
+        const { nickname, password } = request.all()
     
         try {
-          await auth.attempt(email, password)
-          return response.send({ message: 'Login successful' })
+            await auth.attempt(nickname, password)
+            return response.send({ message: 'Login successful' })
         } catch (error) {
-          return response.status(401).send({ message: 'Invalid credentials' })
+            return response.status(401).send({ message: 'Invalid credentials' })
         }
-      }
-
-    // TODO: public async register({ request, auth, response })
+    }
 
     public async index({ response }: HttpContextContract) {
         const users = await this.userService.listUsers()

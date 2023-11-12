@@ -63,6 +63,12 @@ Route.group(() => {
   Route.resource("users", "UserController")
     .only(["index", "show", "update", "destroy"])
 
+  // -- Login
+  Route.post('login', 'UserController.login')
+
+  // -- Register
+  Route.post('register', 'UserController.register')
+
 }).prefix("/api/v1")
 
 // Default handler, matches anything and says there's nothing.

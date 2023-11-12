@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('id')
 
       table.string('nickname')
+      table.string('email')
       table.string('password')
 
       table.enum('role', Object.values(Role))

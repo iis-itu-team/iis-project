@@ -1,41 +1,36 @@
 
 <script>
-    let username = ''
+    let nickname = ''
     let password = ''
     let message = ''
   
     const login = async () => {
-      const response = await fetch('http://localhost:9000/api/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      })
-  
-      const data = await response.json()
-  
-      if (response.ok) {
-        message = data.message
-      } else {
-        message = 'Invalid credentials'
-      }
-
-      alert(message);
-      alert("Response is back!");
+        try {
+            const response = await fetch('http://127.0.0.1:9000/api/v1/register', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nickname, password }),
+            })
+            const data = await response.json()
+            alert(data.message)
+        } catch (error) {
+            console.error('An error occurred:', error)
+            alert('An error occurred. Please check the console for details.')
+        }
     }
-
-  </script>
+</script>
 
 <form on:submit={login}>
     <label class="bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center">
-        Enter your Username:
-        <input type="text" bind:value={username} required/>
+        Enter your Nickname:
+        <input type="text" class="text-input" bind:value={nickname} required/>
     </label>
   
     <label class="bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center">
         Password:
-        <input type="password" bind:value={password} required/>
+        <input type="password" class="text-input" bind:value={password} required/>
     </label>
 
     <div class="mx-auto  max-w-sm">
