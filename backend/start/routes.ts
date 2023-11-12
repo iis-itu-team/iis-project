@@ -39,6 +39,7 @@ Route.group(() => {
   // Don't need the group id for these endpoints
   Route.resource("threads", "ThreadController")
     .only(["index", "show", "update", "destroy"])
+    .paramFor("threads", "thread_id")
 
   // /groups/:group_id/threads
   Route.resource("groups.threads", "ThreadController")
