@@ -22,32 +22,24 @@
 </script>
 
 <form on:submit={login}>
-	<label
-		class="bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center"
-	>
-		Enter your Nickname:
+    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
+        <p>Enter your Nickname:</p>
 		<input type="text" class="text-input" bind:value={nickname} required />
-	</label>
+	</div>
 
-	<label
-		class="bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center"
-	>
-		Password:
+    <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm">
+        <p>Password:</p>
 		<input type="password" class="text-input" bind:value={password} required />
-	</label>
+	</div>
 
 	<div class="mx-auto max-w-sm">
 		<p><a href="/password_reset">Forgot your password?</a></p>
 	</div>
 
-	<button
-		type="submit"
-		class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center"
-	>
+	<button type="submit" class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto mx-10 my-10 max-w-sm flex items-center">
 		<p>
 			<b>Log in</b>
 		</p>
-		<p />
 	</button>
 
 	<div class="mx-auto mx-10 my-10 max-w-sm">
