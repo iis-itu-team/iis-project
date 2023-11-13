@@ -1,14 +1,13 @@
-// import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from "App/Models/User"
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class AuthController {
 
-    register({ request, response }: HttpContextContract) {
+    public async register({ request, response }: HttpContextContract) {
         const { nickname, password, email } = request.all()
 
         try {
-            const user = User.create({ nickname, email, password })
+            const user = await User.create({ nickname, email, password })
             console.log(user)
             return response.send({ message: 'New account was created successfully' })
         } catch (error) {
