@@ -41,7 +41,8 @@
       "environment": [
         "web"
       ]
-    }
+    },
+    "./start/bouncer"
   ],
   "namespaces": {
     "models": "App/Models",
@@ -70,7 +71,8 @@
     "./commands",
     "@adonisjs/core/build/commands",
     "@adonisjs/repl/build/commands",
-    "@adonisjs/lucid/build/commands"
+    "@adonisjs/lucid/build/commands",
+    "@adonisjs/bouncer/build/commands"
   ],
   "commandsAliases": {},
   "tests": {
@@ -88,7 +90,9 @@
     "./providers/AppProvider",
     "@adonisjs/core",
     "@adonisjs/session",
-    "@adonisjs/lucid"
+    "@adonisjs/lucid",
+    "@adonisjs/bouncer",
+    "@adonisjs/auth"
   ],
   "aceProviders": [
     "@adonisjs/repl"

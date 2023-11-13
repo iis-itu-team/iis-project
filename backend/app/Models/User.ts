@@ -9,7 +9,7 @@ export default class User extends BaseModel {
     @column({ isPrimary: true })
     public id: string
 
-    @column()
+    @column({ isUniqe: true })
     public nickname: string
 
     @column()
