@@ -1,17 +1,16 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-
+import { Role } from 'types/role'
 export default class extends BaseSchema {
-  protected tableName = 'threads'
-
-  public async up () {
+  protected tableName = 'users'
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.string('id').primary()
+      table.string('id')
 
-      table.string('title').notNullable()
+      table.string('nickname')
+      table.string('email')
+      table.string('password')
 
-      table.string('owner_id').notNullable()
-      table.string('group_id').notNullable()
-
+      table.enum('role', Object.values(Role))
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
@@ -19,8 +18,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true })
     })
   }
-
-  public async down () {
+  public async down() {
     this.schema.dropTable(this.tableName)
   }
 }

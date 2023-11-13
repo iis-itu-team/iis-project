@@ -41,15 +41,15 @@ const authConfig: AuthConfig = {
         | Name of the driver
         |
         */
-        driver: 'lucid',
+        driver: 'database',
 
         /*
         |--------------------------------------------------------------------------
         | Identifier key
         |--------------------------------------------------------------------------
         |
-        | The identifier key is the unique key on the model. In most cases specifying
-        | the primary key is the right choice.
+        | The identifier key is the unique key inside the defined database table.
+        | In most cases specifying the primary key is the right choice.
         |
         */
         identifierKey: 'id',
@@ -68,16 +68,14 @@ const authConfig: AuthConfig = {
 
         /*
         |--------------------------------------------------------------------------
-        | Model
+        | Database table
         |--------------------------------------------------------------------------
         |
-        | The model to use for fetching or finding users. The model is imported
-        | lazily since the config files are read way earlier in the lifecycle
-        | of booting the app and the models may not be in a usable state at
-        | that time.
+        | The database table to query. Make sure the database table has a `password`
+        | field and `remember_me_token` column.
         |
         */
-        model: () => import('App/Models/User'),
+        usersTable: 'User',
       },
     },
   },
