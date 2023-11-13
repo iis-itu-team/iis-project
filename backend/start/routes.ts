@@ -64,10 +64,10 @@ Route.group(() => {
     .only(["index", "show", "update", "destroy"])
 
   // -- Login
-   Route.post("login", "AuthController.login")
+   Route.post("/auth/login", "AuthController.login")
 
   // -- Register
-  Route.post("register", "AuthController.register")
+  Route.post("/auth/register", "AuthController.register")
  
 }).prefix("/api/v1")
 
