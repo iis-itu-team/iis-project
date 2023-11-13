@@ -38,6 +38,7 @@
 			})
 			.then(() => {
 				invalidateAll();
+				content = undefined;
 			});
 	};
 </script>
