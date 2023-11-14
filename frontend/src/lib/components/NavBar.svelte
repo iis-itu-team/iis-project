@@ -3,6 +3,7 @@
 	import logo from '$lib/assets/logo.svg';
 	import { currentUser } from '$lib/stores/auth';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
+	import { ToastContainer, FlatToast } from 'svelte-toasts';
 
 	$: pageId = $page.route.id;
 
@@ -18,14 +19,24 @@
 		</div>
 		{#if $currentUser}
 			<a
-				class="self-center hover:underline hover:cursor-pointer {pageId === '/account' ? 'font-semibold underline' : ''}"
+				class="self-center hover:underline hover:cursor-pointer {pageId === '/account'
+					? 'font-semibold underline'
+					: ''}"
 				href="/account">{$currentUser.nickname}</a
 			>
 		{:else}
 			<div class="self-center">
-				<a class="hover:underline hover:cursor-pointer {pageId === '/login' ? 'font-semibold underline' : ''}" href="/login">login</a>
-				<a class="hover:underline hover:cursor-pointer {pageId === '/register' ? 'font-semibold underline' : ''}" href="/register"
-					>register</a
+				<a
+					class="hover:underline hover:cursor-pointer {pageId === '/login'
+						? 'font-semibold underline'
+						: ''}"
+					href="/login">login</a
+				>
+				<a
+					class="hover:underline hover:cursor-pointer {pageId === '/register'
+						? 'font-semibold underline'
+						: ''}"
+					href="/register">register</a
 				>
 			</div>
 		{/if}

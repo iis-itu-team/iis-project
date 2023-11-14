@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { client } from '$lib/http/http';
+	import { currentUser, ensureCurrentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
 	import type { Group, Message, Thread } from '$lib/types';
+	import { toasts } from 'svelte-toasts';
 
 	export let data: { group: Group; thread: Thread; messages: Message[] };
 
@@ -26,15 +28,13 @@
 
 	const handleSend = () => {
 		if (content == undefined) {
-			// highlight input
-			alert('You have to type something...');
+			return;
 		}
 
 		client
 			.post(`/groups/${data.group.id}/threads/${data.thread.id}/messages`, {
 				content,
-				/* TODO: Currently logged in user */
-				ownerId: 'user_01HF7HY18FBSBP2GT0GN5Q7EYQ'
+				ownerId: $currentUser?.id
 			})
 			.then(() => {
 				invalidateAll();
@@ -54,7 +54,10 @@
 		{:else}
 			{#each data.messages as message}
 				<div class="flex flex-col">
-					<span class="text-lg font-semibold">{message.owner.nickname}</span>
+					<div class="flex flex-row items-center gap-x-2">
+						<span class="text-lg font-semibold">{message.owner.nickname}</span>
+						<span>&lt;{message.owner.email}&gt;</span>
+					</div>
 					<p class="text-md">
 						{message.content}
 					</p>
@@ -62,13 +65,20 @@
 			{/each}
 		{/if}
 	</div>
-	<div class="flex flex-row gap-x-4 w-full">
-		<input
-			bind:value={content}
-			class="bg-background-light rounded-md p-2 w-full"
-			type="text"
-			placeholder="type something interesting..."
-		/>
-		<button on:keydown={(event) => event.key == "Enter" ? handleSend() : null} on:submit={handleSend} class="hover:underline hover:cursor-pointer">send</button>
-	</div>
+	{#if $currentUser}
+		<div class="flex flex-row gap-x-4 w-full">
+			<input
+				bind:value={content}
+				on:keydown={(event) => (event.key == 'Enter' ? handleSend() : null)}
+				class="bg-background-light rounded-md p-2 w-full"
+				type="text"
+				placeholder="type something interesting..."
+			/>
+			<button on:click={handleSend} disabled={!content} class="{content && 'hover:underline hover:cursor-pointer'} {!content && 'text-stone-400'}">send</button>
+		</div>
+	{:else}
+		<div class="w-full">
+			<span class="italic">Only registered users can send messages.</span>
+		</div>
+	{/if}
 </div>

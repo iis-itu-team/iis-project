@@ -24,6 +24,16 @@ export const register = async (input: RegisterInput) => {
     return res.data;
 }
 
+// send an /auth/me request to see if we're logged in, if yes, set the current user
+export const attemptLoad = async () => {
+    const res = await client.post<ResponseFormat<User>>(`/auth/me`);
+
+    if (res.status === 200 && res.data.status === 'success') {
+        currentUser.set(res.data.data!);
+        console.log("Loaded in through cookie as " + get(currentUser)?.email);
+    }
+}
+
 // if not logged in, redirect to login
 export const ensureCurrentUser = () => {
     const user = get(currentUser);
