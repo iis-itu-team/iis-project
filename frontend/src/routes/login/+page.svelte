@@ -21,12 +21,12 @@
 
 <form on:submit={login}>
     <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-5 max-w-sm">
-        <p>Enter your Nickname:</p>
+        <p><b>Enter your Nickname:</b></p>
 		<input type="text" class="text-input w-full" bind:value={nickname} required />
 	</div>
 
     <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-5 max-w-sm">
-        <p>Password:</p>
+        <p><b>Password:</b></p>
 		<input type="password" class="text-input w-full" bind:value={password} required />
 	</div>
 
@@ -43,7 +43,7 @@
 			<input type="checkbox" checked="unchecked" name="remember" />Remember me
 		</label>
 		<p>
-			<a href="/register">Not registered yet? Create your acount here!</a>
+			Not registered yet? Create your acount <a href="/register"><b>here!</b></a>
 		</p>
 	</div>
 </form>
