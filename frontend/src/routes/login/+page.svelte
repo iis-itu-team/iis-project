@@ -1,28 +1,30 @@
 <script>
-	let nickname = '';
+	import { currentUser, login } from "$lib/stores/auth";
+
+	let email = '';
 	let password = '';
 	let message = '';
 
-	const login = async () => {
-		try {
-			const response = await fetch('http://127.0.0.1:9000/api/v1/auth/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ nickname, password })
-			});
-		} catch (error) {
-			console.error('An error occurred:', error);
-			alert('An error occurred. Please check the console for details.');
+	const handleLogin = async () => {
+		const res = await login({
+			email,
+			password
+		})
+
+		if (res.status !== 'success') {
+			// TODO: show error toast
+			alert("Something went wrong.")
+			return
 		}
+
+		alert(`Logged in as ${$currentUser?.nickname}`)
 	};
 </script>
 
-<form on:submit={login}>
+<form on:submit={handleLogin}>
     <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-5 max-w-sm">
-        <p><b>Enter your Nickname:</b></p>
-		<input type="text" class="text-input w-full" bind:value={nickname} required />
+        <p><b>Enter your email:</b></p>
+		<input type="text" class="text-input w-full" bind:value={email} required />
 	</div>
 
     <div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-5 max-w-sm">

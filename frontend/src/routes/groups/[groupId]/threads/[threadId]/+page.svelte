@@ -34,7 +34,7 @@
 			.post(`/groups/${data.group.id}/threads/${data.thread.id}/messages`, {
 				content,
 				/* TODO: Currently logged in user */
-				ownerId: 'user_random'
+				ownerId: 'user_01HF7HY18FBSBP2GT0GN5Q7EYQ'
 			})
 			.then(() => {
 				invalidateAll();
@@ -69,6 +69,6 @@
 			type="text"
 			placeholder="type something interesting..."
 		/>
-		<button on:click={handleSend} class="hover:underline hover:cursor-pointer">send</button>
+		<button on:keydown={(event) => event.key == "Enter" ? handleSend() : null} on:submit={handleSend} class="hover:underline hover:cursor-pointer">send</button>
 	</div>
 </div>

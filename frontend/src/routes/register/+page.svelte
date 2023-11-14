@@ -1,27 +1,33 @@
 <script>
+	import { goto } from "$app/navigation";
+	import { register } from "$lib/stores/auth";
+
 	// TODO: check if emails and passwords match
 
 	let password = '';
 	let nickname = '';
 	let email = '';
 
-	const register = async () => {
-		try {
-			const response = await fetch('http://127.0.0.1:9000/api/v1/auth/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ nickname, email, password })
-			});
-		} catch (error) {
-			console.error('An error occurred:', error);
-			alert('An error occurred. Please check the console for details.');
+	const handleRegister = async () => {
+		const res = await register({
+			nickname,
+			email,
+			password
+		});
+
+		if (res.status != 'success') {
+			// TODO: display error toast
+			alert('Something went wrong.');
+			return;
 		}
+
+		alert("Successfully registered");
+
+		goto('/login');
 	};
 </script>
 
-<form on:submit={register}>
+<form on:submit={handleRegister}>
 	<div class="bg-secondary rounded-xl p-6 mx-auto mx-10 my-5 max-w-sm">
 		<p><b>Choose a uniqe nickname:<b></p>
 		<input type="text" class="text-input w-full" placeholder="Enter your Username" name="nickname" required/>

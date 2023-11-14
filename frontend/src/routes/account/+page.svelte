@@ -1,7 +1,10 @@
+<script lang="ts">
+	import { currentUser } from "$lib/stores/auth";
+
+</script>
+
 <div class="text-center">
 	<p>Your fancy account!</p>
-	
-	<p><a href="/login">Login</a></p>
-	<p><a href="/register">Register</a></p>
-
+	<p>{$currentUser?.email}</p>
+	<p>{$currentUser?.nickname}</p>
 </div>
