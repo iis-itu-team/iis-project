@@ -3,19 +3,26 @@
 	import logo from '$lib/assets/logo.svg';
 	import { currentUser } from '$lib/stores/auth';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
-	import { ToastContainer, FlatToast } from 'svelte-toasts';
 
 	$: pageId = $page.route.id;
 
 	showCrumbs(false);
+
+	const items = [
+		{
+			text: 'home',
+			href: '/'
+		}
+	];
 </script>
 
 <nav class="flex flex-row h-20 gap-x-10 border-b-2 border-text">
 	<img src={logo} alt="logo" />
 	<div class="w-full flex flex-row justify-between pr-10">
 		<div class="flex flex-row items-center gap-x-10">
-			<a class={pageId === '/' ? 'font-semibold underline' : ''} href="/">home</a>
-			<a class={pageId === '/explore' ? 'font-semibold underline' : ''} href="/explore">explore</a>
+			{#each items as item}
+				<a class={pageId === item.href ? 'font-semibold underline' : ''} href={item.href}>{item.text}</a>
+			{/each}
 		</div>
 		{#if $currentUser}
 			<a
