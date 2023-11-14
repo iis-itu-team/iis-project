@@ -1,7 +1,8 @@
-import { BaseModel, HasMany, beforeCreate, column, hasMany } from "@ioc:Adonis/Lucid/Orm"
+import { BaseModel, HasMany, beforeCreate, beforeSave, column, hasMany } from "@ioc:Adonis/Lucid/Orm"
 import { Role } from "types/role";
 import generateId from "utils/generate-id";
 import Group from "./Group";
+import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class User extends BaseModel {
     public static selfAssignPrimaryKey = true
@@ -27,5 +28,12 @@ export default class User extends BaseModel {
     @beforeCreate()
     public static beforeCreate(user: User) {
         user.id = generateId(user.id, "user");
+    }
+
+    @beforeSave()
+    public static async hashPassword(user: User) {
+        if (user.$dirty.password) {
+            user.password = await Hash.make(user.password)
+        }
     }
 }

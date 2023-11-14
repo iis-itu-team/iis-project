@@ -6,24 +6,28 @@ export default class AuthController {
     public async register({ request, response }: HttpContextContract) {
         const { nickname, password, email } = request.all()
 
-        try {
-            const user = await User.create({ nickname, email, password })
-            console.log(user)
-            return response.send({ message: 'New account was created successfully' })
-        } catch (error) {
-            console.log(error)
-            return response.status(401).send({ message: 'User cannot be created' })
-        }
+        // TODO: check if the email is already taken
+        // TODO: Move that logic in to a service (App\Services)
+
+        const user = await User.create({ nickname, email, password })
+
+        response.status(201).success(user)
     }
 
-    public async login({ request, auth, response }) {
-        const { nickname, password } = request.all()
-    
+    public async login({ request, auth, response }: HttpContextContract) {
+        const { email, password } = request.all()
+
+        // TODO: Check whether the user with this email exists
+
         try {
-            await auth.attempt(nickname, password)
-            return response.send({ message: 'Login successful' })
+            const user = await auth.attempt(email, password)
+
+            response.status(200).formatted({
+                status: 'success',
+                data: user
+            })
         } catch (error) {
-            return response.status(401).send({ message: 'Invalid credentials' })
+            response.status(401).formatted({ status: 'invalid_credentials' })
         }
     }
 }
