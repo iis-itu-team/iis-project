@@ -21,8 +21,6 @@ export default class AuthController {
     public async login({ request, response, auth }: HttpContextContract) {
         const { uid, password } = request.all()
 
-        // TODO: Check whether the user with this email exists
-
         try {
             const user = await auth.attempt(uid, password)
 
@@ -33,5 +31,15 @@ export default class AuthController {
         } catch (error) {
             response.status(401).formatted({ status: 'invalid_credentials' })
         }
+    }
+
+    public async me({ request, response }: HttpContextContract) {
+        const {nickname} = request.all()
+
+        const user = await User.findBy("nickname", nickname)
+        response.status(200).formatted({
+            status: 'success',
+            data: user
+        })
     }
 }

@@ -69,6 +69,9 @@ Route.group(() => {
   // -- Register
   Route.post("/auth/register", "AuthController.register")
  
+  // -- Me
+  Route.post("/auth/me", "AuthController.me")
+
 }).prefix("/api/v1")
 
 // Default handler, matches anything and says there's nothing.
