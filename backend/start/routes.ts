@@ -64,7 +64,7 @@ Route.group(() => {
     .only(["index", "show", "update", "destroy"])
 
   // -- Login
-   Route.post("/auth/login", "AuthController.login")
+  Route.post("/auth/login", "AuthController.login")
 
   // -- Register
   Route.post("/auth/register", "AuthController.register")

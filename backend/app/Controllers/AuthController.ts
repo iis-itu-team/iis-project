@@ -5,9 +5,10 @@ export default class AuthController {
 
     public async register({ request, response, auth }: HttpContextContract) {
         const { nickname, password, email } = request.all()
-
-        // TODO: check if the email is already taken
-        // TODO: Move that logic in to a service (App\Services)
+        
+        if ((await User.findBy("email", email) != null) && (await (User.findBy("nickname", nickname)) != null)) {
+            return response.status(401).formatted({ status: 'nickname_or_email is already taken' })
+        }
 
         try {
             const user = await User.create({ nickname, email, password })

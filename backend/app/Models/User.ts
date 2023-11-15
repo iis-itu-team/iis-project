@@ -27,7 +27,7 @@ export default class User extends BaseModel {
 
     @beforeCreate()
     public static beforeCreate(user: User) {
-        user.id = generateId(user.id, "user");
+        user.id = generateId(user.id, "user")
     }
 
     @beforeSave()
