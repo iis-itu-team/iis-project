@@ -1,9 +1,11 @@
+import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { client } from "$lib/http/http";
 import type { LoginInput, RegisterInput, ResponseFormat, User } from "$lib/types";
+import { redirect } from "@sveltejs/kit";
 import { get, writable } from "svelte/store";
 
-export let currentUser = writable<User|null>(null);
+export let currentUser = writable<User | null>(null);
 
 export const login = async (input: LoginInput) => {
     const res = await client.post<ResponseFormat<User>>(`/auth/login`, input);
@@ -26,20 +28,31 @@ export const register = async (input: RegisterInput) => {
 
 // send an /auth/me request to see if we're logged in, if yes, set the current user
 export const attemptLoad = async () => {
-    const res = await client.post<ResponseFormat<User>>(`/auth/me`);
+    const res = await client.get<ResponseFormat<User>>(`/auth/me`);
 
     if (res.status === 200 && res.data.status === 'success') {
         currentUser.set(res.data.data!);
         console.log("Loaded in through cookie as " + get(currentUser)?.email);
+
+        return res.data.data!;
     }
+
+    return undefined;
 }
 
 // if not logged in, redirect to login
-export const ensureCurrentUser = () => {
+export const ensureCurrentUser = async () => {
     const user = get(currentUser);
 
     if (user == null) {
-        goto('/login');
+        // attempt to load from cookie and /auth/me req
+        const loadedUser = await attemptLoad();
+
+        if (loadedUser) {
+            return loadedUser;
+        }
+
+        if (browser) { goto('/login'); }
     }
 
     return user;

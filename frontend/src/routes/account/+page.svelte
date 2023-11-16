@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { currentUser } from "$lib/stores/auth";
+	import { currentUser, ensureCurrentUser } from "$lib/stores/auth";
+	import { showCrumbs } from "$lib/stores/breadcrumbs";
 
+	showCrumbs(false);
+
+	ensureCurrentUser();
 </script>
 
 <div class="text-center">
