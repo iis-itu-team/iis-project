@@ -6,7 +6,7 @@ export interface User {
 }
 
 export type LoginInput = {
-    email: string
+    uid: string
     password: string
 }
 
