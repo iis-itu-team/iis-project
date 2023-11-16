@@ -28,6 +28,12 @@ export const register = async (input: RegisterInput) => {
 
 // send an /auth/me request to see if we're logged in, if yes, set the current user
 export const attemptLoad = async () => {
+
+    // only attempt to load if no user is loaded
+    if (get(currentUser)) {
+        return;
+    }
+
     const res = await client.get<ResponseFormat<User>>(`/auth/me`);
 
     if (res.status === 200 && res.data.status === 'success') {
