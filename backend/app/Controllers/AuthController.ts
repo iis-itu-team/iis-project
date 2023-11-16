@@ -34,13 +34,15 @@ export default class AuthController {
         }
     }
 
-    public async me({ request, response }: HttpContextContract) {
-        const { nickname } = request.all()
+    public async me({ auth, response }: HttpContextContract) {
 
-        const user = await User.findBy("nickname", nickname)
-        response.status(200).formatted({
-            status: 'success',
-            data: user
-        })
+        if (auth.isLoggedIn == false) {
+            response.status(401).formatted({
+                status: "unauthenticated"
+            });
+            return;
+        }
+
+        response.status(200).success(auth.user);
     }
 }

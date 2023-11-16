@@ -68,9 +68,9 @@ Route.group(() => {
 
   // -- Register
   Route.post("/auth/register", "AuthController.register")
- 
+
   // -- Me
-  Route.post("/auth/me", "AuthController.me")
+  Route.get("/auth/me", "AuthController.me")
 
 }).prefix("/api/v1")
 
