@@ -3,6 +3,10 @@
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { ToastContainer, FlatToast } from 'svelte-toasts';
 	import '../app.css';
+	import { attemptLoad } from '$lib/stores/auth';
+
+	// load the user
+	attemptLoad();
 </script>
 
 <div class="flex flex-col text-text">

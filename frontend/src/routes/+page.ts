@@ -1,4 +1,5 @@
 import { client } from "$lib/http/http";
+import { attemptLoad } from "$lib/stores/auth";
 import type { Group } from "$lib/types/group";
 import type { ResponseFormat } from "$lib/types/response";
 
