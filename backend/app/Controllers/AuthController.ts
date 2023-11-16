@@ -5,9 +5,9 @@ export default class AuthController {
 
     public async register({ request, response, auth }: HttpContextContract) {
         const { nickname, password, email } = request.all()
-        
-        if ((await User.findBy("email", email) != null) && (await (User.findBy("nickname", nickname)) != null)) {
-            return response.status(401).formatted({ status: 'nickname_or_email is already taken' })
+
+        if ((await User.findBy("email", email) != null) || (await (User.findBy("nickname", nickname)) != null)) {
+            return response.status(401).formatted({ status: 'nickname_or_email_taken' })
         }
 
         try {
@@ -35,7 +35,7 @@ export default class AuthController {
     }
 
     public async me({ request, response }: HttpContextContract) {
-        const {nickname} = request.all()
+        const { nickname } = request.all()
 
         const user = await User.findBy("nickname", nickname)
         response.status(200).formatted({
