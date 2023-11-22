@@ -2,10 +2,9 @@ import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { client } from "$lib/http/http";
 import type { LoginInput, RegisterInput, ResponseFormat, User } from "$lib/types";
-import { redirect } from "@sveltejs/kit";
 import { get, writable } from "svelte/store";
 
-export let currentUser = writable<User | null>(null);
+export let currentUser = writable<User | undefined | null>(null);
 
 export const login = async (input: LoginInput) => {
     const res = await client.post<ResponseFormat<User>>(`/auth/login`, input);

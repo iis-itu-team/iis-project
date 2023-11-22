@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { client } from '$lib/http/http';
-	import { currentUser, ensureCurrentUser } from '$lib/stores/auth';
+	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
 	import type { Group } from '$lib/types';
 	import { get } from 'svelte/store';

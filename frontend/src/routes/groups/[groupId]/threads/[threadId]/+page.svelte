@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { client } from '$lib/http/http';
-	import { currentUser, ensureCurrentUser } from '$lib/stores/auth';
+	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
 	import type { Group, Message, Thread } from '$lib/types';
-	import { toasts } from 'svelte-toasts';
 
 	export let data: { group: Group; thread: Thread; messages: Message[] };
 
@@ -74,7 +73,12 @@
 				type="text"
 				placeholder="type something interesting..."
 			/>
-			<button on:click={handleSend} disabled={!content} class="{content && 'hover:underline hover:cursor-pointer'} {!content && 'text-stone-400'}">send</button>
+			<button
+				on:click={handleSend}
+				disabled={!content}
+				class="{content && 'hover:underline hover:cursor-pointer'} {!content && 'text-stone-400'}"
+				>send</button
+			>
 		</div>
 	{:else}
 		<div class="w-full">
