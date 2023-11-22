@@ -5,6 +5,7 @@ import Message from "App/Models/Message"
 import Thread from "App/Models/Thread"
 import User from "App/Models/User"
 import { PaginationInput } from "types/pagination"
+import { ExpandInput } from "types/preload"
 
 export type CreateMessageInput = {
     threadId: string
@@ -17,9 +18,7 @@ export type ListMessagesInput = {
     threadId: string
     groupId: string
     ownerId: string
-
-    expand: string[]
-} & PaginationInput
+} & PaginationInput & ExpandInput
 
 export default class MessageService {
     public async listMessages({ ownerId, groupId, threadId, page, perPage, expand }: ListMessagesInput) {

@@ -1,10 +1,18 @@
+import { ExtractModelRelations } from "@ioc:Adonis/Lucid/Orm"
 import HttpException from "App/Exceptions/HttpException"
 import Group from "App/Models/Group"
 import Message from "App/Models/Message"
 import Thread from "App/Models/Thread"
 import { PaginationInput } from "types/pagination"
+import { ExpandInput } from "types/preload"
 import { PaginationResult } from "types/response-format"
 import { Visibility } from "types/visibility"
+
+export type ListGroupsInput = PaginationInput & {
+    userId?: string
+} & ExpandInput
+
+export type GetGroupInput = {} & ExpandInput
 
 export type GroupCreateInput = {
     title: string
@@ -17,11 +25,17 @@ export type GroupUpdateInput = {
 }
 
 export default class GroupService {
-    public async list({ page, perPage }: PaginationInput = {
-        page: 1,
-        perPage: 10
-    }): Promise<PaginationResult<Group>> {
-        const res = await Group.query().paginate(page ?? 1, perPage ?? 10)
+    public async list({ page, perPage, userId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
+        const q = Group.query()
+
+        // only groups, where the user is a member
+        if (userId) {
+            q.join("group_members", "id", "group_id");
+        }
+
+        expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
+
+        const res = await q.paginate(page ?? 1, perPage ?? 10)
 
         return {
             data: res.all(),
@@ -34,8 +48,13 @@ export default class GroupService {
         }
     }
 
-    public async get(groupId: string): Promise<Group | null> {
-        return await Group.find(groupId);
+    public async get(groupId: string, { expand }: GetGroupInput): Promise<Group | null> {
+        const q = Group.query()
+            .where("id", groupId)
+
+        expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
+
+        return await q.first();
     }
 
     public async create(input: GroupCreateInput): Promise<Group> {

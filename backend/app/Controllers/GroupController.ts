@@ -9,7 +9,13 @@ const listGroupSchema = schema.create({
     ]),
     page: schema.number.optional([
         rules.unsigned()
-    ])
+    ]),
+    userId: schema.string.optional(),
+    expand: schema.string.optional()
+})
+
+const getGroupSchema = schema.create({
+    expand: schema.string.optional()
 })
 
 const createGroupSchema = schema.create({
@@ -30,7 +36,10 @@ export default class {
             schema: listGroupSchema
         })
 
-        const groups = await this.groupService.list(validated)
+        const groups = await this.groupService.list({
+            ...validated,
+            expand: validated.expand?.split(",") ?? []
+        })
 
         response.list(groups)
     }
@@ -38,7 +47,14 @@ export default class {
     public async show({ request, response }: HttpContextContract) {
         const groupId = request.param('id')
 
-        const group = await this.groupService.get(groupId)
+        const validated = await request.validate({
+            schema: getGroupSchema
+        })
+
+        const group = await this.groupService.get(groupId, {
+            ...validated,
+            expand: validated.expand?.split(",") ?? []
+        })
 
         if (!group) {
             response.status(404).fail("group_not_found");
