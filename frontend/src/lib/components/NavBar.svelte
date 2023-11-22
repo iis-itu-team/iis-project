@@ -8,12 +8,22 @@
 
 	showCrumbs(false);
 
-	const items = [
+	let items = [
 		{
 			text: 'home',
 			href: '/'
 		}
 	];
+
+	$: items = $currentUser
+		? [
+				...items,
+				{
+					text: 'my groups',
+					href: '/groups'
+				}
+		  ]
+		: items;
 </script>
 
 <nav class="flex flex-row h-20 gap-x-10 border-b-2 border-text">
@@ -21,16 +31,26 @@
 	<div class="w-full flex flex-row justify-between pr-10">
 		<div class="flex flex-row items-center gap-x-10">
 			{#each items as item}
-				<a class={pageId === item.href ? 'font-semibold underline' : ''} href={item.href}>{item.text}</a>
+				<a class={pageId === item.href ? 'font-semibold underline' : ''} href={item.href}
+					>{item.text}</a
+				>
 			{/each}
 		</div>
 		{#if $currentUser}
-			<a
-				class="self-center hover:underline hover:cursor-pointer {pageId === '/account'
-					? 'font-semibold underline'
-					: ''}"
-				href="/account">{$currentUser.nickname}</a
-			>
+			<div class="self-center flex flex-row gap-x-10">
+				<a
+					class="hover:underline hover:cursor-pointer {pageId === '/groups/create'
+						? 'font-semibold underline'
+						: ''}"
+					href="/groups/create">create group</a
+				>
+				<a
+					class="self-center hover:underline hover:cursor-pointer {pageId === '/account'
+						? 'font-semibold underline'
+						: ''}"
+					href="/account">{$currentUser.nickname}</a
+				>
+			</div>
 		{:else}
 			<div class="self-center">
 				<a
