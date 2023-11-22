@@ -33,49 +33,66 @@ Route.group(() => {
 
   Route.resource("groups", "GroupController")
     .only(["index", "show", "store", "update", "destroy"])
+    .middleware({
+      "store": "require-auth",
+      "update": "require-auth",
+      "destroy": "require-auth"
+    })
 
   // -- Threads
 
   // Don't need the group id for these endpoints
   Route.resource("threads", "ThreadController")
     .only(["index", "show", "update", "destroy"])
+    .middleware({
+      "update": "require-auth",
+      "destroy": "require-auth"
+    })
     .paramFor("threads", "thread_id")
 
   // /groups/:group_id/threads
   Route.resource("groups.threads", "ThreadController")
     .only(["index", "store"])
+    .middleware({
+      "store": "require-auth"
+    })
 
   // -- Messages
 
   // /groups/:group_id/threads/:thread_id/messages
   Route.resource("groups.threads.messages", "MessageController")
     .only(["index", "store"])
+    .middleware({
+      "store": "require-auth"
+    })
 
   // /groups/:group_id/messages
   Route.get("/groups/:group_id/messages", "MessageController.index")
 
   // /messages
   Route.resource("messages", "MessageController")
-    .only(["index", "destroy"])
+    .only(["index", "destroy"]).middleware({
+      "destroy": "require-auth"
+    })
 
   // -- Users
 
   Route.resource("users", "UserController")
     .only(["index", "show", "update", "destroy"]).middleware({
-      "*": "authorize"
+      "*": "require-auth"
     })
 
   // -- Login
   Route.post("/auth/login", "AuthController.login")
 
   // -- Logout
-  Route.post("/auth/logout", "AuthController.logout")
+  Route.post("/auth/logout", "AuthController.logout").middleware("require-auth")
 
   // -- Register
   Route.post("/auth/register", "AuthController.register")
 
   // -- Me
-  Route.get("/auth/me", "AuthController.me")
+  Route.get("/auth/me", "AuthController.me").middleware("require-auth")
 
 }).prefix("/api/v1")
 

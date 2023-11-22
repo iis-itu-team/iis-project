@@ -35,26 +35,10 @@ export default class AuthController {
     }
 
     public async logout({ response, auth }: HttpContextContract) {
-
-        if (auth.isLoggedIn == false) {
-            response.status(401).formatted({
-                status: "unauthenticated"
-            });
-            return;
-        }
-
         response.status(200).success(await auth.logout());
     }
 
     public async me({ auth, response }: HttpContextContract) {
-
-        if (auth.isLoggedIn == false) {
-            response.status(401).formatted({
-                status: "unauthenticated"
-            });
-            return;
-        }
-
         response.status(200).success(auth.user);
     }
 }

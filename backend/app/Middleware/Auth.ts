@@ -1,4 +1,3 @@
-import { AuthenticationException } from '@adonisjs/auth/build/standalone'
 import type { GuardsList } from '@ioc:Adonis/Addons/Auth'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
@@ -46,22 +45,14 @@ export default class AuthMiddleware {
       }
     }
 
-    /**
-     * Unable to authenticate using any guard
-     */
-    throw new AuthenticationException(
-      'Unauthorized access',
-      'E_UNAUTHORIZED_ACCESS',
-      guardLastAttempted,
-      this.redirectTo,
-    )
+    return false
   }
 
   /**
    * Handle request
    */
   public async handle (
-    { auth }: HttpContextContract,
+    { auth, response }: HttpContextContract,
     next: () => Promise<void>,
     customGuards: (keyof GuardsList)[]
   ) {
@@ -70,7 +61,14 @@ export default class AuthMiddleware {
      * the config file
      */
     const guards = customGuards.length ? customGuards : [auth.name]
-    await this.authenticate(auth, guards)
+
+    if (!(await this.authenticate(auth, guards))) {
+      response.status(401).formatted({
+        status: "unauthorized"
+      })
+      return;
+    }
+
     await next()
   }
 }
