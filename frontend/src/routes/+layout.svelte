@@ -10,6 +10,10 @@
 	$currentUser = data.user;
 </script>
 
+<svelte:head>
+	<title>sochub</title>
+</svelte:head>
+
 <div class="flex flex-col text-text">
 	<NavBar />
 	<Breadcrumbs />
