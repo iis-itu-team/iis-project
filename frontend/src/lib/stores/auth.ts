@@ -19,6 +19,17 @@ export const login = async (input: LoginInput) => {
     return res.data;
 }
 
+export const logout = async () => {
+	const res = await client.post<ResponseFormat<void>>('/auth/logout');
+
+	if (res.status === 200 && res.data.status === 'success') {
+		currentUser.set(null);
+		console.log('logged out');
+	}
+
+	return;
+}
+
 export const register = async (input: RegisterInput) => {
     const res = await client.post<ResponseFormat<void>>(`/auth/register`, input);
 

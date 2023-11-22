@@ -5,6 +5,8 @@
 	import { get } from 'svelte/store';
 	import type { User, ResponseFormat } from '$lib/types';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
+	import { logout } from '$lib/stores/auth';
+	import { goto } from '$app/navigation';
 
 	showCrumbs(false);
 	ensureLoggedIn();
@@ -59,6 +61,12 @@
 			});
 		}
 	};
+
+	const user_logout = async () => {
+		await logout();
+		
+		goto('/login');
+	}
 </script>
 
 <div class="text-center">
@@ -116,4 +124,12 @@
 		</form>
 	{/if}
 
+	<br>
+
+	<button
+		on:click={user_logout}
+	    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
+	>
+ 	   <p><b>Logout</b></p>
+	</button>
 </div>
