@@ -40,11 +40,11 @@
 					<div class="grid grid-rows-2">
 						<span>{member.nickname}</span>
 						<span class="italic">{member.group_role}</span>
-						{#if canKick && member.id !== $currentUser?.id}
-							<div class="text-right col-start-2 row-start-2">
+						<div class="text-right col-start-2 row-start-2">
+							{#if canKick && member.id !== $currentUser?.id}
 								<button on:click={() => handleKick(member)}>kick</button>
-							</div>
-						{/if}
+							{/if}
+						</div>
 					</div>
 				{/each}
 			</div>
