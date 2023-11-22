@@ -71,3 +71,10 @@
 		{/if}
 	</div>
 </nav>
+
+<style>
+	a:hover {
+		text-decoration: underline;
+		cursor: pointer;
+	}
+</style>
