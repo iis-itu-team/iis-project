@@ -28,6 +28,9 @@ export default class Message extends BaseModel {
     @column({ columnName: "owner_id" })
     public ownerId: string
 
+    @column({ columnName: "date" })
+    public date: string
+
     @belongsTo(() => User, {
         foreignKey: "ownerId"
     })
@@ -36,5 +39,8 @@ export default class Message extends BaseModel {
     @beforeCreate()
     public static async beforeCreate(message: Message) {
         message.id = generateId(message.id, "message");
+
+        const date = new Date();
+        message.date = date.toISOString();
     }
 }

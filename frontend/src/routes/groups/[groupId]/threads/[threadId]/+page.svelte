@@ -55,9 +55,14 @@
 						<span class="text-lg font-semibold">{message.owner.nickname}</span>
 						<span>&lt;{message.owner.email}&gt;</span>
 					</div>
-					<p class="text-md">
-						{message.content}
-					</p>
+					<div class="flex text-md justify-between">
+						<p class="text-left">
+							{message.content}
+						</p>
+						<p class="text-right">
+							{message.date}
+						</p>
+					</div>
 				</div>
 			{/each}
 		{/if}

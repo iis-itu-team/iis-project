@@ -12,6 +12,7 @@ export type CreateMessageInput = {
     groupId: string
     ownerId: string
     content: string
+    time: string
 }
 
 export type ListMessagesInput = {
@@ -35,7 +36,7 @@ export default class MessageService {
         if (ownerId) {
             q.andWhere("owner_id", ownerId)
         }
-
+        
         // preload expand fields
         expand.forEach((e) => q.preload(e as ExtractModelRelations<Message>));
 
