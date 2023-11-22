@@ -15,6 +15,10 @@ const listRequestSchema = schema.create({
     status: schema.enum.optional(Object.values(GroupRequestStatus))
 })
 
+const changeStatusSchema = schema.create({
+    status: schema.enum([GroupRequestStatus.ACCEPTED, GroupRequestStatus.DENIED])
+})
+
 export default class GroupRequestController {
     private readonly requestService = new GroupRequestService();
 
@@ -30,7 +34,7 @@ export default class GroupRequestController {
 
         const user = auth.user as User;
 
-        await this.requestService.checkModifyPermissions(user, groupId);
+        await this.requestService.checkPermissions(user, groupId);
 
         const requests = await this.requestService.listRequests({
             ...validated,
@@ -50,7 +54,7 @@ export default class GroupRequestController {
 
         const user = auth.user as User
 
-        await this.requestService.checkModifyPermissions(user, groupRequest?.groupId)
+        await this.requestService.checkPermissions(user, groupRequest?.groupId)
 
         if (groupRequest) {
             response.success(groupRequest)
@@ -72,6 +76,18 @@ export default class GroupRequestController {
             groupId,
             userId
         })
+
+        response.success(groupRequest)
+    }
+
+    public async changeStatus({ auth, request, response }: HttpContextContract) {
+        const validated = await request.validate({
+            schema: changeStatusSchema
+        })
+
+        const requestId = request.param("id")
+
+        const groupRequest = await this.requestService.changeStatus(requestId, validated.status, auth.user as User)
 
         response.success(groupRequest)
     }

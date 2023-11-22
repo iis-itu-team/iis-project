@@ -21,28 +21,34 @@ export type ListRequestsInput = {
 } & PaginationInput
 
 export default class GroupRequestService {
-    public async checkModifyPermissions(user: User, groupId?: string) {
-        if (user.role != Role.ADMIN) {
-            if (!groupId) {
-                throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                    userRole: user.role
-                })
-            }
+    public async checkPermissions(user?: User, groupId?: string) {
+        if (!user) {
+            throw new HttpException(401, "unauthenticated", "You're not authenticated.")
+        }
 
-            const membership = await this.getGroupMembership(user.id, groupId);
+        if (user.role == Role.ADMIN) {
+            return
+        }
 
-            if (!membership) {
-                throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                    userRole: user.role
-                })
-            }
+        if (!groupId) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role
+            })
+        }
 
-            if (membership.role != GroupRole.MOD && membership.role != GroupRole.ADMIN) {
-                throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                    userRole: user.role,
-                    groupRole: membership.role
-                })
-            }
+        const membership = await this.getGroupMembership(user.id, groupId);
+
+        if (!membership) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role
+            })
+        }
+
+        if (membership.role != GroupRole.MOD && membership.role != GroupRole.ADMIN) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role,
+                groupRole: membership.role
+            })
         }
     }
 
@@ -89,7 +95,7 @@ export default class GroupRequestService {
         return await GroupRequest.find(requestId)
     }
 
-    public async createRequest({ userId, groupId, type }: CreateRequestInput) {
+    public async createRequest({ userId, groupId, type }: CreateRequestInput): Promise<GroupRequest> {
         // check if exists
         const existing = await GroupRequest.query()
             .where("user_id", userId)
@@ -97,7 +103,7 @@ export default class GroupRequestService {
             .andWhere("type", type)
             .first();
 
-        if (existing !== null) {
+        if (existing) {
             throw new HttpException(400, "already_exists", "You already have a request created, wait for approval.", {
                 userId, groupId, type
             });
@@ -109,16 +115,16 @@ export default class GroupRequestService {
             .table("users")
             .where("user_id", userId)
             .join("group_members", "id", "user_id")
-            .where("group_id", groupId)
+            .andWhere("group_members.group_id", groupId)
             .first();
 
-        if (type == GroupRequestType.JOIN && membership !== null) {
+        if (type == GroupRequestType.JOIN && membership) {
             throw new HttpException(400, "already_joined", "You are already joined in this group.", {
                 userId, groupId
             })
         }
 
-        if (type == GroupRequestType.MOD && membership !== null) {
+        if (type == GroupRequestType.MOD && membership) {
             if (membership.role == GroupRole.MOD) {
                 throw new HttpException(400, "already_mod", "You are already a moderator in this group.", {
                     userId, groupId
@@ -133,6 +139,35 @@ export default class GroupRequestService {
         return await GroupRequest.create({
             userId, groupId, type
         });
+    }
+
+    public async changeStatus(requestId: string, status: GroupRequestStatus, user?: User) {
+        const request = await GroupRequest.find(requestId)
+
+        if (!request) {
+            throw HttpException.notFound("group_request", requestId)
+        }
+
+        await this.checkPermissions(user, request.groupId);
+
+        if (request.type == GroupRequestType.JOIN) {
+            // join the user to the group
+            await request.load("group")
+
+            await request.group.related("members").attach([request.userId])
+        } else if (request.type == GroupRequestType.MOD) {
+            // promote the user
+            await request.load("group")
+
+            await request.group.related("members").pivotQuery()
+                .where("user_id", request.userId)
+                .update({
+                    role: GroupRole.MOD
+                })
+        }
+
+        request.status = status;
+        await request.save()
     }
 
     public async deleteRequest(requestId: string) {

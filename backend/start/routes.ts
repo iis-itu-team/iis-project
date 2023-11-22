@@ -57,6 +57,9 @@ Route.group(() => {
       "destroy": ["require-auth", "admin"]
     })
 
+  Route.put("/requests/:id/status", "GroupRequestController.changeStatus")
+    .middleware("require-auth")
+
   // -- Threads
 
   // Don't need the group id for these endpoints
