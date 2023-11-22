@@ -13,16 +13,16 @@ import { Exception } from '@adonisjs/core/build/standalone'
 |
 */
 export default class HttpException extends Exception {
-    public readonly data?: any
     public readonly error?: any
     public readonly statusCode: string
+    public readonly data?: any
 
     constructor(httpStatus: number = 500, statusCode?: string, error?: any, data?: any) {
-        super(`A failure with status ${statusCode} returned.`, httpStatus, 'E_HTTP_EXPECTED')
+        super(`A failure with status ${statusCode} returned.`, httpStatus, 'FAILURE')
         
         this.error = error;
-        this.data = data;
         this.statusCode = statusCode ?? "fail";
+        this.data = data;
     }
 
     public static notFound(name: string, id: string) {

@@ -14,6 +14,9 @@ export default class Group extends BaseModel {
   @column()
   public title: string
 
+  // private => only the group listing, cannot view content
+  // protected => group and content can be only viewed by registered users
+  // public => group content can be viewed by all users, even unregistered
   @column()
   public visibility: Visibility
 

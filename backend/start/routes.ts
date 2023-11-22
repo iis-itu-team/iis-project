@@ -39,6 +39,24 @@ Route.group(() => {
       "destroy": "require-auth"
     })
 
+  // -- Group Requests
+
+  Route.resource("groups.requests", "GroupRequestController")
+    .only(["index", "store"])
+    .middleware({
+      "index": "require-auth",
+      "store": "require-auth"
+    })
+    .paramFor("groups", "group_id")
+    .paramFor("requests", "request_id")
+
+  Route.resource("requests", "GroupRequestController")
+    .only(["show", "destroy"])
+    .middleware({
+      "show": "require-auth",
+      "destroy": ["require-auth", "admin"]
+    })
+
   // -- Threads
 
   // Don't need the group id for these endpoints

@@ -19,6 +19,7 @@ export default class User extends BaseModel {
     @column({ serializeAs: null })
     public password: string
 
+    // todo: add default in new migration
     @column()
     public role: Role
 
