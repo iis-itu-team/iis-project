@@ -3,6 +3,8 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema } from "@ioc:Adonis/Core/Validator";
 import { GroupRequestStatus, GroupRequestType } from "types/group-request";
 import User from "App/Models/User";
+import GroupRequest from "App/Models/GroupRequest";
+import { PaginationResult } from "types/response-format";
 
 const createRequestSchema = schema.create({
     type: schema.enum(Object.values(GroupRequestType))
@@ -12,7 +14,9 @@ const listRequestSchema = schema.create({
     userId: schema.string.optional(),
 
     type: schema.enum.optional(Object.values(GroupRequestType)),
-    status: schema.enum.optional(Object.values(GroupRequestStatus))
+    status: schema.enum.optional(Object.values(GroupRequestStatus)),
+
+    me: schema.enum.optional(["true", "false"])
 })
 
 const changeStatusSchema = schema.create({
@@ -34,12 +38,22 @@ export default class GroupRequestController {
 
         const user = auth.user as User;
 
-        await this.requestService.checkPermissions(user, groupId);
+        let requests: PaginationResult<GroupRequest>;
 
-        const requests = await this.requestService.listRequests({
-            ...validated,
-            groupId,
-        })
+        if (validated.me === "true") {
+            requests = await this.requestService.listRequests({
+                ...validated,
+                userId: user.id,
+                groupId
+            })
+        } else {
+            await this.requestService.checkPermissions(user, groupId);
+
+            requests = await this.requestService.listRequests({
+                ...validated,
+                groupId,
+            })
+        }
 
         response.list(requests)
     }
