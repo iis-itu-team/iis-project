@@ -6,7 +6,11 @@ import type { Thread } from '$lib/types/thread';
 export async function load({ params }) {
     const groupId = params.groupId;
 
-    const groups = await client.get<ResponseFormat<Group>>(`/groups/${groupId}`);
+    const groups = await client.get<ResponseFormat<Group>>(`/groups/${groupId}`, {
+        params: {
+            expand: ["members"].join(",")
+        }
+    });
 
     // load threads in this group
 

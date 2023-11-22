@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
-	import type { Group, Thread } from '$lib/types';
+	import { showCrumbs, setCrumbs } from '$lib/stores/breadcrumbs';
+	import type { PageData } from './$types';
 
-	export let data: { group: Group; threads: Thread[] };
+	export let data: PageData;
 
-	$: group = data.group;
 	$: threads = data.threads;
+	$: group = data.group;
 
 	showCrumbs(true);
 	$: setCrumbs([
@@ -13,30 +13,28 @@
 			text: 'Groups'
 		},
 		{
-			text: group.title,
-			href: `/groups/${group.id}`,
+			text: group?.title ?? '',
+			href: `/groups/${group?.id}`,
 			selected: true
 		}
 	]);
 </script>
 
-<div class="flex flex-col gap-y-2">
-    <!-- TODO: don't show if joined -->
-	<span class="self-end hover:underline hover:cursor-pointer">request to join</span>
-	<p class="text-white font-semibold text-lg">threads ({threads.length}):</p>
-
-	<div class="flex flex-col gap-y-4">
-		{#each threads as thread}
-			<div class="bg-background-light rounded-xl p-4">
-				<a href={`/groups/${group.id}/threads/${thread.id}`} class="text-lg font-semibold hover:underline hover:cursor-pointer"
-					>{thread.title}</a
-				>
-				<!-- TODO: Load x last messages, show? message count? -->
-			</div>
-		{/each}
-        <div class="self-center">
-            <!-- TODO: if logged in and joined in the group and has the rights -->
-            <a href={`/groups/${group.id}/threads/create`} class="hover:underline hover:cursor-pointer">create a new thread</a>
-        </div>
-	</div>
+<p class="text-white font-semibold text-lg py-2">threads ({threads?.length}):</p>
+<div class="flex flex-col gap-y-4">
+	{#each threads ?? [] as thread}
+		<div class="bg-background-light rounded-xl p-4">
+			<a
+				href={`/groups/${group?.id}/threads/${thread.id}`}
+				class="text-lg font-semibold hover:underline hover:cursor-pointer">{thread.title}</a
+			>
+			<!-- TODO: Load x last messages, show? message count? -->
+		</div>
+	{/each}
+</div>
+<div class="text-center col-span-5">
+	<!-- TODO: if logged in and joined in the group and has the rights -->
+	<a href={`/groups/${group?.id}/threads/create`} class="hover:underline hover:cursor-pointer"
+		>create a new thread</a
+	>
 </div>

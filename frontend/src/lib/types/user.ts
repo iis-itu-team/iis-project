@@ -3,6 +3,12 @@ export interface User {
 
     nickname: string
     email: string
+    role: UserRole
+}
+
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin'
 }
 
 export type LoginInput = {

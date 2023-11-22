@@ -43,8 +43,6 @@
 </script>
 
 <div class="flex flex-col gap-y-2 w-full">
-	<!-- TODO: don't show if joined -->
-	<span class="self-end hover:underline hover:cursor-pointer">request to join</span>
 	<p class="text-white font-semibold text-lg">messages ({data.messages.length}):</p>
 
 	<div class="flex flex-col gap-y-4 border p-4 border-secondary rounded-md">
