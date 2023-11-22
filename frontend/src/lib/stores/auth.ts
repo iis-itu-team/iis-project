@@ -46,7 +46,7 @@ export const attemptLoad = async () => {
 }
 
 // if not logged in, redirect to login
-export const ensureCurrentUser = async () => {
+export const ensureLoggedIn = async () => {
     const user = get(currentUser);
 
     if (user == null) {
@@ -57,7 +57,8 @@ export const ensureCurrentUser = async () => {
             return loadedUser;
         }
 
-        if (browser) { goto('/login'); }
+        goto('/login');
+        return;
     }
 
     return user;

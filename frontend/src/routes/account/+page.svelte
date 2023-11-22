@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { currentUser } from '$lib/stores/auth';
+	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
+	import { showCrumbs } from '$lib/stores/breadcrumbs';
+
+	showCrumbs(false);
+	ensureLoggedIn();
 </script>
 
 <div class="text-center">
