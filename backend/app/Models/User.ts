@@ -1,4 +1,4 @@
-import { BaseModel, HasMany, beforeCreate, beforeSave, column, hasMany } from "@ioc:Adonis/Lucid/Orm"
+import { BaseModel, HasMany, beforeCreate, beforeSave, column, computed, hasMany } from "@ioc:Adonis/Lucid/Orm"
 import { Role } from "types/role";
 import generateId from "utils/generate-id";
 import Group from "./Group";
@@ -29,6 +29,12 @@ export default class User extends BaseModel {
     @beforeCreate()
     public static beforeCreate(user: User) {
         user.id = generateId(user.id, "user")
+    }
+
+    @computed()
+    public get group_role() {
+        if ("pivot_group_role" in this.$extras)
+            return this.$extras.pivot_group_role
     }
 
     @beforeSave()

@@ -44,10 +44,10 @@ export default class GroupRequestService {
             })
         }
 
-        if (membership.role != GroupRole.MOD && membership.role != GroupRole.ADMIN) {
+        if (membership.group_role != GroupRole.MOD && membership.group_role != GroupRole.ADMIN) {
             throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
                 userRole: user.role,
-                groupRole: membership.role
+                groupRole: membership.group_role
             })
         }
     }
@@ -162,7 +162,7 @@ export default class GroupRequestService {
             await request.group.related("members").pivotQuery()
                 .where("user_id", request.userId)
                 .update({
-                    role: GroupRole.MOD
+                    group_role: GroupRole.MOD
                 })
         }
 

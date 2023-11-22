@@ -35,7 +35,7 @@ export default class Group extends BaseModel {
     pivotForeignKey: "group_id",
     pivotRelatedForeignKey: "user_id",
     pivotColumns: [
-      "role"
+      "group_role"
     ]
   })
   public members: ManyToMany<typeof User>
