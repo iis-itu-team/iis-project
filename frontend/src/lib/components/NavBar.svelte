@@ -16,14 +16,16 @@
 	];
 
 	$: items = $currentUser
-		? [
+		? (!items.find((item) => {return item.text == 'my groups' && item.href == '/groups'})
+			? [
 				...items,
 				{
 					text: 'my groups',
 					href: '/groups'
 				}
-		  ]
-		: items;
+			]
+			: items) 
+		: items.filter((item) => {return (item.text == 'my groups' && item.href == '/groups') ? false : true});
 </script>
 
 <nav class="flex flex-row h-20 gap-x-10 border-b-2 border-text">

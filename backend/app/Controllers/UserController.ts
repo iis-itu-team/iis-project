@@ -5,6 +5,7 @@ import { Role } from "types/role"
 
 const updateUserSchema = schema.create({
     nickname: schema.string.optional(),
+	email: schema.string.optional(),
     role: schema.enum.optional(Object.values(Role))
 })
 

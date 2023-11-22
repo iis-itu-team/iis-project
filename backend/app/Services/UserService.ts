@@ -4,6 +4,7 @@ import { Role } from "types/role";
 
 export type UpdateUserInput = {
     nickname?: string
+	email?: string
     role?: Role
 }
 
