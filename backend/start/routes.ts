@@ -61,7 +61,9 @@ Route.group(() => {
   // -- Users
 
   Route.resource("users", "UserController")
-    .only(["index", "show", "update", "destroy"])
+    .only(["index", "show", "update", "destroy"]).middleware({
+      "*": "authorize"
+    })
 
   // -- Login
   Route.post("/auth/login", "AuthController.login")
