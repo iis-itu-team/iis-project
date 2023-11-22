@@ -22,7 +22,8 @@
 	$: currentMember = group?.members?.find((m) => m.id === $currentUser?.id);
 	$: joined = currentMember != undefined;
 
-	const sentRequest = writable<GroupRequest | null | undefined>(null);
+	const sentJoinRequest = writable<GroupRequest | null | undefined>(null);
+	const sentModRequest = writable<GroupRequest | null | undefined>(null);
 
 	onMount(() => {
 		client
@@ -34,7 +35,20 @@
 			})
 			.then((res) => {
 				if (res.status == 200 && res.data.count !== 0) {
-					sentRequest.set(res.data?.data?.[0]);
+					sentJoinRequest.set(res.data?.data?.[0]);
+				}
+			});
+
+		client
+			.get<ResponseFormat<GroupRequest[]>>(`/groups/${group?.id}/requests`, {
+				params: {
+					me: 'true',
+					type: GroupRequestType.MOD
+				}
+			})
+			.then((res) => {
+				if (res.status == 200 && res.data.count !== 0) {
+					sentModRequest.set(res.data?.data?.[0]);
 				}
 			});
 	});
@@ -82,6 +96,53 @@
 		});
 	};
 
+	const requestMod = async () => {
+		const res = await client.post<ResponseFormat<void>>(`/groups/${group?.id}/requests`, {
+			type: GroupRequestType.MOD
+		});
+
+		if (res.status !== 200) {
+			if (res.data.status == 'already_mod') {
+				toasts.add({
+					type: 'error',
+					description: 'You are already a mod.'
+				});
+				return;
+			}
+
+			if (res.data.status == 'already_admin') {
+				toasts.add({
+					type: 'error',
+					description: 'You are an admin.'
+				});
+				return;
+			}
+
+			if (res.data.status == 'already_exists') {
+				toasts.add({
+					type: 'error',
+					description: 'You already requested to be a mod, wait for a response.'
+				});
+				return;
+			}
+
+			toasts.add({
+				type: 'error',
+				description: 'Something went wrong.'
+			});
+			return;
+		}
+
+		toasts.add({
+			type: 'success',
+			description: 'Sent a request to be a mod in this group.'
+		});
+	};
+
+	const handleDelete = () => {
+		/* TODO: Implement */
+	};
+
 	$: canKick =
 		$currentUser?.role == UserRole.ADMIN ||
 		currentMember?.group_role == GroupRole.ADMIN ||
@@ -94,23 +155,53 @@
 	</div>
 	<div class="col-span-3">
 		<div class="flex flex-col gap-y-4">
-			<div class="text-right">
-				{#if joined}
-					<button on:click={handleLeave}>leave</button>
-				{:else if $sentRequest && $sentRequest.status == GroupRequestStatus.WAITING}
-					<span>waiting for response</span>
-				{:else if $sentRequest && $sentRequest.status == GroupRequestStatus.DENIED}
-					<span>request denied</span>
-				{:else}
-					<button on:click={requestToJoin}>request to join</button>
+			<div class=" grid grid-cols-2 grid-rows-3">
+				<span class="font-semibold">{$currentUser?.nickname}</span>
+				<span class="italic text-right">{currentMember?.group_role ?? 'guest'}</span>
+				{#if joined && currentMember?.group_role == GroupRole.MEMBER}
+					<span class="italic">mod</span>
+					<div class="text-right">
+						{#if $sentModRequest && $sentModRequest.status == GroupRequestStatus.WAITING}
+							<span>waiting</span>
+						{:else if $sentModRequest && $sentModRequest.status == GroupRequestStatus.DENIED}
+							<span>denied</span>
+						{:else}
+							<button on:click={requestMod}>request mod</button>
+						{/if}
+					</div>
+				{/if}
+				<span class="italic">presence</span>
+				<div class="text-right">
+					{#if joined}
+						<button on:click={handleLeave}>leave</button>
+					{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.WAITING}
+						<span>waiting</span>
+					{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.DENIED}
+						<span>denied</span>
+					{:else}
+						<button on:click={requestToJoin}>request to join</button>
+					{/if}
+				</div>
+				{#if currentMember?.group_role == GroupRole.ADMIN || currentMember?.group_role == GroupRole.MOD}
+					<div class="text-left">
+						<a href={`/groups/${group?.id}/requests`}>requests</a>
+					</div>
+				{/if}
+				{#if currentMember?.group_role == GroupRole.ADMIN}
+					<div class="text-right">
+						<a href={`/groups/${group?.id}/edit`}>edit group</a>
+					</div>
+					<div class="text-left">
+						<button on:click={handleDelete}>delete group</button>
+					</div>
 				{/if}
 			</div>
 			<div>
 				<span class="font-semibold">members ({group?.members?.length ?? 0}):</span>
-				{#each group?.members ?? [] as member}
+				{#each group?.members?.filter((m) => m.id !== $currentUser?.id) ?? [] as member}
 					<div class="grid grid-rows-2">
 						<span>{member.nickname}</span>
-						<span class="italic">{member.group_role}</span>
+						<span class="text-right italic">{member.group_role}</span>
 						<div class="text-right col-start-2 row-start-2">
 							{#if canKick && member.id !== $currentUser?.id}
 								<button on:click={() => handleKick(member)}>kick</button>
@@ -124,7 +215,8 @@
 </div>
 
 <style>
-	button:hover {
+	button:hover,
+	a:hover {
 		text-decoration: underline;
 		cursor: pointer;
 	}
