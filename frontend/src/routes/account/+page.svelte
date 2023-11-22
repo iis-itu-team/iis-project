@@ -1,14 +1,9 @@
 <script lang="ts">
-	import { showCrumbs } from '$lib/stores/breadcrumbs';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
-
-	// showCrumbs(false);
+	import { currentUser } from '$lib/stores/auth';
 </script>
 
 <div class="text-center">
 	<p>Your fancy account!</p>
-	<d>{data.user?.email}</d>
-	<p>{data.user?.nickname}</p>
+	<d>{$currentUser?.email}</d>
+	<p>{$currentUser?.nickname}</p>
 </div>
