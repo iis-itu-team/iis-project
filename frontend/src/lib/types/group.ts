@@ -11,6 +11,21 @@ export interface Group {
     members?: Member[];
 }
 
+export enum GroupRequestStatus {
+    WAITING = "waiting",
+    ACCEPTED = "accepted",
+    DENIED = "denied"
+}
+
+export type GroupRequest = {
+    status: GroupRequestStatus
+}
+
+export enum GroupRequestType {
+    JOIN = "join",
+    MOD = "mod"
+}
+
 export type Member = Omit<User, 'role'> & {
     group_role: GroupRole
 }
