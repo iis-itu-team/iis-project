@@ -40,6 +40,15 @@
 				content = undefined;
 			});
 	};
+
+	const handleUp = (current_message) => {
+		// TODO: id, rating
+	}
+
+	const handleDown = (current_message) => {
+		// TODO: id, rating
+	}
+
 </script>
 
 <div class="flex flex-col gap-y-2 w-full">
@@ -51,9 +60,20 @@
 		{:else}
 			{#each data.messages as message}
 				<div class="flex flex-col">
-					<div class="flex flex-row items-center gap-x-2">
-						<span class="text-lg font-semibold">{message.owner.nickname}</span>
-						<span>&lt;{message.owner.email}&gt;</span>
+					<div class="flex flex-row gap-x-2 grid grid-cols-2">
+						<div class="place-self-start">
+							<span class="text-lg font-semibold">{message.owner.nickname}</span>
+							<span>&lt;{message.owner.email}&gt;</span>
+						</div>
+						<div class="flex flex-row items-center space-x-2 place-self-end">
+							<p class="text-white font-bold">{message.rating}</p>
+							<button class="flex bg-primary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={handleUp({message})}>
+								&#x21E7
+							</button>
+							<button class="flex bg-secondary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={handleDown({message})}>
+								&#x21E9
+							</button>
+						</div>
 					</div>
 					<div class="flex text-md justify-between">
 						<p class="text-left">
