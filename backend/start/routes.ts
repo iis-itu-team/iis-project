@@ -103,6 +103,9 @@ Route.group(() => {
       "*": "require-auth"
     })
 
+  // -- Rate
+  Route.post("/rate", "MessageController.rate")
+
   // -- Login
   Route.post("/auth/login", "AuthController.login")
 

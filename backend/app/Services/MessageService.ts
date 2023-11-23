@@ -98,4 +98,30 @@ export default class MessageService {
 
         await message.delete()
     }
+
+    public async rateMessage(id: string, up: string) {
+
+        const message = await Message.findBy("id", id)
+        
+        if (!message) {
+            throw HttpException.notFound("message", id)
+        }
+
+        if (message.rating == null) {
+            message.rating = 0
+        }
+
+        console.log(up)
+
+        if (up === "true") {
+            message.rating++
+        } else {
+            message.rating--
+        }
+
+        console.log(message.rating)
+        
+        await message.save()
+        return message.rating
+    }
 }

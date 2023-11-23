@@ -31,6 +31,9 @@ export default class Message extends BaseModel {
     @column({ columnName: "date" })
     public date: string
 
+    @column({ columnName: "rating" })
+    public rating: number
+
     @belongsTo(() => User, {
         foreignKey: "ownerId"
     })
@@ -42,5 +45,7 @@ export default class Message extends BaseModel {
 
         const date = new Date();
         message.date = date.toISOString();
+
+        message.rating = 0;
     }
 }
