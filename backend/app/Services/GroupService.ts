@@ -37,7 +37,7 @@ export default class GroupService {
 
         // only groups, where the user is a member
         if (userId) {
-            q.join("group_members", "id", "group_id");
+            q.join("group_members", "groups.id", "=", "group_members.group_id").where("group_members.user_id", userId);
         }
 
         expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
