@@ -64,10 +64,12 @@ export default class {
         response.success(group)
     }
 
-    public async store({ request, response }: HttpContextContract) {
+    public async store({ auth, request, response }: HttpContextContract) {
         const validated = await request.validate({ schema: createGroupSchema })
 
-        const group = await this.groupService.create(validated)
+        const adminId = auth.user?.id
+
+        const group = await this.groupService.create({ ...validated, adminId })
 
         response.status(201).success(group)
     }

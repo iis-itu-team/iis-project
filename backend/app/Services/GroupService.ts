@@ -7,6 +7,7 @@ import { PaginationInput } from "types/pagination"
 import { ExpandInput } from "types/expand"
 import { PaginationResult } from "types/response-format"
 import { Visibility } from "types/visibility"
+import { GroupRole } from "types/group-role"
 
 export type ListGroupsInput = PaginationInput & {
     userId?: string
@@ -17,6 +18,9 @@ export type GetGroupInput = {} & ExpandInput
 export type GroupCreateInput = {
     title: string
     visibility?: Visibility
+
+    // user to add as admin
+    adminId?: string
 }
 
 export type GroupUpdateInput = {
@@ -60,8 +64,17 @@ export default class GroupService {
     public async create(input: GroupCreateInput): Promise<Group> {
         const group = await Group
             .create({
-                ...input
+                title: input.title,
+                visibility: input.visibility ?? Visibility.PRIVATE
             })
+
+        if (input.adminId) {
+            await group.related("members").attach({
+                [input.adminId]: {
+                    group_role: GroupRole.ADMIN
+                }
+            })
+        }
 
         return group
     }
