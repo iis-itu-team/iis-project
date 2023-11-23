@@ -156,44 +156,46 @@
 	<div class="col-span-3">
 		<div class="flex flex-col gap-y-4">
 			<div class=" grid grid-cols-2 grid-rows-3">
-				<span class="font-semibold">{$currentUser?.nickname}</span>
-				<span class="italic text-right">{currentMember?.group_role ?? 'guest'}</span>
-				{#if joined && currentMember?.group_role == GroupRole.MEMBER}
-					<span class="italic">mod</span>
+				{#if $currentUser}
+					<span class="font-semibold">{$currentUser?.nickname}</span>
+					<span class="italic text-right">{currentMember?.group_role ?? 'guest'}</span>
+					{#if joined && currentMember?.group_role == GroupRole.MEMBER}
+						<span class="italic">mod</span>
+						<div class="text-right">
+							{#if $sentModRequest && $sentModRequest.status == GroupRequestStatus.WAITING}
+								<span>waiting</span>
+							{:else if $sentModRequest && $sentModRequest.status == GroupRequestStatus.DENIED}
+								<span>denied</span>
+							{:else}
+								<button on:click={requestMod}>request mod</button>
+							{/if}
+						</div>
+					{/if}
+					<span class="italic">presence</span>
 					<div class="text-right">
-						{#if $sentModRequest && $sentModRequest.status == GroupRequestStatus.WAITING}
+						{#if joined}
+							<button on:click={handleLeave}>leave</button>
+						{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.WAITING}
 							<span>waiting</span>
-						{:else if $sentModRequest && $sentModRequest.status == GroupRequestStatus.DENIED}
+						{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.DENIED}
 							<span>denied</span>
 						{:else}
-							<button on:click={requestMod}>request mod</button>
+							<button on:click={requestToJoin}>request to join</button>
 						{/if}
 					</div>
-				{/if}
-				<span class="italic">presence</span>
-				<div class="text-right">
-					{#if joined}
-						<button on:click={handleLeave}>leave</button>
-					{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.WAITING}
-						<span>waiting</span>
-					{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.DENIED}
-						<span>denied</span>
-					{:else}
-						<button on:click={requestToJoin}>request to join</button>
+					{#if currentMember?.group_role == GroupRole.ADMIN || currentMember?.group_role == GroupRole.MOD}
+						<div class="text-left">
+							<a href={`/groups/${group?.id}/requests`}>requests</a>
+						</div>
 					{/if}
-				</div>
-				{#if currentMember?.group_role == GroupRole.ADMIN || currentMember?.group_role == GroupRole.MOD}
-					<div class="text-left">
-						<a href={`/groups/${group?.id}/requests`}>requests</a>
-					</div>
-				{/if}
-				{#if currentMember?.group_role == GroupRole.ADMIN}
-					<div class="text-right">
-						<a href={`/groups/${group?.id}/edit`}>edit group</a>
-					</div>
-					<div class="text-left">
-						<button on:click={handleDelete}>delete group</button>
-					</div>
+					{#if currentMember?.group_role == GroupRole.ADMIN}
+						<div class="text-right">
+							<a href={`/groups/${group?.id}/edit`}>edit group</a>
+						</div>
+						<div class="text-left">
+							<button on:click={handleDelete}>delete group</button>
+						</div>
+					{/if}
 				{/if}
 			</div>
 			<div>
