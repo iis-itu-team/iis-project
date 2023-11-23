@@ -8,7 +8,7 @@ export const ssr = false;
 export async function load() {
     const userGroups = await client.get<ResponseFormat<Group[]>>("/groups", {
         params: {
-            ownerId: get(currentUser)?.id
+            userId: get(currentUser)?.id
         }
     });
 
