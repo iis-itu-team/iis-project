@@ -34,6 +34,7 @@ Route.group(() => {
   Route.resource("groups", "GroupController")
     .only(["index", "show", "store", "update", "destroy"])
     .middleware({
+      "show": "group-auth",
       "store": "require-auth",
       "update": "require-auth",
       "destroy": "require-auth"
@@ -75,6 +76,7 @@ Route.group(() => {
   Route.resource("groups.threads", "ThreadController")
     .only(["index", "store"])
     .middleware({
+      "index": "group-auth",
       "store": "require-auth"
     })
 
@@ -84,11 +86,12 @@ Route.group(() => {
   Route.resource("groups.threads.messages", "MessageController")
     .only(["index", "store"])
     .middleware({
+      "index": "group-auth"
       "store": "require-auth"
     })
 
   // /groups/:group_id/messages
-  Route.get("/groups/:group_id/messages", "MessageController.index")
+  Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
 
   // /messages
   Route.resource("messages", "MessageController")
