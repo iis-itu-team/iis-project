@@ -12,7 +12,6 @@ export type CreateMessageInput = {
     groupId: string
     ownerId: string
     content: string
-    time: string
 }
 
 export type ListMessagesInput = {
