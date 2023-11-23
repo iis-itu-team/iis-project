@@ -6,9 +6,15 @@ export interface Group {
     id: string;
     title: string;
     visibility: Visibility;
+	membership: Membership;
 
     threads?: Thread[];
     members?: Member[];
+}
+
+export enum Membership {
+	TRUE = "true",
+	FALSE = "false"
 }
 
 export enum GroupRequestStatus {

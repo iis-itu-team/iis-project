@@ -31,13 +31,17 @@ const updateGroupSchema = schema.create({
 export default class {
     private readonly groupService: GroupService = new GroupService();
 
-    public async index({ request, response }: HttpContextContract) {
+    public async index({ request, response, auth }: HttpContextContract) {
         const validated = await request.validate({
             schema: listGroupSchema
         })
 
+		// id used to signify membership
+        const loggedInUserId = auth.user?.id;
+
         const groups = await this.groupService.list({
             ...validated,
+            loggedInUserId: loggedInUserId,
             expand: validated.expand?.split(",") ?? []
         })
 

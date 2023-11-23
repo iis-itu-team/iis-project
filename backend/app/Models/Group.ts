@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, HasMany, ManyToMany, beforeCreate, column, computed, hasMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import generateId from "utils/generate-id"
 import { Visibility } from "types/visibility"
+import { Membership } from "types/membership"
 import Thread from './Thread'
 import User from './User'
 
@@ -19,6 +20,9 @@ export default class Group extends BaseModel {
   // public => group content can be viewed by all users, even unregistered
   @column()
   public visibility: Visibility
+
+  @computed()
+  public membership: Membership = Membership.FALSE
 
   @hasMany(() => Thread)
   public threads: HasMany<typeof Thread>

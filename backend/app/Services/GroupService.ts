@@ -7,10 +7,13 @@ import { PaginationInput } from "types/pagination"
 import { ExpandInput } from "types/expand"
 import { PaginationResult } from "types/response-format"
 import { Visibility } from "types/visibility"
+import { Membership } from "types/membership"
 import { GroupRole } from "types/group-role"
+import Database from "@ioc:Adonis/Lucid/Database"
 
 export type ListGroupsInput = PaginationInput & {
     userId?: string
+    loggedInUserId?: string
 } & ExpandInput
 
 export type GetGroupInput = {} & ExpandInput
@@ -29,7 +32,7 @@ export type GroupUpdateInput = {
 }
 
 export default class GroupService {
-    public async list({ page, perPage, userId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
+    public async list({ page, perPage, userId, loggedInUserId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
         const q = Group.query().distinctOn("groups.id")
 
         // only groups, where the user is a member
@@ -40,6 +43,18 @@ export default class GroupService {
         expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
 
         const res = await q.paginate(page ?? 1, perPage ?? 10)
+
+		// compute membership fields using loggedInUserId
+		if (loggedInUserId) {
+			const queryResult = await Database.from("group_members")
+				.select()
+				.where("user_id", loggedInUserId)
+			res.forEach((group, idx, arr) => {
+				if (queryResult.findIndex((value) => {return value.group_id == group.id}) != -1) {
+					group.membership = Membership.TRUE;	
+				}
+			})
+		}
 
         return {
             data: res.all(),
