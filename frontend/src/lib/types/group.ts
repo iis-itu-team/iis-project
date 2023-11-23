@@ -18,7 +18,14 @@ export enum GroupRequestStatus {
 }
 
 export type GroupRequest = {
+    id: string
+    
+    group_id: string
     status: GroupRequestStatus
+    type: GroupRequestType
+
+    group?: Group
+    user?: User
 }
 
 export enum GroupRequestType {

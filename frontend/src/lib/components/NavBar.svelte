@@ -2,18 +2,15 @@
 	import { page } from '$app/stores';
 	import logo from '$lib/assets/logo.svg';
 	import { currentUser } from '$lib/stores/auth';
-	import { showCrumbs } from '$lib/stores/breadcrumbs';
 
 	$: pageId = $page.route.id;
-
-	showCrumbs(false);
 
 	$: items = [
 		{
 			text: 'home',
 			href: '/'
 		},
-		...($currentUser ? [{ text: "my groups", href: "/groups" }] : [])
+		...($currentUser ? [{ text: 'my groups', href: '/groups' }] : [])
 	];
 </script>
 
