@@ -16,7 +16,9 @@ const listRequestSchema = schema.create({
     type: schema.enum.optional(Object.values(GroupRequestType)),
     status: schema.enum.optional(Object.values(GroupRequestStatus)),
 
-    me: schema.enum.optional(["true", "false"])
+    me: schema.enum.optional(["true", "false"]),
+
+    expand: schema.string.optional()
 })
 
 const changeStatusSchema = schema.create({
@@ -44,7 +46,8 @@ export default class GroupRequestController {
             requests = await this.requestService.listRequests({
                 ...validated,
                 userId: user.id,
-                groupId
+                groupId,
+                expand: validated.expand?.split(",")
             })
         } else {
             await this.requestService.checkPermissions(user, groupId);
@@ -52,6 +55,7 @@ export default class GroupRequestController {
             requests = await this.requestService.listRequests({
                 ...validated,
                 groupId,
+                expand: validated.expand?.split(",")
             })
         }
 

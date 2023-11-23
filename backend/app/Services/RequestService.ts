@@ -6,6 +6,7 @@ import { GroupRole } from "types/group-role"
 import { PaginationInput } from "types/pagination"
 import { GroupRequestStatus, GroupRequestType } from "types/group-request"
 import { Role } from "types/role"
+import { ExtractModelRelations } from "@ioc:Adonis/Lucid/Orm"
 
 export type CreateRequestInput = {
     userId: string
@@ -18,6 +19,7 @@ export type ListRequestsInput = {
     groupId?: string
     type?: GroupRequestType
     status?: GroupRequestStatus
+    expand?: string[]
 } & PaginationInput
 
 export default class GroupRequestService {
@@ -76,6 +78,10 @@ export default class GroupRequestService {
 
         if (input.status) {
             q.andWhere("status", input.status)
+        }
+
+        if (input.expand) {
+            input.expand.forEach((field) => q.preload(field as ExtractModelRelations<GroupRequest>))
         }
 
         const requests = await q.paginate(input.page ?? 1, input.perPage ?? 10)

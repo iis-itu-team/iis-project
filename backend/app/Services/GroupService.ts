@@ -26,7 +26,7 @@ export type GroupUpdateInput = {
 
 export default class GroupService {
     public async list({ page, perPage, userId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
-        const q = Group.query()
+        const q = Group.query().distinctOn("groups.id")
 
         // only groups, where the user is a member
         if (userId) {
