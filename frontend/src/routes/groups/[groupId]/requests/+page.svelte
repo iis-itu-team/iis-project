@@ -12,6 +12,7 @@
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
 	import { client } from '$lib/http/http';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
 
@@ -31,21 +32,23 @@
 		}
 	]);
 
-	ensureLoggedIn().then((user) => {
-		if (user?.role != UserRole.ADMIN) {
-			const membership = data.group?.members?.find((m) => m.id === $currentUser?.id);
+	onMount(() => {
+		ensureLoggedIn().then((user) => {
+			if (user?.role != UserRole.ADMIN) {
+				const membership = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
-			if (
-				!membership ||
-				(membership.group_role !== GroupRole.ADMIN && membership.group_role !== GroupRole.MOD)
-			) {
-				toasts.add({
-					type: 'error',
-					description: "You're not allowed here."
-				});
-				goto(`/groups/${data.group?.id}`);
+				if (
+					!membership ||
+					(membership.group_role !== GroupRole.ADMIN && membership.group_role !== GroupRole.MOD)
+				) {
+					toasts.add({
+						type: 'error',
+						description: "You're not allowed here."
+					});
+					goto(`/groups/${data.group?.id}`);
+				}
 			}
-		}
+		});
 	});
 
 	const handleStatusChange = async (request: GroupRequest, status: GroupRequestStatus) => {
@@ -79,8 +82,12 @@
 			<p>{request.status}</p>
 			<div class="col-span-2 col-start-11 flex flex-row gap-x-2 justify-start">
 				{#if request.status == GroupRequestStatus.WAITING}
-					<button on:click={() => handleStatusChange(request, GroupRequestStatus.ACCEPTED)}>accept</button>
-					<button on:click={() => handleStatusChange(request, GroupRequestStatus.DENIED)}>deny</button>
+					<button on:click={() => handleStatusChange(request, GroupRequestStatus.ACCEPTED)}
+						>accept</button
+					>
+					<button on:click={() => handleStatusChange(request, GroupRequestStatus.DENIED)}
+						>deny</button
+					>
 				{/if}
 			</div>
 		</div>
