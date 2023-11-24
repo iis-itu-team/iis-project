@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 export interface Breadcrumb {
-    text: string;
+    text?: string;
     href?: string;
     selected?: boolean;
 }

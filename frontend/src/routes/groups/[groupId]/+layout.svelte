@@ -227,7 +227,7 @@
 				<span class="font-semibold">members ({group?.members?.length ?? 0}):</span>
 				{#each group?.members?.filter((m) => m.id !== $currentUser?.id) ?? [] as member}
 					<div class="grid grid-rows-2">
-						<span>{member.nickname}</span>
+						<a href="/users/{member.id}">{member.nickname}</a>
 						<span class="text-right italic">{member.group_role}</span>
 						<div class="text-right col-start-2 row-start-2">
 							{#if canKick && member.id !== $currentUser?.id}
