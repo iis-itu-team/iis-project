@@ -36,19 +36,19 @@ Route.group(() => {
     .middleware({
       "show": "group-auth",
       "store": "require-auth",
-      "update": "require-auth",
-      "destroy": "require-auth"
+      "update": "group-auth",  // needs to check permissions differently, not just visibility
+      "destroy": "group-auth"  // needs to check permissions differently, not just visibility
     })
 
   Route.post("/groups/:id/kick", "GroupController.kick")
-    .middleware("require-auth")
+    .middleware("require-auth") // permissions handled inside group controller/service
 
   // -- Group Requests
 
   Route.resource("groups.requests", "GroupRequestController")
     .only(["index", "store"])
     .middleware({
-      "index": "require-auth",
+      "index": "group-auth",  // should be only visible to mod / owner / admin
       "store": "require-auth"
     })
     .paramFor("groups", "group_id")
@@ -57,7 +57,7 @@ Route.group(() => {
   Route.resource("requests", "GroupRequestController")
     .only(["index", "show", "destroy"])
     .middleware({
-      "index": "require-auth",
+      "index": "require-auth", // should be only visible to mod / owner / admin
       "show": "require-auth",
       "destroy": ["require-auth", "admin"]
     })
@@ -81,7 +81,7 @@ Route.group(() => {
     .only(["index", "store"])
     .middleware({
       "index": "group-auth",
-      "store": "require-auth"
+      "store": "group-auth"
     })
 
   // -- Messages
@@ -91,11 +91,11 @@ Route.group(() => {
     .only(["index", "store"])
     .middleware({
       "index": "group-auth",
-      "store": "require-auth"
+      "store": "group-auth"
     })
 
   // /messages/:messageId/ratings
-  Route.post("/messages/:messageId/ratings", "MessageController.rate")
+  Route.post("/messages/:messageId/ratings", "MessageController.rate") // should be doable by group member
 
   // /groups/:group_id/messages
   Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
