@@ -1,4 +1,4 @@
-import { BaseModel, BelongsTo, beforeCreate, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, BelongsTo, ManyToMany, beforeCreate, belongsTo, column, manyToMany } from "@ioc:Adonis/Lucid/Orm";
 import Group from "./Group";
 import User from "./User";
 import Thread from "./Thread";
@@ -33,6 +33,14 @@ export default class Message extends BaseModel {
 
     @column({ columnName: "rating" })
     public rating: number
+
+    @column({ columnName: "user_id" })
+    public userId: string
+
+    @manyToMany(() => User, {
+        relatedKey: 'userId',
+    })
+    public ratingUser: ManyToMany<typeof User>
 
     @belongsTo(() => User, {
         foreignKey: "ownerId"
