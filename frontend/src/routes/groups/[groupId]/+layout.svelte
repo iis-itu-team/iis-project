@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { client } from '$lib/http/http';
-	import { AccessType, checkAccess, currentUser } from '$lib/stores/auth';
+	import { currentUser } from '$lib/stores/auth';
 	import type { ResponseFormat } from '$lib/types';
 	import {
 		GroupRequestType,
@@ -14,7 +14,7 @@
 	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { requestToJoin } from '$lib/common/group';
 
 	export let data: PageData;
@@ -28,12 +28,6 @@
 	const sentModRequest = writable<GroupRequest | null | undefined>(null);
 
 	onMount(() => {
-		checkAccess({
-			type: AccessType.GROUP_MEMBER_VISIBLE,
-			redirectTo: '/groups',
-			group,
-		});
-
 		client
 			.get<ResponseFormat<GroupRequest[]>>(`/groups/${group?.id}/requests`, {
 				params: {

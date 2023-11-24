@@ -145,7 +145,7 @@ export const checkAccess = async (options: CheckAccessOptions) => {
                 return;
             }
 
-            // user is a member of the group
+            // user is not a guest of the group
             if (options.group?.membership !== Membership.GUEST) {
                 return;
             }

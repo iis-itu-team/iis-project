@@ -1,11 +1,21 @@
 <script lang="ts">
 	import { showCrumbs, setCrumbs } from '$lib/stores/breadcrumbs';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import { checkAccess, AccessType } from '$lib/stores/auth';
 
 	export let data: PageData;
 
 	$: threads = data.threads;
 	$: group = data.group;
+
+	onMount(() => {
+		checkAccess({
+			type: AccessType.GROUP_MEMBER_VISIBLE,
+			redirectTo: '/groups',
+			group
+		});
+	});
 
 	showCrumbs(true);
 	$: setCrumbs([
