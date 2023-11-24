@@ -44,7 +44,16 @@ export default class Message extends BaseModel {
         message.id = generateId(message.id, "message");
 
         const date = new Date();
-        message.date = date.toISOString();
+
+        const options = {
+            hour: '2-digit',    // HH            
+            minute: '2-digit',  // MM
+            day: '2-digit',     // DD
+            month: '2-digit',   // MM
+            year: 'numeric'     // YYYY
+          };
+          
+        message.date = date.toLocaleString('en-GB', options);
 
         message.rating = 0;
     }
