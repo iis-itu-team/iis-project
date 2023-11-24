@@ -55,8 +55,9 @@ Route.group(() => {
     .paramFor("requests", "request_id")
 
   Route.resource("requests", "GroupRequestController")
-    .only(["show", "destroy"])
+    .only(["index", "show", "destroy"])
     .middleware({
+      "index": "require-auth",
       "show": "require-auth",
       "destroy": ["require-auth", "admin"]
     })
@@ -89,7 +90,7 @@ Route.group(() => {
   Route.resource("groups.threads.messages", "MessageController")
     .only(["index", "store"])
     .middleware({
-      "index": "group-auth"
+      "index": "group-auth",
       "store": "require-auth"
     })
 

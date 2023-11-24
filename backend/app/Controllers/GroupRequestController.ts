@@ -6,6 +6,7 @@ import User from "App/Models/User";
 import GroupRequest from "App/Models/GroupRequest";
 import { PaginationResult } from "types/response-format";
 import GroupService from "App/Services/GroupService";
+import { Role } from "types/role";
 
 const createRequestSchema = schema.create({
     type: schema.enum(Object.values(GroupRequestType))
@@ -13,6 +14,7 @@ const createRequestSchema = schema.create({
 
 const listRequestSchema = schema.create({
     userId: schema.string.optional(),
+    groupId: schema.string.optional(),
 
     type: schema.enum.optional(Object.values(GroupRequestType)),
     status: schema.enum.optional(Object.values(GroupRequestStatus)),
@@ -31,11 +33,11 @@ export default class GroupRequestController {
     private readonly groupService = new GroupService()
 
     public async index({ auth, request, response }: HttpContextContract) {
-        const groupId = request.param("group_id")
-
         const validated = await request.validate({
             schema: listRequestSchema
         })
+
+        const groupId = request.param("group_id", validated.groupId)
 
         // list the requests only if the current user is admin
         // or group admin or group mod
