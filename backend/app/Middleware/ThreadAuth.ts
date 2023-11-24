@@ -13,7 +13,7 @@ export default class ThreadAuth {
       return
     }
 
-    const thread = await Thread.query().select().where('threads.id', '=', request.param('id'))
+    const thread = await Thread.query().where('threads.id', '=', request.param('thread_id'))
 
     const groupId = thread.at(0)?.groupId ?? ''
 
