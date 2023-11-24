@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
 	import type { PageData } from './$types';

@@ -73,6 +73,9 @@ export enum AccessType {
     GROUP_MEMBER,
     // group member of group public / protected
     GROUP_MEMBER_VISIBLE,
+
+    // check user visibility
+    USER_VISIBLE,
 }
 
 type CheckAccessOptions = {
@@ -80,6 +83,7 @@ type CheckAccessOptions = {
     type: AccessType
 
     group?: Group
+    user?: User
 }
 
 export const checkAccess = async (options: CheckAccessOptions) => {
@@ -169,6 +173,19 @@ export const checkAccess = async (options: CheckAccessOptions) => {
                 deny();
                 return;
             }
+            break;
+        case AccessType.USER_VISIBLE:
+            if (options.user?.visibility === Visibility.PUBLIC ||
+                get(currentUser)?.role === UserRole.ADMIN) {
+                break;
+            }
+
+            if (await checkLoggedIn() &&
+                options.user?.visibility === Visibility.PROTECTED) {
+                break;
+            }
+
+            deny();
             break;
     }
 }

@@ -1,9 +1,12 @@
+import type { Visibility } from "./visibility"
+
 export interface User {
     id: string
 
     nickname: string
     email: string
     role: UserRole
+    visibility: Visibility
 }
 
 export enum UserRole {
