@@ -1,14 +1,8 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation';
-	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
+	import { invalidateAll } from '$app/navigation';
+	import { AccessType, checkAccess } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
-	import {
-		GroupRole,
-		UserRole,
-		GroupRequestStatus,
-		type GroupRequest,
-		type ResponseFormat
-	} from '$lib/types';
+	import { GroupRequestStatus, type GroupRequest, type ResponseFormat } from '$lib/types';
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
 	import { client } from '$lib/http/http';
@@ -33,21 +27,10 @@
 	]);
 
 	onMount(() => {
-		ensureLoggedIn().then((user) => {
-			if (user?.role != UserRole.ADMIN) {
-				const membership = data.group?.members?.find((m) => m.id === $currentUser?.id);
-
-				if (
-					!membership ||
-					(membership.group_role !== GroupRole.ADMIN && membership.group_role !== GroupRole.MOD)
-				) {
-					toasts.add({
-						type: 'error',
-						description: "You're not allowed here."
-					});
-					goto(`/groups/${data.group?.id}`);
-				}
-			}
+		checkAccess({
+			type: AccessType.GROUP_MANAGE,
+			group: data.group,
+			redirectTo: `/groups/${data.group?.id}`
 		});
 	});
 

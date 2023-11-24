@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { client } from '$lib/http/http';
-	import { currentUser } from '$lib/stores/auth';
+	import { AccessType, checkAccess, currentUser } from '$lib/stores/auth';
 	import type { ResponseFormat } from '$lib/types';
 	import {
 		GroupRequestType,
@@ -28,6 +28,12 @@
 	const sentModRequest = writable<GroupRequest | null | undefined>(null);
 
 	onMount(() => {
+		checkAccess({
+			type: AccessType.GROUP_MEMBER_VISIBLE,
+			redirectTo: '/groups',
+			group,
+		});
+
 		client
 			.get<ResponseFormat<GroupRequest[]>>(`/groups/${group?.id}/requests`, {
 				params: {
@@ -205,7 +211,7 @@
 						{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.DENIED}
 							<span>denied</span>
 						{:else}
-							<button on:click={() => requestToJoin(group)}>request to join</button>
+							<button on:click={handleRequestToJoin}>request to join</button>
 						{/if}
 					</div>
 					{#if currentMember?.group_role == GroupRole.ADMIN || currentMember?.group_role == GroupRole.MOD}

@@ -1,8 +1,11 @@
 import { goto } from "$app/navigation";
 import { client } from "$lib/http/http";
-import type { LoginInput, RegisterInput, ResponseFormat, User } from "$lib/types";
+import { UserRole, type Group, type LoginInput, type RegisterInput, type ResponseFormat, type User, Visibility } from "$lib/types";
 import { get, writable } from "svelte/store";
 import { fetchRequests } from "./requests";
+import { error } from "@sveltejs/kit";
+import { Membership } from "$lib/types/group";
+import { toasts } from "svelte-toasts";
 
 export let currentUser = writable<User | undefined | null>(null);
 
@@ -60,8 +63,118 @@ export const attemptLoad = async () => {
     return undefined;
 }
 
+export enum AccessType {
+    ADMIN,
+    GROUP_ADMIN,
+    GROUP_MOD,
+    // group admin or mod or user admin
+    GROUP_MANAGE,
+    // group member
+    GROUP_MEMBER,
+    // group member of group public / protected
+    GROUP_MEMBER_VISIBLE,
+}
+
+type CheckAccessOptions = {
+    redirectTo?: string
+    type: AccessType
+
+    group?: Group
+}
+
+export const checkAccess = async (options: CheckAccessOptions) => {
+    const deny = () => {
+        if (options.redirectTo) {
+            toasts.add({
+                type: "error",
+                description: "Not allowed here."
+            });
+            goto(options.redirectTo);
+            return;
+        }
+
+        throw error(401, "Not allowed here.");
+    }
+
+    switch (options.type) {
+        case AccessType.GROUP_MANAGE:
+            if (!(await checkLoggedIn())) {
+                deny();
+                return;
+            }
+
+            if (options.group?.membership === Membership.ADMIN ||
+                options.group?.membership === Membership.MOD ||
+                get(currentUser)?.role === UserRole.ADMIN) {
+                return;
+            }
+
+            deny();
+            break;
+        case AccessType.GROUP_ADMIN:
+            if (!(await checkLoggedIn())) {
+                deny();
+                return;
+            }
+
+            if (options.group?.membership === Membership.ADMIN) {
+                return;
+            }
+
+            deny();
+            break;
+        case AccessType.GROUP_MOD:
+            if (!(await checkLoggedIn())) {
+                deny();
+                return;
+            }
+
+            if (options.group?.membership === Membership.MOD) {
+                return;
+            }
+
+            deny();
+            break;
+        case AccessType.GROUP_MEMBER_VISIBLE:
+            if (options.group?.visibility === Visibility.PUBLIC) {
+                return;
+            }
+
+            if (!(await checkLoggedIn())) {
+                deny();
+                return;
+            }
+
+            // user is a member of the group
+            if (options.group?.membership !== Membership.GUEST) {
+                return;
+            }
+
+            // is logged in and the group is protected
+            if (options.group?.visibility === Visibility.PROTECTED) {
+                return;
+            }
+
+            // user is a guest and the group is private, send him off.
+            deny();
+            break;
+        case AccessType.GROUP_MEMBER:
+            if (options.group?.membership === Membership.GUEST) {
+                deny();
+                return;
+            }
+            break;
+        case AccessType.ADMIN:
+            if (get(currentUser)?.role !== UserRole.ADMIN) {
+                deny();
+                return;
+            }
+            break;
+    }
+}
+
 // if not logged in, redirect to login
-export const ensureLoggedIn = async () => {
+export const checkLoggedIn = async () => {
     const user = get(currentUser);
 
     if (user == null) {
@@ -71,10 +184,17 @@ export const ensureLoggedIn = async () => {
         if (loadedUser) {
             return loadedUser;
         }
-
-        goto('/login');
-        return;
+        return false;
     }
 
     return user;
+}
+
+// if not logged in, redirect to login
+export const ensureLoggedIn = async () => {
+    const user = checkLoggedIn();
+
+    if (!user) {
+        goto('/login');
+    }
 }

@@ -44,21 +44,21 @@
 		{#if publicGroups.length > 0}
 			<div>
 				<p class="font-semibold text-lg">public groups ({publicGroups.length}):</p>
-				<GroupList groups={publicGroups} />
+				<GroupList groups={publicGroups} visibility={Visibility.PUBLIC} />
 			</div>
 		{/if}
 
 		{#if protectedGroups.length > 0}
 			<div>
 				<p class="font-semibold text-lg">protected groups ({protectedGroups.length}):</p>
-				<GroupList groups={protectedGroups} />
+				<GroupList groups={protectedGroups} visibility={Visibility.PROTECTED} />
 			</div>
 		{/if}
 
 		{#if privateGroups.length > 0}
 			<div>
 				<p class="font-semibold text-lg">private groups ({privateGroups.length}):</p>
-				<GroupList groups={privateGroups} />
+				<GroupList groups={privateGroups} visibility={Visibility.PRIVATE} />
 			</div>
 		{/if}
 	{:catch err}

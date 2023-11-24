@@ -5,4 +5,4 @@ export type { Thread } from "./thread";
 export type { Message } from "./message";
 export type { User, LoginInput, RegisterInput } from "./user";
 export { UserRole } from "./user";
-export type { Visibility } from "./visibility";
+export { Visibility } from "./visibility";

@@ -6,15 +6,17 @@ export interface Group {
     id: string;
     title: string;
     visibility: Visibility;
-	membership: Membership;
+    membership: Membership;
 
     threads?: Thread[];
     members?: Member[];
 }
 
 export enum Membership {
-	TRUE = "true",
-	FALSE = "false"
+    ADMIN = "admin",
+    MOD = "mod",
+    MEMBER = "member",
+    GUEST = "guest"
 }
 
 export enum GroupRequestStatus {
@@ -25,7 +27,7 @@ export enum GroupRequestStatus {
 
 export type GroupRequest = {
     id: string
-    
+
     group_id: string
     user_id: string
     status: GroupRequestStatus
