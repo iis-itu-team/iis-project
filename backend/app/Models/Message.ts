@@ -47,6 +47,12 @@ export default class Message extends BaseModel {
     })
     public owner: BelongsTo<typeof User>
 
+    @column.dateTime({ autoCreate: true })
+    public createdAt: DateTime
+     
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    public updatedAt: DateTime
+
     @beforeCreate()
     public static async beforeCreate(message: Message) {
         message.id = generateId(message.id, "message");

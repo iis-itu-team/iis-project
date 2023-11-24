@@ -30,6 +30,13 @@ export default class User extends BaseModel {
     @hasMany(() => Group)
     public groups: HasMany<typeof Group>
 
+    @column.dateTime({ autoCreate: true })
+    public createdAt: DateTime
+
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    public updatedAt: DateTime
+
+
     @beforeCreate()
     public static beforeCreate(user: User) {
         user.id = generateId(user.id, "user")

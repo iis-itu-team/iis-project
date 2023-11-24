@@ -25,6 +25,12 @@ export default class Thread extends BaseModel {
     @belongsTo(() => Group)
     public group: BelongsTo<typeof Group>
 
+    @column.dateTime({ autoCreate: true })
+    public createdAt: DateTime
+ 
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    public updatedAt: DateTime
+
     @beforeCreate()
     public static async beforeCreate(thread: Thread) {
         thread.id = generateId(thread.id, "thread");

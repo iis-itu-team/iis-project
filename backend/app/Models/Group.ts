@@ -39,6 +39,7 @@ export default class Group extends BaseModel {
     relatedKey: "id",
     pivotForeignKey: "group_id",
     pivotRelatedForeignKey: "user_id",
+	pivotTimestamps: true,
     pivotColumns: [
       "group_role"
     ]
