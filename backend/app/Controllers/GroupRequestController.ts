@@ -49,7 +49,7 @@ export default class GroupRequestController {
         if (validated.me === "true") {
             requests = await this.requestService.listRequests({
                 ...validated,
-                userId: user.id,
+                userId: user?.id,
                 groupId,
                 expand: validated.expand?.split(",")
             })

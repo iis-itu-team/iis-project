@@ -56,7 +56,7 @@ export default class {
             schema: getGroupSchema
         })
 
-        const loggedInUserId = auth.user?.id
+        const loggedInUserId = auth.user?.id ?? ''
 
         const group = await this.groupService.get(groupId, {
             ...validated,
