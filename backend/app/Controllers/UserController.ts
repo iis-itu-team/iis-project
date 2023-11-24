@@ -3,6 +3,7 @@ import UserService from "App/Services/UserService"
 import { schema, rules } from "@ioc:Adonis/Core/Validator"
 import { Role } from "types/role"
 import { Visibility } from "types/visibility"
+import User from "App/Models/User"
 
 const updateUserSchema = schema.create({
     nickname: schema.string.optional([
@@ -18,16 +19,20 @@ const updateUserSchema = schema.create({
 export default class UserController {
     private readonly userService = new UserService()
 
-    public async index({ response }: HttpContextContract) {
-        const users = await this.userService.listUsers()
+    public async index({ auth, response }: HttpContextContract) {
+        // only return users that are visible to the logged in user or guest
+        const users = await this.userService.listUsers(auth.user as User)
 
         response.success(users)
     }
 
-    public async show({ request, response }: HttpContextContract) {
+    public async show({ auth, request, response }: HttpContextContract) {
         const id = request.param("id")
 
-        const user = await this.userService.getUser(id)
+        // only allow if the user profile is visible to the logged in user
+        const loggedInUser = auth.user as User;
+
+        const user = await this.userService.getUser(id, loggedInUser)
 
         response.success(user)
     }

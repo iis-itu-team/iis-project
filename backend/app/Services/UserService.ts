@@ -17,18 +17,47 @@ export type CreateUserInput = {
 }
 
 export default class UserService {
-    public async listUsers() {
-        return await User.all()
+    public async listUsers(loggedInUser?: User) {
+        const q = User.query()
+
+        // if not loggedIn, return only public
+        if (!loggedInUser) {
+            q.where("visibility", Visibility.PUBLIC)
+        } else {
+            if (loggedInUser.role === Role.USER) {
+                // if not admin, return protected, public
+                q.where("visibility", Visibility.PROTECTED)
+                    .orWhere("visibility", Visibility.PUBLIC)
+            }
+            // if admin, return all
+        }
+
+        return await q
     }
 
-    public async getUser(id: string) {
+    public async getUser(id: string, loggedInUser?: User) {
         const user = await User.findBy("id", id)
 
         if (!user) {
             throw HttpException.notFound("user", id)
         }
 
-        return user
+        if (loggedInUser?.role == Role.ADMIN) {
+            return user
+        }
+
+        if (loggedInUser && user.visibility === Visibility.PROTECTED) {
+            return user
+        }
+
+        if (user.visibility == Visibility.PUBLIC) {
+            return user;
+        }
+
+        throw new HttpException(403, "not_allowed", "You cannot access this profile.", {
+            visibility: user.visibility,
+            you: loggedInUser
+        })
     }
 
     public async createUser({ email, nickname, password, visibility }: CreateUserInput) {

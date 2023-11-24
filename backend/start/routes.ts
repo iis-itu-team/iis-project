@@ -110,7 +110,9 @@ Route.group(() => {
 
   Route.resource("users", "UserController")
     .only(["index", "show", "update", "destroy"]).middleware({
-      "*": "require-auth"
+      "show": "require-auth",
+      "update": "require-auth",
+      "destroy": "require-auth",
     })
 
   // -- Rate
