@@ -14,6 +14,7 @@
 	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
 	import { onMount } from 'svelte';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
@@ -53,12 +54,60 @@
 			});
 	});
 
-	const handleKick = (member: Member) => {
-		/* TODO: Implement */
+	const handleKick = async (member: Member) => {
+		const res = await client.post<ResponseFormat<void>>(`/groups/${group?.id}/kick`, {
+			userId: member.id
+		});
+
+		if (res.status !== 200) {
+			if (res.data.status === 'not_a_member') {
+				toasts.add({
+					type: 'error',
+					description: 'User is not a member.'
+				});
+				return;
+			}
+
+			toasts.add({
+				type: 'error',
+				description: 'Something went wrong.'
+			});
+			return;
+		}
+
+		toasts.add({
+			type: 'success',
+			description: 'Member kicked.'
+		});
+		invalidateAll();
 	};
 
-	const handleLeave = () => {
-		/* TODO: Implement */
+	const handleLeave = async () => {
+		const res = await client.post<ResponseFormat<void>>(`/groups/${group?.id}/kick`, {
+			userId: $currentUser?.id
+		});
+
+		if (res.status !== 200) {
+			if (res.data.status === 'not_a_member') {
+				toasts.add({
+					type: 'error',
+					description: 'User is not a member.'
+				});
+				return;
+			}
+
+			toasts.add({
+				type: 'error',
+				description: 'Something went wrong.'
+			});
+			return;
+		}
+
+		toasts.add({
+			type: 'success',
+			description: 'You left, bye...'
+		});
+		goto('/groups');
 	};
 
 	const requestToJoin = async () => {
@@ -147,6 +196,9 @@
 		$currentUser?.role == UserRole.ADMIN ||
 		currentMember?.group_role == GroupRole.ADMIN ||
 		currentMember?.group_role == GroupRole.MOD;
+
+	// can leave only if he's not an admin
+	$: canLeave = currentMember?.group_role !== GroupRole.ADMIN;
 </script>
 
 <div class="grid grid-cols-12 grid-rows-2 gap-8">
@@ -174,7 +226,9 @@
 					<span class="italic">presence</span>
 					<div class="text-right">
 						{#if joined}
-							<button on:click={handleLeave}>leave</button>
+							{#if canLeave}
+								<button on:click={handleLeave}>leave</button>
+							{/if}
 						{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.WAITING}
 							<span>waiting</span>
 						{:else if $sentJoinRequest && $sentJoinRequest.status == GroupRequestStatus.DENIED}
