@@ -48,7 +48,7 @@ Route.group(() => {
   Route.resource("groups.requests", "GroupRequestController")
     .only(["index", "store"])
     .middleware({
-      "index": "group-auth",  // should be only visible to mod / owner / admin
+      "index": "group-auth",  // should be only visible to mod / owner / admin?
       "store": "require-auth"
     })
     .paramFor("groups", "group_id")
@@ -57,7 +57,7 @@ Route.group(() => {
   Route.resource("requests", "GroupRequestController")
     .only(["index", "show", "destroy"])
     .middleware({
-      "index": "require-auth", // should be only visible to mod / owner / admin
+      "index": "require-auth", // should be only visible to mod / owner / admin?
       "show": "require-auth",
       "destroy": ["require-auth", "admin"]
     })
@@ -71,8 +71,10 @@ Route.group(() => {
   Route.resource("threads", "ThreadController")
     .only(["index", "show", "update", "destroy"])
     .middleware({
-      "update": "require-auth",
-      "destroy": "require-auth"
+      "index": "thread-auth",
+      "show": "thread-auth",
+      "update": "thread-auth", // should check differently (is admin / mod...)
+      "destroy": "thread-auth" // should check differently (is admin / mod...)
     })
     .paramFor("threads", "thread_id")
 
@@ -95,7 +97,7 @@ Route.group(() => {
     })
 
   // /messages/:messageId/ratings
-  Route.post("/messages/:messageId/ratings", "MessageController.rate") // should be doable by group member
+  Route.post("/messages/:messageId/ratings", "MessageController.rate")
 
   // /groups/:group_id/messages
   Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
