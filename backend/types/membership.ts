@@ -1,4 +1,5 @@
 export enum Membership {
-	TRUE = "true",
-	FALSE = "false"
+	MOD = "mod",
+	MEMBER = "member",
+	GUEST = "guest"
 }

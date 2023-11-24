@@ -7,7 +7,6 @@ import { PaginationInput } from "types/pagination"
 import { ExpandInput } from "types/expand"
 import { PaginationResult } from "types/response-format"
 import { Visibility } from "types/visibility"
-import { Membership } from "types/membership"
 import { GroupRole } from "types/group-role"
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from "App/Models/User"
@@ -78,23 +77,31 @@ export default class GroupService {
         // only groups, where the user is a member
         if (userId) {
             q.join("group_members", "groups.id", "=", "group_members.group_id").where("group_members.user_id", userId);
+
+            // append his membership
+            q.select("*",
+                Database.from("group_members")
+                    .select("group_role")
+                    .whereRaw("group_members.group_id = groups.id")
+                    .where("user_id", userId)
+                    .as("membership")
+            );
         }
 
         expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
 
-        const res = await q.paginate(page ?? 1, perPage ?? 10)
-
         // compute membership fields using loggedInUserId
-        if (loggedInUserId) {
-            const queryResult = await Database.from("group_members")
-                .select()
-                .where("user_id", loggedInUserId)
-            res.forEach((group, idx, arr) => {
-                if (queryResult.findIndex((value) => { return value.group_id == group.id }) != -1) {
-                    group.membership = Membership.TRUE;
-                }
-            })
+        if (!userId && loggedInUserId) {
+            q.select("*",
+                Database.from("group_members")
+                    .select("group_role")
+                    .whereRaw("group_members.group_id = groups.id")
+                    .where("user_id", loggedInUserId)
+                    .as("membership")
+            );
         }
+
+        const res = await q.paginate(page ?? 1, perPage ?? 10)
 
         return {
             data: res.all(),
