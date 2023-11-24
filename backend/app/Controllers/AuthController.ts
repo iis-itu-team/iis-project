@@ -1,35 +1,51 @@
-import User from "App/Models/User"
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema, rules } from "@ioc:Adonis/Core/Validator"
+import { Visibility } from "types/visibility"
+import UserService from "App/Services/UserService"
+
+const registerSchema = schema.create({
+    nickname: schema.string([
+        rules.minLength(5)
+    ]),
+    email: schema.string([
+        rules.email()
+    ]),
+    password: schema.string([
+        rules.minLength(5)
+    ]),
+    visibility: schema.enum.optional(Object.values(Visibility))
+})
+
+const loginSchema = schema.create({
+    uid: schema.string(),
+    password: schema.string()
+})
 
 export default class AuthController {
+    private readonly userService = new UserService()
 
     public async register({ request, response, auth }: HttpContextContract) {
-        const { nickname, password, email } = request.all()
+        const validated = await request.validate({
+            schema: registerSchema
+        })
 
-        if ((await User.findBy("email", email) != null) || (await (User.findBy("nickname", nickname)) != null)) {
-            return response.status(401).formatted({ status: 'nickname_or_email_taken' })
-        }
+        const user = await this.userService.createUser(validated)
 
-        try {
-            const user = await User.create({ nickname, email, password })
-            await auth.login(user)
-            return response.status(201).success(user)
-        } catch (error) {
-            response.status(401).formatted({ status: 'user_cannot_be_created' })
-        }
+        await auth.login(user)
+
+        response.status(201).success(user)
     }
 
     public async login({ request, response, auth }: HttpContextContract) {
-        const { uid, password } = request.all()
+        const { uid, password } = await request.validate({
+            schema: loginSchema
+        })
 
         try {
             const user = await auth.attempt(uid, password)
 
-            response.status(200).formatted({
-                status: 'success',
-                data: user
-            })
-        } catch (error) {
+            response.success(user)
+        } catch {
             response.status(401).formatted({ status: 'invalid_credentials' })
         }
     }

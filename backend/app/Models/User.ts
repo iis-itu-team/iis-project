@@ -3,6 +3,7 @@ import { Role } from "types/role";
 import generateId from "utils/generate-id";
 import Group from "./Group";
 import Hash from '@ioc:Adonis/Core/Hash'
+import { Visibility } from "types/visibility";
 
 export default class User extends BaseModel {
     public static selfAssignPrimaryKey = true
@@ -22,6 +23,9 @@ export default class User extends BaseModel {
     // todo: add default in new migration
     @column()
     public role: Role
+
+    @column()
+    public visibility: Visibility
 
     @hasMany(() => Group)
     public groups: HasMany<typeof Group>
