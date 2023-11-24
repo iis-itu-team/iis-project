@@ -94,6 +94,9 @@ Route.group(() => {
       "store": "require-auth"
     })
 
+  // /messages/:messageId/ratings
+  Route.post("/messages/:messageId/ratings", "MessageController.rate")
+
   // /groups/:group_id/messages
   Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
 
