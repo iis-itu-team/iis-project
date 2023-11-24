@@ -69,11 +69,11 @@ export default class MessageController {
         response.success()
     }
 
-    // /rate
+    // /messages/:messageId/ratings
     public async rate({ request, response }: HttpContextContract) {
-        const { id, up } = request.all()
+        const { message_id, user_id, up } = request.all()
 
-        const rating = await this.messageService.rateMessage(id, up)
+        const rating = await this.messageService.rateMessage(message_id, user_id, up)
 
         response.success(rating)
     }

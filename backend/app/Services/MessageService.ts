@@ -6,6 +6,7 @@ import Thread from "App/Models/Thread"
 import User from "App/Models/User"
 import { PaginationInput } from "types/pagination"
 import { ExpandInput } from "types/expand"
+import Database from "@ioc:Adonis/Lucid/Database"
 
 export type CreateMessageInput = {
     threadId: string
@@ -99,12 +100,24 @@ export default class MessageService {
         await message.delete()
     }
 
-    public async rateMessage(id: string, up: string) {
+    public async rateMessage(message_id: string, user_id: string, up: string) {
 
-        const message = await Message.findBy("id", id)
+        const message = await Message.findBy("id", message_id)
         
         if (!message) {
-            throw HttpException.notFound("message", id)
+            throw HttpException.notFound("message", message_id)
+        }
+
+        const q = await Database.knexQuery().table("messages")
+            .where("user_id", user_id)
+
+        console.log(q)
+
+        if (q !== null) {
+            console.log("User already rated this message", user_id, message.userId)
+            return message.rating 
+        } else {
+            await message.userId().attach([user_id]);
         }
 
         if (message.rating == null) {
