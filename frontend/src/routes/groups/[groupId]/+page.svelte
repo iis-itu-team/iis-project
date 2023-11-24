@@ -10,7 +10,8 @@
 	showCrumbs(true);
 	$: setCrumbs([
 		{
-			text: 'Groups'
+			text: 'Groups',
+			href: `/groups`
 		},
 		{
 			text: group?.title ?? '',
