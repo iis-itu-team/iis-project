@@ -8,46 +8,60 @@
 	import type { ResponseFormat } from '$lib/types';
 
 	const fetch = (async () => {
-	    const groupsRes = await client.get<ResponseFormat<Group[]>>("/groups");
-	
-	    if (groupsRes.status === 200 && groupsRes.data.status === 'success') {
-	        const groups = groupsRes.data.data!;
+		const groupsRes = await client.get<ResponseFormat<Group[]>>('/groups');
 
-			const public_groups = groups.filter((group) => {return group.visibility == Visibility.PUBLIC});
-			const protected_groups = groups.filter((group) => {return group.visibility == Visibility.PROTECTED});
-			const private_groups = groups.filter((group) => {return group.visibility == Visibility.PRIVATE});
+		if (groupsRes.status === 200 && groupsRes.data.status === 'success') {
+			const groups = groupsRes.data.data!;
 
-			return [public_groups, protected_groups, private_groups];
-	    } else {
-	        toasts.add({
-	            type: 'error',
-	            description: 'Failed loading groups'
-	        });
+			const publicGroups = groups.filter((group) => {
+				return group.visibility == Visibility.PUBLIC;
+			});
+			const protectedGroups = groups.filter((group) => {
+				return group.visibility == Visibility.PROTECTED;
+			});
+			const privateGroups = groups.filter((group) => {
+				return group.visibility == Visibility.PRIVATE;
+			});
 
-			throw "Error loading groups";
-	    }
-	})()
+			return [publicGroups, protectedGroups, privateGroups];
+		} else {
+			toasts.add({
+				type: 'error',
+				description: 'Failed loading groups.'
+			});
+
+			throw 'Error loading groups';
+		}
+	})();
 
 	showCrumbs(false);
 </script>
 
-<div class="flex flex-col gap-y-2">
+<div class="flex flex-col gap-y-8">
 	{#await fetch}
-		<p class ="text-white font-bold text-xl2">Loading...</p>
-	{:then [public_groups, protected_groups, private_groups]}
-		<p class="text-white font-semibold text-lg">public groups ({public_groups.length}):</p>
-		<GroupList groups={public_groups} />
+		<p class="text-md">loading...</p>
+	{:then [publicGroups, protectedGroups, privateGroups]}
+		{#if publicGroups.length > 0}
+			<div>
+				<p class="font-semibold text-lg">public groups ({publicGroups.length}):</p>
+				<GroupList groups={publicGroups} />
+			</div>
+		{/if}
 
-		<br>
+		{#if protectedGroups.length > 0}
+			<div>
+				<p class="font-semibold text-lg">protected groups ({protectedGroups.length}):</p>
+				<GroupList groups={protectedGroups} />
+			</div>
+		{/if}
 
-		<p class="text-white font-semibold text-lg">protected groups ({protected_groups.length}):</p>
-		<GroupList groups={protected_groups} />
-
-		<br>
-
-		<p class="text-white font-semibold text-lg">private groups ({private_groups.length}):</p>
-		<GroupList groups={private_groups} />
+		{#if privateGroups.length > 0}
+			<div>
+				<p class="font-semibold text-lg">private groups ({privateGroups.length}):</p>
+				<GroupList groups={privateGroups} />
+			</div>
+		{/if}
 	{:catch err}
-		<p class ="text-red font-bold text-xl2">{err}</p>
+		<p class="text-red font-bold text-xl2">{err}</p>
 	{/await}
 </div>

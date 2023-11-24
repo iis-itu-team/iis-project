@@ -1,8 +1,8 @@
-import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { client } from "$lib/http/http";
 import type { LoginInput, RegisterInput, ResponseFormat, User } from "$lib/types";
 import { get, writable } from "svelte/store";
+import { fetchRequests } from "./requests";
 
 export let currentUser = writable<User | undefined | null>(null);
 
@@ -16,18 +16,20 @@ export const login = async (input: LoginInput) => {
         console.log("Logged in as " + get(currentUser)?.email);
     }
 
+    await fetchRequests();
+
     return res.data;
 }
 
 export const logout = async () => {
-	const res = await client.post<ResponseFormat<void>>('/auth/logout');
+    const res = await client.post<ResponseFormat<void>>('/auth/logout');
 
-	if (res.status === 200 && res.data.status === 'success') {
-		currentUser.set(null);
-		console.log('logged out');
-	}
+    if (res.status === 200 && res.data.status === 'success') {
+        currentUser.set(null);
+        console.log('logged out');
+    }
 
-	return;
+    return;
 }
 
 export const register = async (input: RegisterInput) => {
@@ -49,6 +51,8 @@ export const attemptLoad = async () => {
     if (res.status === 200 && res.data.status === 'success') {
         currentUser.set(res.data.data!);
         console.log("Loaded in through cookie as " + get(currentUser)?.email);
+
+        await fetchRequests();
 
         return res.data.data!;
     }

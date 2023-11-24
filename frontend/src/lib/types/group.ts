@@ -27,6 +27,7 @@ export type GroupRequest = {
     id: string
     
     group_id: string
+    user_id: string
     status: GroupRequestStatus
     type: GroupRequestType
 

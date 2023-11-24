@@ -5,9 +5,12 @@
 	import '../app.css';
 	import { currentUser } from '$lib/stores/auth';
 	import type { PageData } from './$types';
+	import { fetchRequests } from '$lib/stores/requests';
 
 	export let data: PageData;
+	
 	$currentUser = data.user;
+	fetchRequests();
 </script>
 
 <svelte:head>
