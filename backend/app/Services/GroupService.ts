@@ -17,7 +17,9 @@ export type ListGroupsInput = PaginationInput & {
     loggedInUserId?: string
 } & ExpandInput
 
-export type GetGroupInput = {} & ExpandInput
+export type GetGroupInput = {
+    loggedInUserId?: string
+} & ExpandInput
 
 export type GroupCreateInput = {
     title: string
@@ -114,9 +116,16 @@ export default class GroupService {
         }
     }
 
-    public async get(groupId: string, { expand }: GetGroupInput): Promise<Group | null> {
+    public async get(groupId: string, { expand, loggedInUserId }: GetGroupInput): Promise<Group | null> {
         const q = Group.query()
             .where("id", groupId)
+            .select("*",
+                Database.from("group_members")
+                    .select("group_role")
+                    .whereRaw("group_members.group_id = groups.id")
+                    .where("user_id", loggedInUserId!)
+                    .as("membership")
+            );
 
         expand.forEach((field) => q.preload(field as ExtractModelRelations<Group>));
 

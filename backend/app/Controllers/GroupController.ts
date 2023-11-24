@@ -49,16 +49,19 @@ export default class {
         response.list(groups)
     }
 
-    public async show({ request, response }: HttpContextContract) {
+    public async show({ auth, request, response }: HttpContextContract) {
         const groupId = request.param('id')
 
         const validated = await request.validate({
             schema: getGroupSchema
         })
 
+        const loggedInUserId = auth.user?.id
+
         const group = await this.groupService.get(groupId, {
             ...validated,
-            expand: validated.expand?.split(",") ?? []
+            expand: validated.expand?.split(",") ?? [],
+            loggedInUserId
         })
 
         if (!group) {
