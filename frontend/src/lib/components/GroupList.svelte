@@ -14,12 +14,8 @@
 		group_type == Visibility.PUBLIC || (group_type == Visibility.PROTECTED && $currentUser != null);
 
 	$: groups.forEach((g) => {
-		g.joinRequest = $groupRequests.find(
-			(r) => r.group_id == g.id && r.user_id == $currentUser?.id
-		);
+		g.joinRequest = $groupRequests.find((r) => r.group_id == g.id && r.user_id == $currentUser?.id);
 	});
-
-	$: console.log(groups);
 </script>
 
 <div class="flex flex-col gap-y-4 p-2">
@@ -40,7 +36,7 @@
 					<button
 						on:click={async () => {
 							await requestToJoin(group);
-                            invalidateAll();
+							invalidateAll();
 						}}>request to join</button
 					>
 				{/if}
