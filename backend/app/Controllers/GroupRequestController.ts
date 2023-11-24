@@ -5,6 +5,7 @@ import { GroupRequestStatus, GroupRequestType } from "types/group-request";
 import User from "App/Models/User";
 import GroupRequest from "App/Models/GroupRequest";
 import { PaginationResult } from "types/response-format";
+import GroupService from "App/Services/GroupService";
 
 const createRequestSchema = schema.create({
     type: schema.enum(Object.values(GroupRequestType))
@@ -26,7 +27,8 @@ const changeStatusSchema = schema.create({
 })
 
 export default class GroupRequestController {
-    private readonly requestService = new GroupRequestService();
+    private readonly requestService = new GroupRequestService()
+    private readonly groupService = new GroupService()
 
     public async index({ auth, request, response }: HttpContextContract) {
         const groupId = request.param("group_id")
@@ -50,7 +52,7 @@ export default class GroupRequestController {
                 expand: validated.expand?.split(",")
             })
         } else {
-            await this.requestService.checkPermissions(user, groupId);
+            await this.groupService.checkPermissions(user, groupId);
 
             requests = await this.requestService.listRequests({
                 ...validated,
@@ -72,7 +74,7 @@ export default class GroupRequestController {
 
         const user = auth.user as User
 
-        await this.requestService.checkPermissions(user, groupRequest?.groupId)
+        await this.groupService.checkPermissions(user, groupRequest?.groupId)
 
         if (groupRequest) {
             response.success(groupRequest)

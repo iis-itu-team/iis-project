@@ -2,6 +2,7 @@ import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import GroupService from "App/Services/GroupService"
 import { schema, rules } from "@ioc:Adonis/Core/Validator"
 import { Visibility } from "types/visibility";
+import User from "App/Models/User";
 
 const listGroupSchema = schema.create({
     perPage: schema.number.optional([
@@ -36,7 +37,7 @@ export default class {
             schema: listGroupSchema
         })
 
-		// id used to signify membership
+        // id used to signify membership
         const loggedInUserId = auth.user?.id;
 
         const groups = await this.groupService.list({
@@ -76,6 +77,23 @@ export default class {
         const group = await this.groupService.create({ ...validated, adminId })
 
         response.status(201).success(group)
+    }
+
+    public async kick({ auth, request, response }: HttpContextContract) {
+        const validated = await request.validate({
+            schema: schema.create({
+                userId: schema.string()
+            })
+        })
+
+        const groupId = request.param("id")
+
+        // verfiy the current user can kick
+        await this.groupService.checkPermissions(auth.user as User, groupId)
+
+        await this.groupService.kick(groupId, validated.userId)
+
+        response.success()
     }
 
     public async update({ request, response }: HttpContextContract) {

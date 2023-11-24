@@ -10,6 +10,8 @@ import { Visibility } from "types/visibility"
 import { Membership } from "types/membership"
 import { GroupRole } from "types/group-role"
 import Database from "@ioc:Adonis/Lucid/Database"
+import User from "App/Models/User"
+import { Role } from "types/role"
 
 export type ListGroupsInput = PaginationInput & {
     userId?: string
@@ -32,6 +34,44 @@ export type GroupUpdateInput = {
 }
 
 export default class GroupService {
+    public async checkPermissions(user?: User, groupId?: string) {
+        if (!user) {
+            throw new HttpException(401, "unauthenticated", "You're not authenticated.")
+        }
+
+        if (user.role == Role.ADMIN) {
+            return
+        }
+
+        if (!groupId) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role
+            })
+        }
+
+        const membership = await this.getGroupMembership(user.id, groupId);
+
+        if (!membership) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role
+            })
+        }
+
+        if (membership.group_role != GroupRole.MOD && membership.group_role != GroupRole.ADMIN) {
+            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
+                userRole: user.role,
+                groupRole: membership.group_role
+            })
+        }
+    }
+
+    public async getGroupMembership(userId: string, groupId: string) {
+        return await Database.knexQuery().table("group_members")
+            .where("user_id", userId)
+            .andWhere("group_id", groupId)
+            .first();
+    }
+
     public async list({ page, perPage, userId, loggedInUserId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
         const q = Group.query().distinctOn("groups.id")
 
@@ -44,17 +84,17 @@ export default class GroupService {
 
         const res = await q.paginate(page ?? 1, perPage ?? 10)
 
-		// compute membership fields using loggedInUserId
-		if (loggedInUserId) {
-			const queryResult = await Database.from("group_members")
-				.select()
-				.where("user_id", loggedInUserId)
-			res.forEach((group, idx, arr) => {
-				if (queryResult.findIndex((value) => {return value.group_id == group.id}) != -1) {
-					group.membership = Membership.TRUE;	
-				}
-			})
-		}
+        // compute membership fields using loggedInUserId
+        if (loggedInUserId) {
+            const queryResult = await Database.from("group_members")
+                .select()
+                .where("user_id", loggedInUserId)
+            res.forEach((group, idx, arr) => {
+                if (queryResult.findIndex((value) => { return value.group_id == group.id }) != -1) {
+                    group.membership = Membership.TRUE;
+                }
+            })
+        }
 
         return {
             data: res.all(),
@@ -102,6 +142,33 @@ export default class GroupService {
         }
 
         return await group.merge(input).save()
+    }
+
+    public async kick(groupId: string, userId: string) {
+        const group = await Group.query()
+            .where("id", groupId)
+            .preload("members")
+            .first()
+
+        if (!group) {
+            throw HttpException.notFound("group", groupId)
+        }
+
+        const membership = group.members.find((m) => m.id === userId);
+
+        if (!membership) {
+            throw new HttpException(400, "not_a_member", "User is not a member.", {
+                groupId, userId
+            })
+        }
+
+        if (membership.group_role === GroupRole.ADMIN) {
+            throw new HttpException(400, "is_admin", "Admins cannot be kicked or leave.", {
+                groupId, userId
+            })
+        }
+
+        await group.related("members").detach([userId])
     }
 
     public async delete(groupId: string) {

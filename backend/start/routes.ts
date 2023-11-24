@@ -40,6 +40,9 @@ Route.group(() => {
       "destroy": "require-auth"
     })
 
+  Route.post("/groups/:id/kick", "GroupController.kick")
+    .middleware("require-auth")
+
   // -- Group Requests
 
   Route.resource("groups.requests", "GroupRequestController")

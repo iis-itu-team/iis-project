@@ -7,6 +7,7 @@ import { PaginationInput } from "types/pagination"
 import { GroupRequestStatus, GroupRequestType } from "types/group-request"
 import { Role } from "types/role"
 import { ExtractModelRelations } from "@ioc:Adonis/Lucid/Orm"
+import GroupService from "./GroupService"
 
 export type CreateRequestInput = {
     userId: string
@@ -23,43 +24,7 @@ export type ListRequestsInput = {
 } & PaginationInput
 
 export default class GroupRequestService {
-    public async checkPermissions(user?: User, groupId?: string) {
-        if (!user) {
-            throw new HttpException(401, "unauthenticated", "You're not authenticated.")
-        }
-
-        if (user.role == Role.ADMIN) {
-            return
-        }
-
-        if (!groupId) {
-            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                userRole: user.role
-            })
-        }
-
-        const membership = await this.getGroupMembership(user.id, groupId);
-
-        if (!membership) {
-            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                userRole: user.role
-            })
-        }
-
-        if (membership.group_role != GroupRole.MOD && membership.group_role != GroupRole.ADMIN) {
-            throw new HttpException(401, "not_allowed", "You're not allowed to do this.", {
-                userRole: user.role,
-                groupRole: membership.group_role
-            })
-        }
-    }
-
-    public async getGroupMembership(userId: string, groupId: string) {
-        return await Database.knexQuery().table("group_members")
-            .where("user_id", userId)
-            .andWhere("group_id", groupId)
-            .first();
-    }
+    private readonly groupService = new GroupService()
 
     public async listRequests(input: ListRequestsInput) {
         const q = GroupRequest.query()
@@ -154,7 +119,7 @@ export default class GroupRequestService {
             throw HttpException.notFound("group_request", requestId)
         }
 
-        await this.checkPermissions(user, request.groupId);
+        await this.groupService.checkPermissions(user, request.groupId);
 
         if (request.type == GroupRequestType.JOIN) {
             // join the user to the group
