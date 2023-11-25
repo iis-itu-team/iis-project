@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ensureLoggedIn } from '$lib/stores/auth';
+	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
 	import { client } from '$lib/http/http';
 	import type { User, ResponseFormat, Visibility } from '$lib/types';
@@ -8,8 +8,6 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
-
-	export let data: PageData;
 
 	showCrumbs(false);
 
@@ -45,9 +43,9 @@
 	};
 
 	const defaults = {
-		visibility: data.user?.visibility,
-		email: data.user?.email,
-		nickname: data.user?.nickname
+		visibility: $currentUser?.visibility,
+		email: $currentUser?.email,
+		nickname: $currentUser?.nickname
 	};
 
 	let values: FormValues = {
@@ -73,9 +71,9 @@
 	$: validate(schema, values);
 
 	$: hasChanges =
-		data.user?.email !== values.email ||
-		data.user?.nickname !== values.nickname ||
-		data.user?.visibility !== values.visibility;
+		$currentUser?.email !== values.email ||
+		$currentUser?.nickname !== values.nickname ||
+		$currentUser?.visibility !== values.visibility;
 
 	$: canSubmit = hasChanges && !hasErrors;
 
@@ -98,7 +96,7 @@
 	];
 
 	const handleSubmit = async () => {
-		const res = await client.put<ResponseFormat<User>>(`/users/${data.user?.id}`, {
+		const res = await client.put<ResponseFormat<User>>(`/users/${$currentUser?.id}`, {
 			...values
 		});
 
