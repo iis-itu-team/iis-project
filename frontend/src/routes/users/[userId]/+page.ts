@@ -13,6 +13,6 @@ export async function load({ params }) {
     }
 
     return {
-        user: user.data
+        user: user.data.data
     }
 }

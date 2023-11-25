@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { currentUser, login } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
 
@@ -20,12 +20,11 @@
 			});
 			return;
 		}
-
++
 		toasts.add({
 			type: 'success',
 			description: `Logged in as ${$currentUser?.nickname}`
 		});
-
 		goto('/');
 	};
 </script>
