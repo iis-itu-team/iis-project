@@ -15,8 +15,8 @@ export enum UserRole {
 }
 
 export type LoginInput = {
-    uid: string
-    password: string
+    uid?: string
+    password?: string
 }
 
 export type RegisterInput = {
