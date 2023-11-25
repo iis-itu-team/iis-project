@@ -209,7 +209,7 @@ export const checkLoggedIn = async () => {
 
 // if not logged in, redirect to login
 export const ensureLoggedIn = async () => {
-    const user = checkLoggedIn();
+    const user = await checkLoggedIn();
 
     if (!user) {
         goto('/login');
