@@ -10,7 +10,6 @@
 	$: sorted_messages = data.messages.sort((mes1, mes2) => {
 		let date1 = new Date(mes1.date)
 		let date2 = new Date(mes2.date)
-		console.log(date1 + " " + date2)
 		return date1 > date2
 	})
 
