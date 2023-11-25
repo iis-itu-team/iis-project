@@ -77,7 +77,7 @@ export default class UserService {
     }
 
     public async updateUser(id: string, input: UpdateUserInput) {
-        const user = await this.getUser(id)
+        const user = await User.find(id)
 
         if (!user) {
             throw HttpException.notFound("user", id)
@@ -88,11 +88,12 @@ export default class UserService {
         // we're trying to edit
 
         user.merge(input)
+
         return await user.save()
     }
 
     public async deleteUser(id: string) {
-        const user = await User.findBy("id", id)
+        const user = await User.find(id)
 
         if (!user) {
             throw HttpException.notFound("user", id)
