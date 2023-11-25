@@ -61,15 +61,7 @@ export default class UserService {
     }
 
     public async createUser({ email, nickname, password, visibility }: CreateUserInput) {
-        const existing = await User.query()
-            .where("email", email)
-            .orWhere("nickname", nickname)
-            .first()
-
-        if (existing) {
-            throw new HttpException(400, "nickname_or_email_taken", "Nickname or email are already taken.",
-                { email, nickname })
-        }
+        await this.checkExists(email, nickname);
 
         const user = await User.create({ nickname, email, password, visibility })
 
