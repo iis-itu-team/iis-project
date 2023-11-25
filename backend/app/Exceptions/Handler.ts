@@ -23,14 +23,22 @@ export default class ExceptionHandler extends HttpExceptionHandler {
   }
 
   public async handle(error: any, ctx: HttpContextContract) {
-    if (error.code !== 'FAILURE') {
-      return super.handle(error, ctx)
+    if (error.code === 'FAILURE') {
+      ctx.response.fail(error.status, {
+        status: error.statusCode,
+        error: error.error,
+        data: error.data
+      })
+      return
     }
 
-    ctx.response.fail(error.status, {
-      status: error.statusCode,
-      error: error.error,
-      data: error.data
-    })
+    if (error.code === 'E_VALIDATION_FAILURE') {
+      ctx.response.fail("validation_fail", {
+        data: error.messages.errors
+      })
+      return
+    }
+
+    return super.handle(error, ctx)
   }
 }

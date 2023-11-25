@@ -76,12 +76,54 @@ export default class UserService {
         return user
     }
 
+    private async checkExists(email?: string, nickname?: string) {
+        if (!email && !nickname) {
+            return;
+        }
+
+        const existingQ = User.query()
+
+        if (email) {
+            existingQ.where("email", email)
+        }
+
+        if (nickname) {
+            existingQ.orWhere("nickname", nickname)
+        }
+
+        const existing = await existingQ.first()
+
+        if (existing) {
+            if (existing.email === email) {
+                throw new HttpException(400, "email_taken", "Email is already taken.",
+                    { email })
+            } else {
+                throw new HttpException(400, "nickname_taken", "Nickname is already taken.",
+                    { nickname })
+            }
+        }
+    }
+
+    private deleteUnchanged<T extends Object>(original: T, input: T) {
+        Object.keys(original).forEach((k) => {
+            if (original[k] === input[k]) {
+                console.log("delete", k);
+                delete input[k];
+            }
+        })
+    }
+
     public async updateUser(id: string, input: UpdateUserInput) {
         const user = await User.find(id)
 
         if (!user) {
             throw HttpException.notFound("user", id)
         }
+
+        // no need to update what stays the same
+        this.deleteUnchanged(user.$attributes, input)
+
+        await this.checkExists(input.email, input.nickname)
 
         // only user himself or an administrator can update him
         // todo: get currently logged in user and check if he's an admin or the user

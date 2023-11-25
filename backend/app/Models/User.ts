@@ -4,6 +4,7 @@ import generateId from "utils/generate-id";
 import Group from "./Group";
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Visibility } from "types/visibility";
+import { DateTime } from "luxon";
 
 export default class User extends BaseModel {
     public static selfAssignPrimaryKey = true
@@ -35,7 +36,6 @@ export default class User extends BaseModel {
 
     @column.dateTime({ autoCreate: true, autoUpdate: true })
     public updatedAt: DateTime
-
 
     @beforeCreate()
     public static beforeCreate(user: User) {
