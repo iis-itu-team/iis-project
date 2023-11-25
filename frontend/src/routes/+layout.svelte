@@ -1,8 +1,8 @@
 <script lang="ts">
+	import '../app.css';
 	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { ToastContainer, FlatToast } from 'svelte-toasts';
-	import '../app.css';
 	import { currentUser } from '$lib/stores/auth';
 	import type { PageData } from './$types';
 	import { fetchRequests } from '$lib/stores/requests';

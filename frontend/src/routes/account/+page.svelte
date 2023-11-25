@@ -1,135 +1,221 @@
 <script lang="ts">
-	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
+	import { ensureLoggedIn } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
-	import { client } from "$lib/http/http";
-	import { get } from 'svelte/store';
-	import type { User, ResponseFormat } from '$lib/types';
+	import { client } from '$lib/http/http';
+	import { type User, type ResponseFormat, Visibility } from '$lib/types';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
 	import { logout } from '$lib/stores/auth';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 
 	showCrumbs(false);
+
 	ensureLoggedIn();
 
-	let editing_email = false;
-	let editing_nickname = false;
+	// -- Realtime basic validation
 
-	let email = get(currentUser)?.email;
-	let nickname = get(currentUser)?.nickname;
-	let id = get(currentUser)?.id;
-
-	function set_edit_email(value: boolean): void {
-		editing_email = value;
+	type FormValues = {
+		email?: string;
+		nickname?: string;
+		visibility?: Visibility;
 	};
 
-	function set_edit_nickname(value: boolean): void {
-		editing_nickname = value;
-	};
+	type Schema = any;
 
-	const update_email = async () => {
-		const res = await client.put<ResponseFormat<User>>("/users/" + id, {email: email});
-
-		if (res.status === 200 && res.data.status === 'success'){
-			toasts.add({
-				type: 'success',
-				description: "Successfully changed email to " + email
-			});
-
-			currentUser.set(res.data.data!);
-		} else {
-			toasts.add({
-				type: 'error',
-				description: "Failed to change email"
-			});
+	const schema = {
+		email: {
+			validate(val?: string) {
+				if (!val || val.trim().length === 0) {
+					return 'email cannot be empty';
+				}
+			}
+		},
+		nickname: {
+			validate(val?: string) {
+				if (!val || val.trim().length === 0) {
+					return 'nickname cannot be empty';
+				}
+			}
 		}
 	};
 
-	const update_nickname = async () => {
-		const res = await client.put<ResponseFormat<User>>("/users/" + id, {nickname: nickname});
+	const defaults = {
+		visibility: Visibility.PUBLIC,
+		email: data.user?.email,
+		nickname: data.user?.nickname
+	};
 
-		if (res.status === 200 && res.data.status === 'success'){
+	let values: FormValues = {
+		...defaults
+	};
+
+	let errors: { [key: string]: string } = {};
+	let hasErrors: boolean = false;
+
+	const validate = (schema: Schema, values: FormValues) => {
+		hasErrors = false;
+		Object.entries(schema).forEach(([key, validator]) => {
+			const value = values[key as keyof FormValues];
+
+			errors[key] = (validator as any).validate(value);
+
+			if (errors[key]) {
+				hasErrors = true;
+			}
+		});
+	};
+
+	$: validate(schema, values);
+
+	$: hasChanges =
+		data.user?.email !== values.email ||
+		data.user?.nickname !== values.nickname ||
+		data.user?.visibility !== values.visibility;
+
+	$: canSubmit = hasChanges && !hasErrors;
+
+	const visibilityOptions = [
+		{
+			value: 'private',
+			text: 'Private',
+			description: 'No one can see your profile.'
+		},
+		{
+			value: 'protected',
+			text: 'Protected',
+			description: 'Only registered users can see your profile.'
+		},
+		{
+			value: 'public',
+			text: 'Public',
+			description: 'Anyone can see your profile..'
+		}
+	];
+
+	const handleSubmit = async () => {
+		const res = await client.put<ResponseFormat<User>>(`/users/${data.user?.id}`, {
+			...values
+		});
+
+		if (res.status === 200 && res.data.status === 'success') {
+			errors = {};
+			hasErrors = false;
+			invalidateAll();
+
 			toasts.add({
 				type: 'success',
-				description: "Successfully changed nickname to " + nickname
+				description: 'Account information updated.'
 			});
+			return;
+		}
 
-			currentUser.set(res.data.data!);
-		} else {
+		if (res.data.status === 'nickname_taken') {
+			errors.nickname = 'already taken';
 			toasts.add({
 				type: 'error',
-				description: "Failed to change nickname"
+				description: 'Nickname already taken.'
 			});
+			return;
+		}
+
+		if (res.data.status === 'email_taken') {
+			errors.email = 'already taken';
+			toasts.add({
+				type: 'error',
+				description: 'Email already taken.'
+			});
+			return;
+		}
+
+		if (res.data.status === 'validation_fail') {
+			const validationErrors = res.data.data as unknown as any[];
+
+			validationErrors.forEach((val: { rule: string; field: string; message: string }) => {
+				errors[val.field] = val.message;
+			});
+			return;
 		}
 	};
 
-	const user_logout = async () => {
+	const handleLogout = async () => {
 		await logout();
-		
-		goto('/login');
-	}
+		goto('/');
+	};
 </script>
 
-<div class="text-center">
-	<p>Your fancy account!</p>
-
-	<br>
-	
-	<p><b>Email:</b></p>
-	{#if !editing_email}
-		<d>{$currentUser?.email}</d>
-		<button
-		    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
-			on:click={() => set_edit_email(true)}
-		>
-		    <p><b>Edit</b></p>
-		</button>
-	{:else}
-		<form on:submit={() => {set_edit_email(false); update_email()}}>
-			<div class="bg-secondary rounded-xl p-6 mx-auto my-5 max-w-sm">
-         		<p><b>Enter your new email:</b></p>
-         		<input type="text" class="text-input w-full" bind:value={email} required />
+<div class="flex flex-col">
+	<div class="self-end">
+		<button class="button" on:click={handleLogout}>logout</button>
+	</div>
+	<form method="post" on:submit|preventDefault class="flex flex-col gap-y-4 p-10 max-w-md m-auto">
+		<div class="flex flex-col gap-y-2">
+			<label class="text-lg" for="email">Email</label>
+			<input
+				class="bg-background-light rounded-md p-2"
+				name="email"
+				type="text"
+				placeholder="Email"
+				bind:value={values.email}
+			/>
+			{#if errors.email}
+				<p class="error">{errors.email}</p>
+			{/if}
+		</div>
+		<div class="flex flex-col gap-y-2">
+			<label class="text-lg" for="email">Nickname</label>
+			<input
+				class="bg-background-light rounded-md p-2"
+				name="nickname"
+				type="text"
+				placeholder="Nickname"
+				bind:value={values.nickname}
+			/>
+			{#if errors.nickname}
+				<p class="error">{errors.nickname}</p>
+			{/if}
+		</div>
+		<p class="text-lg">Visibility</p>
+		{#each visibilityOptions as option}
+			<div class="flex flex-row gap-x-4 items-center justify-start">
+				<input
+					class="w-6 h-6 hover:cursor-pointer accent-primary"
+					name={option.value}
+					bind:group={values.visibility}
+					id={option.value}
+					type="radio"
+					value={option.value}
+				/>
+				<div class="flex flex-col">
+					<label class="text-lg bold" for={option.value}>{option.text}</label>
+					<p class="text-md text-gray-300">{option.description}</p>
+				</div>
 			</div>
-
+		{/each}
+		<div class="flex flex-row gap-x-4 justify-center">
 			<button
-			    type="submit"
-			    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
+				type="submit"
+				disabled={!canSubmit}
+				class={canSubmit ? 'button' : 'button-disabled'}
+				on:click={handleSubmit}
 			>
-			    <p><b>Save</b></p>
+				save changes
 			</button>
-		</form>
-	{/if}
-
-	<p><b>Nickname:</b></p>
-	{#if !editing_nickname}
-		<p>{$currentUser?.nickname}</p>
-		<button
-		    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
-			on:click={() => set_edit_nickname(true)}
-		>
-		    <p><b>Edit</b></p>
-		</button>
-	{:else}
-		<form on:submit={() => {set_edit_nickname(false); update_nickname()}}>
-			<div class="bg-secondary rounded-xl p-6 mx-auto my-5 max-w-sm">
-         		<p><b>Enter your new nickname:</b></p>
-         		<input type="text" class="text-input w-full" bind:value={nickname} required />
-			</div>
-
-			<button
-			    type="submit"
-			    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
-			>
-			    <p><b>Save</b></p>
-			</button>
-		</form>
-	{/if}
-
-	<br>
-
-	<button
-		on:click={user_logout}
-	    class="bg-primary hover:bg-secondary box-border rounded-xl p-6 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
-	>
- 	   <p><b>Logout</b></p>
-	</button>
+		</div>
+	</form>
 </div>
+
+<style lang="postcss">
+	.button {
+		@apply hover:cursor-pointer hover:underline text-white;
+	}
+
+	.button-disabled {
+		@apply hover:cursor-auto text-gray-400;
+	}
+
+	.error {
+		@apply text-red-400;
+	}
+</style>

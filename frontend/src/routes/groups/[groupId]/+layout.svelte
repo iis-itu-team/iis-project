@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { client } from '$lib/http/http';
-	import { currentUser } from '$lib/stores/auth';
+	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
 	import type { ResponseFormat } from '$lib/types';
 	import {
 		GroupRequestType,
@@ -28,6 +28,8 @@
 	const sentModRequest = writable<GroupRequest | null | undefined>(null);
 
 	onMount(() => {
+		ensureLoggedIn();
+
 		client
 			.get<ResponseFormat<GroupRequest[]>>(`/groups/${group?.id}/requests`, {
 				params: {
