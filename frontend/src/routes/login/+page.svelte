@@ -134,7 +134,7 @@
 		<button
 			type="submit"
 			disabled={!canSubmit}
-			class={canSubmit ? 'button' : 'button-disabled'}
+			class="bg-primary hover:bg-secondary box-border rounded-xl p-2 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl {canSubmit ? 'button' : 'button-disabled'}"
 			on:click={handleSubmit}
 		>
 			log in
