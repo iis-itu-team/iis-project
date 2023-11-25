@@ -20,7 +20,7 @@ export type LoginInput = {
 }
 
 export type RegisterInput = {
-    nickname: string
-    email: string
-    password: string
+    nickname?: string;
+    email?: string;
+    password?: string;
 }
