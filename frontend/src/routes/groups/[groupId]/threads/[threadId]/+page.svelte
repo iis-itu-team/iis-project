@@ -7,6 +7,13 @@
 
 	export let data: { group: Group; thread: Thread; messages: Message[] };
 
+	$: sorted_messages = data.messages.sort((mes1, mes2) => {
+		let date1 = new Date(mes1.date)
+		let date2 = new Date(mes2.date)
+		console.log(date1 + " " + date2)
+		return date1 > date2
+	})
+
 	showCrumbs(true);
 	$: setCrumbs([
 		{
@@ -70,7 +77,7 @@
 		{#if data.messages.length == 0}
 			<p>Nothing yet... so empty.</p>
 		{:else}
-			{#each data.messages as message}
+			{#each sorted_messages as message}
 				<div class="flex flex-col">
 					<div class="flex flex-row gap-x-2 grid grid-cols-2">
 						<div class="place-self-start">
@@ -92,7 +99,13 @@
 							{message.content}
 						</p>
 						<p class="text-right">
-							{message.date}
+							{new Date(message.date).toLocaleString("en-gb", {
+								hour: "2-digit",
+								minute: "2-digit",
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric"
+							})}
 						</p>
 					</div>
 				</div>

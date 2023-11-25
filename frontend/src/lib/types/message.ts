@@ -11,4 +11,6 @@ export interface Message {
     content: string;
 
 	rating: number;
+
+	date: string;
 }

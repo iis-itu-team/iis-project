@@ -65,17 +65,7 @@ export default class Message extends BaseModel {
     public static async beforeCreate(message: Message) {
         message.id = generateId(message.id, "message");
 
-        const date = new Date();
-
-        const options = {
-            hour: '2-digit',    // HH            
-            minute: '2-digit',  // MM
-            day: '2-digit',     // DD
-            month: '2-digit',   // MM
-            year: 'numeric'     // YYYY
-          };
-          
-        message.date = date.toLocaleString('en-GB', options);
+        message.date = new Date().toISOString();
 
         message.rating = 0;
     }
