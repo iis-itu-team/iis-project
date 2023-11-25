@@ -4,8 +4,6 @@
 	import { register } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
 
-	// TODO: check if emails and passwords match
-
 	let formValues: Partial<RegisterInput & { verifyEmail: string; verifyPassword: string }> = {};
 
 	const handleRegister = async () => {
@@ -13,6 +11,22 @@
 			toasts.add({
 				type: 'error',
 				description: 'Invalid properties.'
+			});
+			return;
+		}
+
+		if (formValues.email != formValues.verifyEmail) {
+			toasts.add({
+				type: 'error',
+				description: "Emails don't match."
+			});
+			return;
+		}
+
+		if (formValues.password != formValues.verifyPassword) {
+			toasts.add({
+				type: 'error',
+				description: "Passwords don't match."
 			});
 			return;
 		}
@@ -28,6 +42,19 @@
 				type: 'error',
 				description: 'Nickname or email are already taken.'
 			});
+			return;
+		}
+
+		if (res.errors) {
+			let err = ''
+			for (const error of res.errors) {
+				err += error.field + ': ' + error.message + '\n'
+				console.log(err)
+			}
+
+			toasts.error({
+				description: err
+			})
 			return;
 		}
 
