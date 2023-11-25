@@ -45,5 +45,6 @@ Server.middleware.registerNamed({
     'admin': () => import('App/Middleware/AdminOnly'),
     'require-auth': () => import('App/Middleware/Auth'),
     'group-auth': () => import('App/Middleware/GroupAuth'),
-    'thread-auth': () => import('App/Middleware/ThreadAuth')
+    'thread-auth': () => import('App/Middleware/ThreadAuth'),
+    'rating-auth': () => import('App/Middleware/RatingAuth')
 })

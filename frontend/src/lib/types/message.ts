@@ -9,4 +9,6 @@ export interface Message {
     groupId: string;
 
     content: string;
+
+	rating: number;
 }

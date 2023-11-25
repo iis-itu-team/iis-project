@@ -102,38 +102,54 @@ export default class MessageService {
 
     public async rateMessage(message_id: string, user_id: string, up: string) {
 
-        const message = await Message.findBy("id", message_id)
+        const message = await Message.find(message_id)
         
         if (!message) {
             throw HttpException.notFound("message", message_id)
         }
 
-        const q = await Database.knexQuery().table("messages")
-            .where("user_id", user_id)
+		const message_rating = await Database.from("user_ratings")
+			.select()
+			.where("user_id", "=", user_id)
+			.andWhere("message_id", "=", message_id)
 
-        console.log(q)
+		if (message_rating.length == 0) {
+			await Database.table("user_ratings").insert({
+				user_id: user_id,
+				message_id: message_id,
+				up: up
+			})
+		}
 
-        if (q !== null) {
-            console.log("User already rated this message", user_id, message.userId)
-            return message.rating 
-        } else {
-            await message.userId().attach([user_id]);
-        }
+		if (message_rating.length == 1) {
+			await Database.from("user_ratings")
+				.where("user_id", "=", user_id)
+				.andWhere("message_id", "=", message_id)
+				.delete()
 
-        if (message.rating == null) {
-            message.rating = 0
-        }
+			if (message_rating.at(0)?.up != up) {
+				await Database.table("user_ratings").insert({
+					user_id: user_id,
+					message_id: message_id,
+					up: up
+				})
+			}
+		}
 
-        console.log(up)
-
-        if (up === "true") {
-            message.rating++
-        } else {
-            message.rating--
-        }
-
-        console.log(message.rating)
-        
+		let message_ratings = await Database.from("user_ratings")
+			.select()
+			.where("message_id", "=", message_id)
+		
+		let rating_final = 0
+		for (const rate of message_ratings) {
+			if (rate.up == "true") {
+				rating_final += 1
+			} else {
+				rating_final -= 1
+			}
+		}
+		
+		message.rating = rating_final
         await message.save()
         return message.rating
     }

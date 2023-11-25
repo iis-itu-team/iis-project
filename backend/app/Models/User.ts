@@ -2,6 +2,7 @@ import { BaseModel, HasMany, beforeCreate, beforeSave, column, computed, hasMany
 import { Role } from "types/role";
 import generateId from "utils/generate-id";
 import Group from "./Group";
+import Message from "./Message";
 import Hash from '@ioc:Adonis/Core/Hash'
 import { Visibility } from "types/visibility";
 import { DateTime } from "luxon";
@@ -30,6 +31,9 @@ export default class User extends BaseModel {
 
     @hasMany(() => Group)
     public groups: HasMany<typeof Group>
+
+	@hasMany(() => Message)
+	public ratings: HasMany<typeof Message>
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime

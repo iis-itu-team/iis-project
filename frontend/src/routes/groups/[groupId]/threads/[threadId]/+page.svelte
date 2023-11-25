@@ -41,13 +41,25 @@
 			});
 	};
 
-	const handleUp = (current_message) => {
-		// TODO: id, rating
-	}
+	async function handleUp(current_message) {
+		await client.post('/messages/' + current_message.id + '/ratings', {
+			message_id: current_message.id,
+			up: 'true'
+		}).then(() => {
+			invalidateAll();
+			content = undefined;
+		});
+	};
 
-	const handleDown = (current_message) => {
-		// TODO: id, rating
-	}
+	async function handleDown(current_message) {
+		await client.post('/messages/' + current_message.id + '/ratings', {
+			message_id: current_message.id,
+			up: 'false'
+		}).then(() => {
+			invalidateAll();
+			content = undefined;
+		});
+	};
 
 </script>
 
@@ -67,10 +79,10 @@
 						</div>
 						<div class="flex flex-row items-center space-x-2 place-self-end">
 							<p class="text-white font-bold">{message.rating}</p>
-							<button class="flex bg-primary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={handleUp({message})}>
+							<button class="flex bg-primary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={async () => await handleUp(message)}>
 								&#x21E7
 							</button>
-							<button class="flex bg-secondary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={handleDown({message})}>
+							<button class="flex bg-secondary hover:bg-background-light text-white font-bold py-1 px-2.5 rounded-full" on:click={async () => await handleDown(message)}>
 								&#x21E9
 							</button>
 						</div>

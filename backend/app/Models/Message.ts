@@ -1,4 +1,4 @@
-import { BaseModel, BelongsTo, ManyToMany, beforeCreate, belongsTo, column, manyToMany } from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, BelongsTo, ManyToMany, beforeCreate, belongsTo, column, manyToMany, computed } from "@ioc:Adonis/Lucid/Orm";
 import Group from "./Group";
 import User from "./User";
 import Thread from "./Thread";
@@ -31,14 +31,22 @@ export default class Message extends BaseModel {
     @column({ columnName: "date" })
     public date: string
 
-    @column({ columnName: "rating" })
-    public rating: number
+    @column({ columnName: "rating_int" })
+    public rating: number 
 
     @column({ columnName: "user_id" })
     public userId: string
 
     @manyToMany(() => User, {
-        relatedKey: 'userId',
+      pivotTable: "user_ratings",
+      localKey: "id", // E: Replace `"id"` with `'id'`      
+      relatedKey: "id", // E: Replace `"id"` with `'id'`    
+      pivotForeignKey: "message_id", // E: Replace `"group_id"` with `'group_id'`
+      pivotRelatedForeignKey: "user_id", // E: Replace `"user_id"` with `'user_id'`
+      pivotTimestamps: true, // E: Replace `↹` with `····`
+      pivotColumns: [ // E: Replace `⏎······"group_role"⏎····]` with `'group_role'],`
+        "up"
+      ]
     })
     public ratingUser: ManyToMany<typeof User>
 

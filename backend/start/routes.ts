@@ -97,7 +97,7 @@ Route.group(() => {
     })
 
   // /messages/:messageId/ratings
-  Route.post("/messages/:messageId/ratings", "MessageController.rate")
+  Route.post("/messages/:message_id/ratings", "MessageController.rate").middleware("rating-auth")
 
   // /groups/:group_id/messages
   Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
@@ -118,7 +118,8 @@ Route.group(() => {
     })
 
   // -- Rate
-  Route.post("/rate", "MessageController.rate")
+  // obsolete - same functionality in /messages/:messageId/ratings
+  //Rout.post("/rate", "MessageController.rate")
 
   // -- Login
   Route.post("/auth/login", "AuthController.login")
