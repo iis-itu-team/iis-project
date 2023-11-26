@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { RegisterInput, Visibility } from '$lib/types';
 	import { goto } from '$app/navigation';
 	import { register } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
@@ -24,6 +23,8 @@
 			validate(val?: string) {
 				if (!val || val.trim().length === 0) {
 					return 'choose a cool nickname';
+				} else if (val.trim().length < 5) {
+					return 'has to be at least 5 characters';
 				}
 			},
 			title: 'Nickname',
@@ -33,6 +34,8 @@
 			validate(val?: string) {
 				if (!val || val.trim().length === 0) {
 					return 'choose a *secure* password';
+				} else if (val.trim().length < 5) {
+					return 'has to be at least 5 characters';
 				}
 			},
 			title: 'Password',
