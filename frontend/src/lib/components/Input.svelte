@@ -22,7 +22,6 @@
         value={value ?? ""}
 		placeholder={title}
 		on:input={handleInput}
-        on:keydown
 	/>
 	{#if error}
 		<p class="text-red-400">{error}</p>

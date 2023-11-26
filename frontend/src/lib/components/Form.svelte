@@ -102,7 +102,6 @@
 			{/each}
 		{:else}
 			<Input
-				on:keydown={(event) => event?.key === 'Enter' && canSubmit && handleSubmit()}
 				name={field}
 				type={options.type}
 				title={options.title}
@@ -112,19 +111,20 @@
 		{/if}
 	{/each}
 
-	<div class="flex flex-row gap-x-4 justify-center">
-		{#if onCancel}
-			<button class="btn-no" on:click={onCancel}>
-				{cancelText}
-			</button>
-		{/if}
+	<!-- reverse order to make the submit button first () -->
+	<div class="flex flex-row-reverse gap-x-4 justify-center">
 		<button
 			type="submit"
 			disabled={!canSubmit}
 			class={canSubmit ? 'btn-yes' : 'btn-disabled'}
-			on:click={handleSubmit}
+			on:click|preventDefault={handleSubmit}
 		>
 			{submitText}
 		</button>
+		{#if onCancel}
+			<button class="btn-no" type="button" on:click={onCancel}>
+				{cancelText}
+			</button>
+		{/if}
 	</div>
 </form>
