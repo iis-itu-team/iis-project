@@ -6,8 +6,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#FC814A",
-        secondary: "#8377D1",
+        primary: {
+          DEFAULT: "#FC814A",
+          light: "#FDAC86"
+        },
+        secondary: {
+          DEFAULT: "#8377D1",
+          light: "#9E95DB"
+        },
         text: "#F2F2F2",
         input: "#000000",
         background: {

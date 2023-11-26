@@ -19,7 +19,7 @@
 	<div class="w-full flex flex-row justify-between pr-10">
 		<div class="flex flex-row items-center gap-x-10">
 			{#each items as item}
-				<a class={pageId === item.href ? 'font-semibold underline' : ''} href={item.href}
+				<a class="nav {pageId === item.href ? 'nav-selected' : ''}" href={item.href}
 					>{item.text}</a
 				>
 			{/each}
@@ -27,14 +27,14 @@
 		{#if $currentUser}
 			<div class="self-center flex flex-row gap-x-10">
 				<a
-					class="hover:underline hover:cursor-pointer {pageId === '/groups/create'
-						? 'font-semibold underline'
+					class="nav {pageId === '/groups/create'
+						? 'nav-selected'
 						: ''}"
 					href="/groups/create">create group</a
 				>
 				<a
-					class="self-center hover:underline hover:cursor-pointer {pageId === '/account'
-						? 'font-semibold underline'
+					class="self-center nav {pageId === '/account'
+						? 'nav-selected'
 						: ''}"
 					href="/account">{$currentUser.nickname}</a
 				>
@@ -42,14 +42,14 @@
 		{:else}
 			<div class="self-center">
 				<a
-					class="hover:underline hover:cursor-pointer {pageId === '/login'
-						? 'font-semibold underline'
+					class="nav {pageId === '/login'
+						? 'nav-selected'
 						: ''}"
 					href="/login">login</a
 				>
 				<a
-					class="hover:underline hover:cursor-pointer {pageId === '/register'
-						? 'font-semibold underline'
+					class="nav {pageId === '/register'
+						? 'nav-selected'
 						: ''}"
 					href="/register">register</a
 				>
@@ -57,10 +57,3 @@
 		{/if}
 	</div>
 </nav>
-
-<style>
-	a:hover {
-		text-decoration: underline;
-		cursor: pointer;
-	}
-</style>

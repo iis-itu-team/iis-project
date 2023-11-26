@@ -114,27 +114,17 @@
 
 	<div class="flex flex-row gap-x-4 justify-center">
 		{#if onCancel}
-			<button class="btn" on:click={onCancel}>
+			<button class="btn-no" on:click={onCancel}>
 				{cancelText}
 			</button>
 		{/if}
 		<button
 			type="submit"
 			disabled={!canSubmit}
-			class={canSubmit ? 'btn' : 'btn-disabled'}
+			class={canSubmit ? 'btn-yes' : 'btn-disabled'}
 			on:click={handleSubmit}
 		>
 			{submitText}
 		</button>
 	</div>
 </form>
-
-<style lang="postcss">
-	.btn {
-		@apply hover:cursor-pointer hover:underline text-white;
-	}
-
-	.btn-disabled {
-		@apply hover:cursor-auto text-gray-400;
-	}
-</style>

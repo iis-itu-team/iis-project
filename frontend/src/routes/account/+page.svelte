@@ -166,7 +166,7 @@
 
 <div class="flex flex-col">
 	<div class="self-end">
-		<button class="hover:cursor-pointer hover:underline" on:click={handleLogout}>logout</button>
+		<button class="btn" on:click={handleLogout}>logout</button>
 	</div>
 
 	<div class="max-w-md m-auto p-10">

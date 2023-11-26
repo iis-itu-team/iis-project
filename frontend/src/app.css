@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .btn {
+        @apply py-1 px-3 text-primary/100 border-primary border rounded-sm;
+        @apply hover:bg-primary-light/10;
+    }
+
+    .btn-yes {
+        @apply btn;
+    }
+
+    .btn-no {
+        @apply py-1 px-3 text-gray-300 border-gray-300 border rounded-sm;
+        @apply hover:bg-gray-300/10;
+    }
+
+    .nav {
+        @apply hover:decoration-primary;
+        @apply underline underline-offset-2 decoration-2 decoration-secondary-light;
+    }
+
+    .nav-selected {
+        @apply nav;
+        @apply decoration-primary;
+    }
+
+    .btn-disabled {
+        @apply py-1 px-3 text-red-300/50 border-red-100/25 border rounded-sm border-dashed;
+    }
+}

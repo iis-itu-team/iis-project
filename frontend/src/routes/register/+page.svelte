@@ -90,6 +90,6 @@
 <div class="flex flex-col gap-y-4 w-full items-center p-10 max-w-md m-auto">
 	<Form bind:errors submitText="register" {fields} onSubmit={handleSubmit} />
 	<p>
-		Already registered? come on, <a class="button" href="/login">log in</a>!
+		Already registered? come on, <a class="nav" href="/login">log in</a>!
 	</p>
 </div>

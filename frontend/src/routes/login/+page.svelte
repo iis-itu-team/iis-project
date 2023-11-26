@@ -62,6 +62,6 @@
 <div class="flex flex-col gap-y-4 items-center p-10 max-w-md m-auto">
 	<Form onSubmit={handleSubmit} {fields} {defaults} submitText="login" />
 	<p>
-		Not registered yet? do it, <a class="button" href="/register">register</a>!
+		Not registered yet? do it, <a class="nav" href="/register">register</a>!
 	</p>
 </div>
