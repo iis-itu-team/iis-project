@@ -6,8 +6,10 @@
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
 	import { logout } from '$lib/stores/auth';
 	import { goto, invalidateAll } from '$app/navigation';
-	import type { PageData } from './$types';
+	import type { Group, Message, Thread } from '$lib/types';
 	import { onMount } from 'svelte';
+
+	export let data: { messages: Message[] };
 
 	showCrumbs(false);
 
@@ -144,6 +146,56 @@
 		await logout();
 		goto('/');
 	};
+
+	let groups_count = 0;
+	let threads_count = 0;
+	let messages_count = 0;
+	let score = 0;
+
+	let group_last = "";
+	let thread_last = "";
+
+	const getStatistics = async () => {
+		const res = await client.put<ResponseFormat<User>>(`/users/${$currentUser?.id}`, {
+			...values
+		});
+
+		if (res.status === 200 && res.data.status === 'success') {
+			// alert("gucci")
+		}
+
+		groups_count = 0;
+		threads_count = 0;
+		messages_count = 0;
+		score = 0;
+
+		group_last = "";
+		thread_last = "";
+
+		const messages = res.data.data;
+
+		for (let message in messages) {
+			
+			if (group_last !== message.group_id) {
+				group_last = message.group_id;
+				groups_count++;
+			}
+
+			if (thread_last !== message.thread_id) {
+				thread_last = message.thread_id;
+				threads_count++;
+			}
+
+			// TODO: fix rating
+			if (message.rating !== null) {
+				score += message.rating
+			}
+			
+			messages_count++
+		}
+	}
+
+
 </script>
 
 <div class="flex flex-col">
@@ -197,7 +249,6 @@
 		<div class="flex flex-row gap-x-4 justify-center">
 			<button
 				type="submit"
-				disabled={!canSubmit}
 				class={canSubmit ? 'button' : 'button-disabled'}
 				on:click={handleSubmit}
 			>
@@ -205,6 +256,26 @@
 			</button>
 		</div>
 	</form>
+
+
+	<div class="flex flex-col items-center gap-y-4 p-10">
+		<div class="flex flex-col">
+			<p class="bold text-xl">Statistics:</p>
+		</div>
+
+		<div class="flex flex-col">
+			<p>Groups: {groups_count}</p>
+			<p>Threads: {threads_count}</p>
+			<p>Messages: {messages_count}</p>
+			<p>Score (based on message rating): {score}</p>
+		</div>
+
+		<button 
+			class="bg-primary hover:bg-secondary box-border rounded-xl p-2 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
+			on:click={getStatistics}>Check for statistics
+		</button>
+	</div>
+
 </div>
 
 <style lang="postcss">
