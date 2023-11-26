@@ -14,6 +14,7 @@
 
     const generateNumbers: (first: number, last: number) => void = ((first, last) => {
         pageNumbers = []
+        if (last - first == 0) return;
         for (let i: number = first; i <= last; i++) {
             pageNumbers.push(i)
         }
