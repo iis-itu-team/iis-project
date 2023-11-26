@@ -142,8 +142,12 @@
 
 		group_last = '';
 		thread_last = '';
+		
+		readMessages(res.data.data)
+	};
 
-		for (let message in res.data.data) {
+	function readMessages(messages: Message[]) {
+		for (let message in messages) {
 			if (group_last !== message.group_id) {
 				group_last = message.group_id;
 				groups_count++;
@@ -158,10 +162,22 @@
 			if (message.rating !== undefined) {
 				score += message.rating;
 			}
-
 			messages_count++;
 		}
 	};
+
+	const deleteAccount = async () => {
+		if (confirm("Your account will be deleted") == false ) {
+			alert("Account deletion was cancelled by user");
+			return;
+		} 
+		
+		await client.delete<ResponseFormat<void>>(`/users/${$currentUser?.id}`);
+
+		// TODO: redirect
+		alert("Your account was deleted")
+	}
+
 </script>
 
 <div class="flex flex-col">
@@ -174,17 +190,20 @@
 	</div>
 
 	<div class="flex flex-col items-center gap-y-4 p-10">
-		<div class="flex flex-col">
+		<div class="max-w-md m-auto text-left">
 			<p class="bold text-xl">Statistics:</p>
 		</div>
 
-		<div class="flex flex-col">
+		<div class="max-w-md m-auto text-left">
 			<p>Groups: {groups_count}</p>
 			<p>Threads: {threads_count}</p>
 			<p>Messages: {messages_count}</p>
-			<p>Score (based on message rating): {score}</p>
+			<p>Rating: {score} </p>
 		</div>
 
 		<button class="btn" on:click={getStatistics}>Check for statistics</button>
+	
+		<p>Dangerous Zone</p>
+		<button class="btn" on:click={deleteAccount}>Delete my account</button>
 	</div>
 </div>
