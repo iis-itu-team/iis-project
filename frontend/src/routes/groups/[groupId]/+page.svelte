@@ -3,7 +3,10 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { checkAccess, AccessType, currentUser } from '$lib/stores/auth';
-	import { GroupRole, UserRole } from '$lib/types';
+	import { GroupRole, UserRole, type Thread, type ResponseFormat } from '$lib/types';
+	import { client } from '$lib/http/http';
+	import { toasts } from 'svelte-toasts';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
@@ -37,6 +40,19 @@
 		$currentUser?.role == UserRole.ADMIN ||
 		currentMember?.group_role == GroupRole.ADMIN ||
 		currentMember?.group_role == GroupRole.MOD;
+
+	const handleThreadDelete = async (thread: Thread) => {
+		const res = await client.delete<ResponseFormat<void>>(`/threads/${thread.id}`);
+
+		if (res.status === 200 && res.data.status === 'success') {
+			toasts.add({
+				type: 'success',
+				description: `Thread ${thread.title} deleted.`
+			});
+			invalidateAll();
+			return;
+		}
+	};
 </script>
 
 <p class="text-white font-semibold text-lg py-2">threads ({threads?.length}):</p>
@@ -47,10 +63,16 @@
 				href={`/groups/${group?.id}/threads/${thread.id}`}
 				class="text-lg font-semibold hover:underline hover:cursor-pointer">{thread.title}</a
 			>
-			<a
-				href={`/groups/${group?.id}/threads/${thread.id}/edit`}
-				class="hover:underline hover:cursor-pointer">edit</a
-			>
+			<div>
+				<button
+					on:click={() => handleThreadDelete(thread)}
+					class="hover:underline hover:cursor-pointer">delete</button
+				>
+				<a
+					href={`/groups/${group?.id}/threads/${thread.id}/edit`}
+					class="hover:underline hover:cursor-pointer">edit</a
+				>
+			</div>
 		</div>
 	{/each}
 </div>
