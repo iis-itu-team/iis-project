@@ -69,8 +69,8 @@
 			return;
 		}
 
-		if (res.data.status === 'validation_fail') {
-			const validationErrors = res.data.data as unknown as any[];
+		if (res.status === 'validation_fail') {
+			const validationErrors = res.data as unknown as any[];
 
 			validationErrors.forEach((val: { rule: string; field: string; message: string }) => {
 				errors[val.field] = val.message;
