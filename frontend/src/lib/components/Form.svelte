@@ -85,7 +85,7 @@
 		{#if options.type === 'radio'}
 			<p class="text-lg">{options.title}</p>
 			{#each options.radioOptions ?? [] as option}
-				<div class="flex flex-row gap-x-4 items-center justify-start">
+				<div class="flex flex-row gap-x-4 justify-start">
 					<input
 						class="w-6 h-6 hover:cursor-pointer accent-primary"
 						name={option.value}

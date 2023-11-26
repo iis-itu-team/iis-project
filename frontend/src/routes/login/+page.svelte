@@ -24,12 +24,16 @@
 			},
 			title: 'Password',
 			type: 'password'
+		},
+		rememberMe: {
+			title: 'Remember me',
+			type: 'checkbox'
 		}
 	};
 
 	const defaults = {
 		uid: getLastUsedUid()
-	}
+	};
 
 	const handleSubmit = async (values: any) => {
 		const res = await login(values);

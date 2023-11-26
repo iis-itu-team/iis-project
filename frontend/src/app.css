@@ -31,4 +31,10 @@
     .btn-disabled {
         @apply py-1 px-3 text-red-300/50 border-red-100/25 border rounded-sm border-dashed;
     }
+
+    .checkbox {
+		@apply appearance-none;
+		@apply hover:cursor-pointer rounded-full h-6 w-6 border-primary border-2;
+		@apply outline-none checked:ring-background-dark checked:bg-primary checked:ring-4 checked:ring-inset;
+	}
 }
