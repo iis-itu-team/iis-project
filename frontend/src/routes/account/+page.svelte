@@ -2,7 +2,7 @@
 	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
 	import { client } from '$lib/http/http';
-	import type { User, ResponseFormat } from '$lib/types';
+	import type { User, Message, ResponseFormat } from '$lib/types';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
 	import { logout } from '$lib/stores/auth';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -125,12 +125,14 @@
 	let thread_last = '';
 
 	const getStatistics = async () => {
-		const res = await client.put<ResponseFormat<User>>(`/users/${$currentUser?.id}`, {
-			...values
-		});
+		const res = await client.get<ResponseFormat<Message[]>>(`/statistics/${$currentUser?.id}`, {
+			params: {
+				expand: "owner"
+			}
+    	});
 
-		if (res.status === 200 && res.data.status === 'success') {
-			// alert("gucci")
+		if (res.status !== 200 || res.data.status !== 'success') {
+			alert("not gucci")
 		}
 
 		groups_count = 0;
@@ -141,9 +143,7 @@
 		group_last = '';
 		thread_last = '';
 
-		const messages = res.data.data;
-
-		for (let message in messages) {
+		for (let message in res.data.data) {
 			if (group_last !== message.group_id) {
 				group_last = message.group_id;
 				groups_count++;
@@ -155,7 +155,7 @@
 			}
 
 			// TODO: fix rating
-			if (message.rating !== null) {
+			if (message.rating !== undefined) {
 				score += message.rating;
 			}
 
@@ -185,10 +185,6 @@
 			<p>Score (based on message rating): {score}</p>
 		</div>
 
-		<button
-			class="bg-primary hover:bg-secondary box-border rounded-xl p-2 mx-auto my-5 w-full max-w-sm flex items-center justify-center text-2xl"
-			on:click={getStatistics}
-			>Check for statistics
-		</button>
+		<button class="btn" on:click={getStatistics}>Check for statistics</button>
 	</div>
 </div>
