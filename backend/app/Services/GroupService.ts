@@ -194,8 +194,6 @@ export default class GroupService {
             throw HttpException.notFound('group', groupId)
         }
 
-        await group.delete()
-
         // delete all messages in this group
         await Message.query()
             .where("group_id", groupId)
@@ -205,5 +203,10 @@ export default class GroupService {
         await Thread.query()
             .where("group_id", groupId)
             .delete()
+
+        // delete all memberships
+        await group.related("members").detach()
+
+        await group.delete()
     }
 }

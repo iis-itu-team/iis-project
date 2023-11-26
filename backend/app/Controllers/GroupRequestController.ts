@@ -6,7 +6,6 @@ import User from "App/Models/User";
 import GroupRequest from "App/Models/GroupRequest";
 import { PaginationResult } from "types/response-format";
 import GroupService from "App/Services/GroupService";
-import { Role } from "types/role";
 
 const createRequestSchema = schema.create({
     type: schema.enum(Object.values(GroupRequestType))

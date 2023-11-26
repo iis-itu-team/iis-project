@@ -5,7 +5,6 @@ import User from "App/Models/User"
 import { GroupRole } from "types/group-role"
 import { PaginationInput } from "types/pagination"
 import { GroupRequestStatus, GroupRequestType } from "types/group-request"
-import { Role } from "types/role"
 import { ExtractModelRelations } from "@ioc:Adonis/Lucid/Orm"
 import GroupService from "./GroupService"
 
