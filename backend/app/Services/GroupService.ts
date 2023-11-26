@@ -11,6 +11,7 @@ import { GroupRole } from "types/group-role"
 import Database from "@ioc:Adonis/Lucid/Database"
 import User from "App/Models/User"
 import { Role } from "types/role"
+import GroupRequest from "App/Models/GroupRequest"
 
 export type ListGroupsInput = PaginationInput & {
     userId?: string
@@ -201,6 +202,11 @@ export default class GroupService {
 
         // delete all threads in this group
         await Thread.query()
+            .where("group_id", groupId)
+            .delete()
+
+        // delete all requests
+        await GroupRequest.query()
             .where("group_id", groupId)
             .delete()
 

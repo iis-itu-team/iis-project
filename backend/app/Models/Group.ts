@@ -4,6 +4,7 @@ import generateId from "utils/generate-id"
 import { Visibility } from "types/visibility"
 import Thread from './Thread'
 import User from './User'
+import GroupRequest from './GroupRequest'
 
 export default class Group extends BaseModel {
   public static selfAssignPrimaryKey = true
@@ -33,13 +34,16 @@ export default class Group extends BaseModel {
     return this.threads?.length;
   }
 
+  @hasMany(() => GroupRequest)
+  public requests: HasMany<typeof GroupRequest>
+
   @manyToMany(() => User, {
     pivotTable: "group_members",
     localKey: "id",
     relatedKey: "id",
     pivotForeignKey: "group_id",
     pivotRelatedForeignKey: "user_id",
-	pivotTimestamps: true,
+    pivotTimestamps: true,
     pivotColumns: [
       "group_role"
     ]

@@ -106,9 +106,9 @@ export default class GroupRequestService {
             }
         }
 
-        return await GroupRequest.create({
+        return (await GroupRequest.create({
             userId, groupId, type
-        });
+        })).refresh();
     }
 
     public async changeStatus(requestId: string, status: GroupRequestStatus, user?: User) {
