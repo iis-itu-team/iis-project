@@ -102,6 +102,7 @@
 			{/each}
 		{:else}
 			<Input
+				on:keydown={(event) => event?.key === 'Enter' && canSubmit && handleSubmit()}
 				name={field}
 				type={options.type}
 				title={options.title}

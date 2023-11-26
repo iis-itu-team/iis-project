@@ -2,7 +2,8 @@
 	import { showCrumbs, setCrumbs } from '$lib/stores/breadcrumbs';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import { checkAccess, AccessType } from '$lib/stores/auth';
+	import { checkAccess, AccessType, currentUser } from '$lib/stores/auth';
+	import { GroupRole, UserRole } from '$lib/types';
 
 	export let data: PageData;
 
@@ -29,23 +30,34 @@
 			selected: true
 		}
 	]);
+
+	$: currentMember = group?.members?.find((m) => m.id === $currentUser?.id);
+
+	$: canManage =
+		$currentUser?.role == UserRole.ADMIN ||
+		currentMember?.group_role == GroupRole.ADMIN ||
+		currentMember?.group_role == GroupRole.MOD;
 </script>
 
 <p class="text-white font-semibold text-lg py-2">threads ({threads?.length}):</p>
 <div class="flex flex-col gap-y-4">
 	{#each threads ?? [] as thread}
-		<div class="bg-background-light rounded-xl p-4">
+		<div class="flex flex-row items-center justify-between bg-background-light rounded-xl p-4">
 			<a
 				href={`/groups/${group?.id}/threads/${thread.id}`}
 				class="text-lg font-semibold hover:underline hover:cursor-pointer">{thread.title}</a
 			>
-			<!-- TODO: Load x last messages, show? message count? -->
+			<a
+				href={`/groups/${group?.id}/threads/${thread.id}/edit`}
+				class="hover:underline hover:cursor-pointer">edit</a
+			>
 		</div>
 	{/each}
 </div>
 <div class="text-center col-span-5">
-	<!-- TODO: if logged in and joined in the group and has the rights -->
-	<a href={`/groups/${group?.id}/threads/create`} class="hover:underline hover:cursor-pointer"
-		>create a new thread</a
-	>
+	{#if canManage}
+		<a href={`/groups/${group?.id}/threads/create`} class="hover:underline hover:cursor-pointer"
+			>create a new thread</a
+		>
+	{/if}
 </div>
