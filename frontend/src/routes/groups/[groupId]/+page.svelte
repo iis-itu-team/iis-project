@@ -5,13 +5,19 @@
 	import { checkAccess, AccessType, currentUser } from '$lib/stores/auth';
 	import { GroupRole, UserRole, type Thread, type ResponseFormat } from '$lib/types';
 	import { client } from '$lib/http/http';
-	import { toasts } from 'svelte-toasts';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import Pagination from '$lib/components/Pagination.svelte';
+	import Error from '../../+error.svelte';
+	import { error } from '@sveltejs/kit';
+	import { errorInfoFromResponse } from '$lib/common/error';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
-	$: threads = data.threads;
 	$: group = data.group;
+	let threadsLength: number = 0;
+	let pageCurrent: number = 1;
+	let pageFirst: number = 0;
+	let pageLast: number = 0;
 
 	onMount(() => {
 		checkAccess({
@@ -40,6 +46,29 @@
 		$currentUser?.role == UserRole.ADMIN ||
 		currentMember?.group_role == GroupRole.ADMIN ||
 		currentMember?.group_role == GroupRole.MOD;
+
+	async function fetch() {
+		// waits for group.id to be loaded in
+		await invalidateAll();
+
+		const threadsRes = await client.get<ResponseFormat<Thread[]>>(`/groups/${group?.id}/threads`, {
+		    params: {
+		        page: pageCurrent
+		    }              
+		});                
+		                   
+		if (threadsRes.status !== 200) {                                                                                                       
+		    throw error(threadsRes.status, errorInfoFromResponse(threadsRes));
+		}
+
+		pageFirst = threadsRes.data.pagination?.firstPage ?? 0;
+		pageLast = threadsRes.data.pagination?.lastPage ?? 0;
+		pageCurrent = threadsRes.data.pagination?.currentPage ?? 0;
+
+		return threadsRes.data.data ?? [];
+	};
+
+	let fetchPromise = fetch();
 </script>
 
 <div>
@@ -51,14 +80,21 @@
 		{/if}
 	</div>
 </div>
-<p class="text-white font-semibold text-lg py-2">threads ({threads?.length}):</p>
+<p class="text-white font-semibold text-lg py-2">threads ({threadsLength}):</p>
 <div class="flex flex-col gap-y-4">
-	{#each threads ?? [] as thread}
-		<div class="flex flex-row items-center justify-between bg-background-light rounded-xl p-4">
-			<a
-				href={`/groups/${group?.id}/threads/${thread.id}`}
-				class="text-lg font-semibold hover:underline hover:cursor-pointer">{thread.title}</a
-			>
-		</div>
-	{/each}
+	{#await fetchPromise}
+		<p>Loading...<p/>
+	{:then threads}
+		{#each threads as thread}
+			<div class="flex flex-row items-center justify-between bg-background-light rounded-xl p-4">
+				<a
+					href={`/groups/${group?.id}/threads/${thread.id}`}
+					class="text-lg font-semibold hover:underline hover:cursor-pointer">{thread.title}</a
+				>
+			</div>
+		{/each}
+		<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchPromise = fetch()}/>
+	{:catch err}
+		<Error error={err}/>
+	{/await}
 </div>

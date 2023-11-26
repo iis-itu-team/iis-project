@@ -18,16 +18,7 @@ export async function load({ params }) {
         throw error(groupRes.status, errorInfoFromResponse(groupRes));
     }
 
-    // load threads in this group
-
-    const threadsRes = await client.get<ResponseFormat<Thread[]>>(`/groups/${groupId}/threads`);
-
-    if (threadsRes.status !== 200) {
-        throw error(threadsRes.status, errorInfoFromResponse(threadsRes));
-    }
-
     return {
         group: groupRes.data.data,
-        threads: threadsRes.data.data
     }
 }
