@@ -54,4 +54,12 @@ export default class UserController {
 
         response.success()
     }
+
+    public async statistic( {request, response }: HttpContextContract) {
+        const id = request.param("user_id")
+        
+        const data = await this.userService.statisticUser(id)
+
+        response.success(data)
+    }
 }

@@ -121,6 +121,9 @@ Route.group(() => {
   // obsolete - same functionality in /messages/:messageId/ratings
   //Rout.post("/rate", "MessageController.rate")
 
+  // -- User statistics
+  Route.get("/statistics/:user_id", "UserController.statistic")
+
   // -- Login
   Route.post("/auth/login", "AuthController.login")
 

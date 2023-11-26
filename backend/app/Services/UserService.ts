@@ -1,5 +1,8 @@
+import Database from "@ioc:Adonis/Lucid/Database";
 import HttpException from "App/Exceptions/HttpException";
 import User from "App/Models/User";
+import Message from "App/Models/Message"
+import Group from "App/Models/Group";
 import { Role } from "types/role";
 import { Visibility } from "types/visibility";
 
@@ -134,5 +137,20 @@ export default class UserService {
 
         // todo: delete everything the user owns
         await user.delete()
+    }
+
+    public async statisticUser(id: string) {
+        const user = await User.findBy("id", id)
+
+        if (!user) {
+            console.log("user:", id)
+            throw HttpException.notFound("user", id)
+        }
+
+        const groups = Group.query().andWhere("owner_id", id)
+
+        const messages = Message.query().andWhere("owner_id", id)
+
+        return messages
     }
 }
