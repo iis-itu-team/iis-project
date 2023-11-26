@@ -8,7 +8,7 @@
 
 	export let data: PageData;
 
-	$: sorted_messages = data.messages.sort((mes1: Message, mes2: Message) => {
+	$: sorted_messages = data.messages?.sort((mes1: Message, mes2: Message) => {
 		let date1 = new Date(mes1.date);
 		let date2 = new Date(mes2.date);
 
@@ -17,7 +17,7 @@
 		}
 
 		return date1 > date2 ? 1 : -1;
-	});
+	}) ?? [];
 
 	showCrumbs(true);
 	$: setCrumbs([
