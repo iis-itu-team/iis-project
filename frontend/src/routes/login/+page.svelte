@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { getLastUsedUid, setLastUsedUid } from '$lib/common/credentials-helper';
 	import Form from '$lib/components/Form.svelte';
 	import { currentUser, login } from '$lib/stores/auth';
 	import type { FormFields } from '$lib/types/form';
@@ -26,10 +27,16 @@
 		}
 	};
 
+	const defaults = {
+		uid: getLastUsedUid()
+	}
+
 	const handleSubmit = async (values: any) => {
 		const res = await login(values);
 
 		if (res.status === 'success') {
+			setLastUsedUid(values.uid);
+
 			toasts.add({
 				type: 'success',
 				description: `Logged in as ${$currentUser?.nickname}`
@@ -53,7 +60,7 @@
 </script>
 
 <div class="flex flex-col gap-y-4 items-center p-10 max-w-md m-auto">
-	<Form onSubmit={handleSubmit} {fields} submitText="login" />
+	<Form onSubmit={handleSubmit} {fields} {defaults} submitText="login" />
 	<p>
 		Not registered yet? do it, <a class="button" href="/register">register</a>!
 	</p>

@@ -5,6 +5,7 @@
 	import { toasts } from 'svelte-toasts';
 	import Form from '$lib/components/Form.svelte';
 	import type { FormFields } from '$lib/types/form';
+	import { setLastUsedUid } from '$lib/common/credentials-helper';
 
 	// -- Realtime basic validation
 
@@ -52,6 +53,8 @@
 		const res = await register(values);
 
 		if (res.status === 'success') {
+			setLastUsedUid(values.email);
+			
 			toasts.add({
 				type: 'success',
 				description: 'Registered!'
