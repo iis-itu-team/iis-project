@@ -1,16 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Form from '$lib/components/Form.svelte';
 	import { client } from '$lib/http/http';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
-	import type { Group, ResponseFormat } from '$lib/types';
+	import { Visibility, type Group, type ResponseFormat } from '$lib/types';
+	import type { FormFields } from '$lib/types/form';
 	import { toasts } from 'svelte-toasts';
-
-	const values: Partial<{
-		title: string;
-		visibility: string;
-	}> = {
-		visibility: 'private'
-	};
 
 	showCrumbs(true);
 
@@ -25,88 +20,62 @@
 		}
 	]);
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (values: any) => {
 		const res = await client.post<ResponseFormat<Group>>('/groups', {
 			title: values.title,
-            visibility: values.visibility
+			visibility: values.visibility
 		});
 
-		if (res.status !== 201 || res.data.status !== 'success') {
+		if (res.status === 201 && res.data.status === 'success') {
 			toasts.add({
-				type: 'error',
-				description: 'Something went wrong.'
+				type: 'success',
+				description: `Group ${res.data.data?.title} created.`
 			});
-            return;
+			goto(`/groups/${res.data.data?.id}`);
+			return true;
 		}
 
-        toasts.add({
-            type: "success",
-            description: `Group ${res.data.data?.title} created.`
-        });
-        
-        goto(`/groups/${res.data.data?.id}`);
+		return res.data;
 	};
 
-	const visibilityOptions = [
-		{
-			value: 'private',
-			text: 'Private',
-			description: 'No one can see inside your group.'
+	let errors: any = {};
+	const fields: FormFields = {
+		title: {
+			validate(val?: any) {
+				if (!val || val.trim().length === 0) {
+					return 'enter a title for your group';
+				}
+			},
+			title: 'Group title',
+			type: 'text'
 		},
-		{
-			value: 'protected',
-			text: 'Protected',
-			description: 'Only registered users can see inside your group.'
-		},
-		{
-			value: 'public',
-			text: 'Public',
-			description: 'Anyone can see inside your group.'
+		visibilityOptions: {
+			title: 'Visibility',
+			type: 'radio',
+			radioOptions: [
+				{
+					value: 'private',
+					text: 'Private',
+					description: 'No one can see inside your group.'
+				},
+				{
+					value: 'protected',
+					text: 'Protected',
+					description: 'Only registered users can see inside your group.'
+				},
+				{
+					value: 'public',
+					text: 'Public',
+					description: 'Anyone can see inside your group.'
+				}
+			]
 		}
-	];
+	};
+	const defaults = {
+		visibility: Visibility.PUBLIC
+	};
 </script>
 
-<form class="flex flex-col gap-y-4 p-10 max-w-md m-auto">
-	<div class="flex flex-col">
-		<label class="text-lg" for="title">Title</label>
-		<input
-			class="bg-background-light rounded-md p-2"
-			name="title"
-			type="text"
-			placeholder="Group title"
-			bind:value={values.title}
-		/>
-	</div>
-	<p class="text-lg">Visibility</p>
-	{#each visibilityOptions as option}
-		<div class="flex flex-row gap-x-4 items-center justify-start">
-			<input
-				class="w-6 h-6 hover:cursor-pointer accent-primary"
-				name={option.value}
-				bind:group={values.visibility}
-				id={option.value}
-				type="radio"
-				value={option.value}
-			/>
-			<div class="flex flex-col">
-				<label class="text-lg bold" for={option.value}>{option.text}</label>
-				<p class="text-md text-gray-300">{option.description}</p>
-			</div>
-		</div>
-	{/each}
-	<div class="flex flex-row gap-x-4 justify-center">
-		<button
-			on:click={() => {
-				goto(`/groups`);
-			}}>Cancel</button
-		>
-		<button type="submit" on:click={handleSubmit}> Create </button>
-	</div>
-</form>
-
-<style>
-	button:hover {
-		text-decoration: underline;
-		cursor: pointer;
-	}
-</style>
+<div class="m-auto p-10 max-w-md">
+	<Form bind:errors {fields} onSubmit={handleSubmit} {defaults} onCancel={() => goto('/')} />
+</div>

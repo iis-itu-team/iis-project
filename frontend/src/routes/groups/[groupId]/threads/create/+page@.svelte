@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Form from '$lib/components/Form.svelte';
 	import { client } from '$lib/http/http';
 	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
-	import type { Group } from '$lib/types';
+	import type { Group, ResponseFormat, Thread } from '$lib/types';
+	import type { FormFields } from '$lib/types/form';
 	import { get } from 'svelte/store';
 
 	export let data: { group: Group };
 
 	$: group = data.group;
-
-	const values = {
-		title: 'First law of robotics'
-	};
 
 	showCrumbs(true);
 	$: setCrumbs([
@@ -29,7 +27,19 @@
 		}
 	]);
 
-	const handleSubmit = () => {
+	const fields: FormFields = {
+		title: {
+			validate(val?: any) {
+				if (!val || val.trim().length === 0) {
+					return 'enter a title for the thread';
+				}
+			},
+			title: 'Thread title',
+			type: 'text'
+		}
+	};
+
+	const handleSubmit = async (values: any) => {
 		const user = get(currentUser);
 
 		const data = {
@@ -37,36 +47,22 @@
 			ownerId: user!.id
 		};
 
-		client.post(`/groups/${group.id}/threads`, data).then(() => {
+		const res = await client.post<ResponseFormat<Thread>>(`/groups/${group.id}/threads`, data);
+
+		if (res.status === 201 && res.data.status === 'success') {
 			goto(`/groups/${group.id}`);
-		});
+			return true;
+		}
+
+		return res.data;
 	};
 </script>
 
-<form class="flex flex-col gap-y-4 p-10 max-w-md m-auto">
-	<div class="flex flex-col">
-		<label class="text-lg" for="title">Title</label>
-		<input
-			class="bg-background-light rounded-md p-2"
-			name="title"
-			type="text"
-			placeholder="Thread title"
-			bind:value={values.title}
-		/>
-	</div>
-	<div class="flex flex-row gap-x-4 justify-center">
-		<button
-			on:click={() => {
-				goto(`/groups/${group.id}`);
-			}}>Cancel</button
-		>
-		<button type="submit" on:click={handleSubmit}> Create </button>
-	</div>
-</form>
-
-<style>
-	button:hover {
-		text-decoration: underline;
-		cursor: pointer;
-	}
-</style>
+<div class="m-auto max-w-md p-10">
+	<Form
+		{fields}
+		onSubmit={handleSubmit}
+		onCancel={() => goto(`/groups/${group.id}`)}
+		submitText="create"
+	/>
+</div>
