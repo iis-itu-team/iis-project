@@ -93,11 +93,11 @@ export default class ThreadService {
             throw HttpException.notFound("thread", id)
         }
 
-        await thread.delete()
-
         // delete all messages in this thread
         await Message.query()
             .where("thread_id", id)
             .delete()
+
+        await thread.delete()
     }
 }
