@@ -161,8 +161,19 @@
 		});
 	};
 
-	const handleDelete = () => {
-		/* TODO: Implement */
+	const handleDelete = async () => {
+		const res = await client.delete<ResponseFormat<void>>(`/groups/${group?.id}`);
+
+		if (res.status === 200 && res.data.status === 'success') {
+			toasts.add({
+				type: 'success',
+				description: `Group ${group?.title} deleted.`
+			});
+			goto(`/groups`, {
+				invalidateAll: true
+			});
+			return;
+		}
 	};
 
 	$: canKick =
