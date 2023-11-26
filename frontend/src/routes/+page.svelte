@@ -8,9 +8,18 @@
 	import type { ResponseFormat } from '$lib/types';
 	import { errorInfoFromResponse } from '$lib/common/error';
 	import Error from './+error.svelte';
+    import Pagination from '$lib/components/Pagination.svelte';
 
-	const fetch = (async () => {
-		const groupsRes = await client.get<ResponseFormat<Group[]>>('/groups');
+    let pageCurrent: number = 1
+    let pageFirst: number = 0
+    let pageLast: number = 0
+
+	async function fetch() {
+        const groupsRes = await client.get<ResponseFormat<Group[]>>('/groups', {
+            params: {
+                page: pageCurrent
+            }
+        });
 
 		if (groupsRes.status === 200 && groupsRes.data.status === 'success') {
 			const groups = groupsRes.data.data!;
@@ -25,6 +34,10 @@
 				return group.visibility == Visibility.PRIVATE;
 			});
 
+            pageFirst = groupsRes.data.pagination?.firstPage ?? 0
+            pageLast = groupsRes.data.pagination?.lastPage ?? 0
+            pageCurrent = groupsRes.data.pagination?.currentPage ?? 0
+
 			return [publicGroups, protectedGroups, privateGroups];
 		} else {
 			toasts.add({
@@ -34,13 +47,15 @@
 
 			throw errorInfoFromResponse(groupsRes);
 		}
-	})();
+	};
+
+    let fetchPromise = fetch();
 
 	showCrumbs(false);
 </script>
 
 <div class="flex flex-col gap-y-8">
-	{#await fetch}
+	{#await fetchPromise}
 		<p class="text-md">loading...</p>
 	{:then [publicGroups, protectedGroups, privateGroups]}
 		{#if publicGroups.length > 0}
@@ -63,6 +78,8 @@
 				<GroupList groups={privateGroups} visibility={Visibility.PRIVATE} />
 			</div>
 		{/if}
+
+		<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchPromise = fetch()}/>
 	{:catch err}
 		<Error error={err} />
 	{/await}
