@@ -1,4 +1,5 @@
 import { client } from "$lib/http/http";
+import { appendRequest } from "$lib/stores/requests";
 import { type ResponseFormat, GroupRequestType, type Group, type GroupRequest } from "$lib/types";
 import { toasts } from "svelte-toasts";
 
@@ -31,9 +32,12 @@ export const requestToJoin = async (group?: Group) => {
         return;
     }
 
+    const req = res.data.data;
+    appendRequest(req!);
+
     toasts.add({
         type: 'success',
         description: 'Sent a request to join this group.'
     });
-    return res.data.data;
+    return req;
 };

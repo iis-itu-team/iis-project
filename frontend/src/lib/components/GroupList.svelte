@@ -5,7 +5,6 @@
 	import { Membership } from '$lib/types/group';
 	import { groupRequests } from '$lib/stores/requests';
 	import { requestToJoin } from '$lib/common/group';
-	import { invalidateAll } from '$app/navigation';
 
 	export let groups: (Group & { joinRequest?: GroupRequest })[];
 	export let visibility: Visibility = Visibility.PUBLIC;
@@ -16,6 +15,12 @@
 	$: groups.forEach((g) => {
 		g.joinRequest = $groupRequests.find((r) => r.group_id == g.id && r.user_id == $currentUser?.id);
 	});
+
+	const handleJoinRequest = async (group: Group & { joinRequest?: GroupRequest }) => {
+		await requestToJoin(group);
+		// trigger groups update
+		groups = groups;
+	};
 </script>
 
 <div class="flex flex-col gap-y-4 p-2">
@@ -33,13 +38,7 @@
 				{#if group.joinRequest}
 					<span class="btn-disabled">{group.joinRequest.status}</span>
 				{:else}
-					<button
-						class="btn"
-						on:click={async () => {
-							await requestToJoin(group);
-							invalidateAll();
-						}}>request to join</button
-					>
+					<button class="btn" on:click={() => handleJoinRequest(group)}>request to join</button>
 				{/if}
 			{/if}
 		</div>

@@ -8,8 +8,11 @@ import { currentUser } from "./auth";
 
 export const groupRequests = writable<GroupRequest[]>([]);
 
-export const fetchRequests = async () => {
+export const appendRequest = (request: GroupRequest) => {
+    groupRequests.set([...get(groupRequests), request]);
+} 
 
+export const fetchRequests = async () => {
     if (!get(currentUser)) {
         groupRequests.set([]);
         return;
