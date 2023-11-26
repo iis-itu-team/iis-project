@@ -5,4 +5,5 @@ export type { Thread } from "./thread";
 export type { Message } from "./message";
 export type { User, LoginInput, RegisterInput } from "./user";
 export { UserRole } from "./user";
-export { Visibility } from "./visibility";
+export { Visibility, groupVisibilityRadioOptions } from "./visibility";
+export { type FormFields } from "./form";

@@ -20,7 +20,7 @@
 			href: `/groups/${data.group?.id}`
 		},
 		{
-			text: 'requests',
+			text: 'Requests',
 			href: `/groups/${data.group?.id}/requests`,
 			selected: true
 		}

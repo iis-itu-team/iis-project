@@ -53,6 +53,10 @@
 	$: canSubmit = !hasErrors && (!requireChanges || containsChanges);
 
 	const handleSubmit = async () => {
+		if (!canSubmit) {
+			return;
+		}
+
 		const res = await onSubmit(values);
 
 		if (res === true) {
@@ -98,7 +102,6 @@
 			{/each}
 		{:else}
 			<Input
-				on:keydown={(event) => (event?.key == 'Enter' ? handleSubmit() : null)}
 				name={field}
 				type={options.type}
 				title={options.title}
@@ -114,7 +117,12 @@
 				{cancelText}
 			</button>
 		{/if}
-		<button type="submit" disabled={!canSubmit} class={canSubmit ? 'btn' : 'btn-disabled'} on:click={handleSubmit}>
+		<button
+			type="submit"
+			disabled={!canSubmit}
+			class={canSubmit ? 'btn' : 'btn-disabled'}
+			on:click={handleSubmit}
+		>
 			{submitText}
 		</button>
 	</div>
