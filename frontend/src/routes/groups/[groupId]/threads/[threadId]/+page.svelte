@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { client } from '$lib/http/http';
 	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
@@ -87,7 +87,9 @@
 				type: 'success',
 				description: `Thread ${data.thread?.title} deleted.`
 			});
-			invalidateAll();
+			goto(`/groups/${data.group?.id}`, {
+				invalidateAll: true
+			});
 			return;
 		}
 	};

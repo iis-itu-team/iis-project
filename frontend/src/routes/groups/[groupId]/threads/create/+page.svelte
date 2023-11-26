@@ -50,7 +50,9 @@
 		const res = await client.post<ResponseFormat<Thread>>(`/groups/${group.id}/threads`, data);
 
 		if (res.status === 201 && res.data.status === 'success') {
-			goto(`/groups/${group.id}`);
+			goto(`/groups/${group.id}`, {
+				invalidateAll: true
+			});
 			return true;
 		}
 

@@ -31,9 +31,10 @@
 			{/if}
 			{#if $currentUser && group.membership === Membership.GUEST}
 				{#if group.joinRequest}
-					<p>{group.joinRequest.status}</p>
+					<span class="btn-disabled">{group.joinRequest.status}</span>
 				{:else}
 					<button
+						class="btn"
 						on:click={async () => {
 							await requestToJoin(group);
 							invalidateAll();
@@ -44,11 +45,3 @@
 		</div>
 	{/each}
 </div>
-
-<style>
-	button:hover,
-	a:hover {
-		text-decoration: underline;
-		cursor: pointer;
-	}
-</style>
