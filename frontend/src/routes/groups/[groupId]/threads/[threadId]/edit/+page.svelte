@@ -13,7 +13,8 @@
 	onMount(() => {
 		checkAccess({
 			type: AccessType.GROUP_MANAGE,
-			redirectTo: `/groups/${data.group?.id}`
+			redirectTo: `/groups/${data.group?.id}`,
+			group: data.group
 		});
 	});
 
