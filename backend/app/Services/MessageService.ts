@@ -36,9 +36,13 @@ export default class MessageService {
         if (ownerId) {
             q.andWhere("owner_id", ownerId)
         }
-        
+
         // preload expand fields
         expand.forEach((e) => q.preload(e as ExtractModelRelations<Message>));
+
+        // Needs to be already sorted for correct pagination
+        q.orderBy("id", "asc")
+        q.orderBy("date", "asc")
 
         const messages = await q.paginate(page ?? 1, perPage ?? 10)
 
