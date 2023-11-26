@@ -18,13 +18,14 @@ const registerSchema = schema.create({
 
 const loginSchema = schema.create({
     uid: schema.string(),
-    password: schema.string()
+    password: schema.string(),
+    rememberMe: schema.boolean.optional()
 })
 
 export default class AuthController {
     private readonly userService = new UserService()
 
-    public async register({ request, response, auth }: HttpContextContract) {
+    public async register({ request, response }: HttpContextContract) {
         const validated = await request.validate({
             schema: registerSchema,
             messages: {
@@ -36,18 +37,16 @@ export default class AuthController {
 
         const user = await this.userService.createUser(validated)
 
-        await auth.login(user)
-
         response.status(201).success(user)
     }
 
     public async login({ request, response, auth }: HttpContextContract) {
-        const { uid, password } = await request.validate({
+        const { uid, password, rememberMe } = await request.validate({
             schema: loginSchema
         })
 
         try {
-            const user = await auth.attempt(uid, password)
+            const user = await auth.use('web').attempt(uid, password, !!rememberMe)
 
             response.success(user)
         } catch {
