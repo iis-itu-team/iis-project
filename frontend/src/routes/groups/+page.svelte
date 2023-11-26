@@ -7,11 +7,17 @@
 	import { get } from 'svelte/store';
 	import { errorInfoFromResponse } from '$lib/common/error';
 	import Error from "../+error.svelte";
+    import Pagination from '$lib/components/Pagination.svelte';
 
-	const fetchGroups = (async () => {
+	let pageCurrent: number = 1;
+    let pageFirst: number = 0;
+    let pageLast: number = 0;
+
+	async function fetchGroups() {
 		const res = await client.get<ResponseFormat<Group[]>>('/groups', {
 			params: {
-				userId: get(currentUser)?.id
+                userId: get(currentUser)?.id,
+                page: pageCurrent
 			}
 		});
 
@@ -19,8 +25,13 @@
 			throw errorInfoFromResponse(res);
 		}
 
+        pageFirst = res.data.pagination?.firstPage ?? 0
+        pageLast = res.data.pagination?.lastPage ?? 0
+        pageCurrent = res.data.pagination?.currentPage ?? 0
+
 		return res.data.data;
-	})();
+	};
+    let fetchGroupsPromise = fetchGroups();
 
 	showCrumbs(true);
 	setCrumbs([
@@ -33,14 +44,15 @@
 </script>
 
 <div class="flex flex-col">
-	{#await fetchGroups}
+	{#await fetchGroupsPromise}
 		<p class="text-center">loading...</p>
 	{:then groups}
-		<p class="text-white font-semibold text-lg">my groups ({groups?.length ?? 0}):</p>
-		<GroupList groups={groups ?? []} />
 		<a href={`/groups/create`} class="self-center hover:underline hover:cursor-pointer"
 			>create a new group</a
 		>
+		<p class="text-white font-semibold text-lg">my groups ({groups?.length ?? 0}):</p>
+		<GroupList groups={groups ?? []} />
+		<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchGroupsPromise = fetchGroups()}/>
 	{:catch error}
 		<Error {error} />
 	{/await}
