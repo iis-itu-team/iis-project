@@ -6,6 +6,8 @@
 	import { toasts } from 'svelte-toasts';
 	import { client } from '$lib/http/http';
 	import type { ResponseFormat } from '$lib/types';
+	import { errorInfoFromResponse } from '$lib/common/error';
+	import Error from './+error.svelte';
 
 	const fetch = (async () => {
 		const groupsRes = await client.get<ResponseFormat<Group[]>>('/groups');
@@ -30,7 +32,7 @@
 				description: 'Failed loading groups.'
 			});
 
-			throw 'Error loading groups';
+			throw errorInfoFromResponse(groupsRes);
 		}
 	})();
 
@@ -62,6 +64,6 @@
 			</div>
 		{/if}
 	{:catch err}
-		<p class="text-red font-bold text-xl2">{err}</p>
+		<Error error={err} />
 	{/await}
 </div>

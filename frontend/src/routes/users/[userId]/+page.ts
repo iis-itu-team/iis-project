@@ -1,3 +1,4 @@
+import { errorInfoFromResponse } from '$lib/common/error.js';
 import { client } from '$lib/http/http.js'
 import type { ResponseFormat } from '$lib/types/response.js'
 import type { User } from '$lib/types/user.js'
@@ -9,7 +10,7 @@ export async function load({ params }) {
     const user = await client.get<ResponseFormat<User>>(`/users/${userId}`);
 
     if (user.status !== 200) {
-        throw error(user.status, user.data.error);
+        throw error(user.status, errorInfoFromResponse(user));
     }
 
     return {

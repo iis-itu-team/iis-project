@@ -5,6 +5,8 @@
 	import { currentUser } from '$lib/stores/auth';
 	import type { ResponseFormat, Group } from '$lib/types';
 	import { get } from 'svelte/store';
+	import { errorInfoFromResponse } from '$lib/common/error';
+	import Error from "../+error.svelte";
 
 	const fetchGroups = (async () => {
 		const res = await client.get<ResponseFormat<Group[]>>('/groups', {
@@ -12,6 +14,10 @@
 				userId: get(currentUser)?.id
 			}
 		});
+
+		if (res.status !== 200) {
+			throw errorInfoFromResponse(res);
+		}
 
 		return res.data.data;
 	})();
@@ -35,5 +41,7 @@
 		<a href={`/groups/create`} class="self-center hover:underline hover:cursor-pointer"
 			>create a new group</a
 		>
+	{:catch error}
+		<Error {error} />
 	{/await}
 </div>
