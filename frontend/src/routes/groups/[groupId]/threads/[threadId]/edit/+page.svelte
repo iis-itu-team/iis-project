@@ -40,7 +40,7 @@
 				type: 'success',
 				description: 'Thread updated.'
 			});
-			goto(`/groups/${data.group?.id}`, {
+			goto(`/groups/${data.group?.id}/threads/${data.thread?.id}`, {
 				invalidateAll: true
 			});
 			return true;
@@ -55,6 +55,6 @@
 		{fields}
 		{defaults}
 		onSubmit={handleSubmit}
-		onCancel={() => goto(`/groups/${data.group?.id}`)}
+		onCancel={() => goto(`/groups/${data.group?.id}/threads/${data.thread?.id}`)}
 	/>
 </div>

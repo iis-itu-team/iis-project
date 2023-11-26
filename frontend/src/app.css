@@ -6,6 +6,7 @@
     .btn {
         @apply py-1 px-3 text-primary/100 border-primary border rounded-sm;
         @apply hover:bg-primary-light/10;
+        @apply h-10;
     }
 
     .btn-yes {

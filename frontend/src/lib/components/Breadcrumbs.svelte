@@ -3,7 +3,7 @@
 </script>
 
 {#if $show}
-	<div class="flex flex-row text-xl gap-x-2 p-10">
+	<div class="flex flex-row text-xl gap-x-2">
 		...:
 		{#each $breadcrumbs as crumb, id}
 			{#if crumb.href}

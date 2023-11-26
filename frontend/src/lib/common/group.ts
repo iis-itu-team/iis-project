@@ -35,6 +35,5 @@ export const requestToJoin = async (group?: Group) => {
         type: 'success',
         description: 'Sent a request to join this group.'
     });
-
-    return res.data.data
+    return res.data.data;
 };

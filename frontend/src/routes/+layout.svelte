@@ -8,7 +8,7 @@
 	import { fetchRequests } from '$lib/stores/requests';
 
 	export let data: PageData;
-	
+
 	$currentUser = data.user;
 	fetchRequests();
 </script>
@@ -17,14 +17,15 @@
 	<title>sochub</title>
 </svelte:head>
 
-<div class="flex flex-col text-text">
+<div class="flex flex-col gap-y-10 text-text">
 	<NavBar />
-	<Breadcrumbs />
-	<div class="p-10">
+	<div class="px-10">
+		<Breadcrumbs />
+	</div>
+	<div class="px-10">
 		<slot />
 	</div>
 	<ToastContainer let:data>
 		<FlatToast {data} />
 	</ToastContainer>
 </div>
-
