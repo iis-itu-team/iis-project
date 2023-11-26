@@ -5,8 +5,17 @@
 	import type { ResponseFormat, FormFields, Thread } from '$lib/types';
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
+	import { onMount } from 'svelte';
+	import { AccessType, checkAccess } from '$lib/stores/auth';
 
 	export let data: PageData;
+
+	onMount(() => {
+		checkAccess({
+			type: AccessType.GROUP_MANAGE,
+			redirectTo: `/groups/${data.group?.id}`
+		});
+	});
 
 	const fields: FormFields = {
 		title: {
