@@ -3,7 +3,7 @@
 	import { client } from '$lib/http/http';
 	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
-	import type { Group, Message, Thread } from '$lib/types';
+	import type { Message } from '$lib/types';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
