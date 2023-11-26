@@ -26,7 +26,12 @@ export default class AuthController {
 
     public async register({ request, response, auth }: HttpContextContract) {
         const validated = await request.validate({
-            schema: registerSchema
+            schema: registerSchema,
+            messages: {
+                'password.minLength': 'password has to be at least {{ options.minLength }} characters long',
+                'nickname.minLength': 'nickname has to be at least {{ options.minLength }} characters long',
+                'email.email': 'invalid email format'
+            }
         })
 
         const user = await this.userService.createUser(validated)
