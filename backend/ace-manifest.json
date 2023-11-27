@@ -1,5 +1,25 @@
 {
   "commands": {
+    "manage:admin": {
+      "settings": {
+        "loadApp": true,
+        "stayAlive": false
+      },
+      "commandPath": "./commands/ManageAdmin",
+      "commandName": "manage:admin",
+      "description": "give user an administrator role",
+      "args": [
+        {
+          "type": "string",
+          "propertyName": "uid",
+          "name": "uid",
+          "required": true,
+          "description": "email, nickname or id of the user"
+        }
+      ],
+      "aliases": [],
+      "flags": []
+    },
     "dump:rcfile": {
       "settings": {},
       "commandPath": "@adonisjs/core/build/commands/DumpRc",
