@@ -65,7 +65,9 @@
 		pageLast = threadsRes.data.pagination?.lastPage ?? 0;
 		pageCurrent = threadsRes.data.pagination?.currentPage ?? 0;
 
-		return threadsRes.data.data ?? [];
+		const result = threadsRes.data.data ?? [];
+		threadsLength = result.length;
+		return result;
 	};
 
 	let fetchPromise = fetch();
