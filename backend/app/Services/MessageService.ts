@@ -15,6 +15,10 @@ export type CreateMessageInput = {
     content: string
 }
 
+export type UpdateMessageInput = {
+    content: string
+}
+
 export type ListMessagesInput = {
     threadId: string
     groupId: string
@@ -102,6 +106,18 @@ export default class MessageService {
         })
 
         return await message.save()
+    }
+
+    public async updateMessage(id: string, input: UpdateMessageInput) {
+        const message = await Message.findBy("id", id)
+
+        if (!message) {
+            throw HttpException.notFound("message", id)
+        }
+
+        message.merge(input)
+
+        return (await message.save()).refresh()
     }
 
     public async deleteMessage(id: string) {

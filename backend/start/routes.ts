@@ -92,8 +92,7 @@ Route.group(() => {
   Route.resource("groups.threads.messages", "MessageController")
     .only(["index", "store"])
     .middleware({
-      "index": "group-auth",
-      "store": "group-auth"
+      "*": "group-auth",
     })
 
   // /messages/:messageId/ratings
@@ -104,8 +103,9 @@ Route.group(() => {
 
   // /messages
   Route.resource("messages", "MessageController")
-    .only(["index", "destroy"]).middleware({
-      "destroy": "require-auth"
+    .only(["index", "destroy", "update"]).middleware({
+      "destroy": "require-auth",
+      "update": "require-auth"
     })
 
   // -- Users

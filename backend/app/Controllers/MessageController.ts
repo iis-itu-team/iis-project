@@ -19,6 +19,12 @@ const createMessageSchema = schema.create({
     ])
 })
 
+const updateMessageSchema = schema.create({
+    content: schema.string([
+        rules.maxLength(255)
+    ])
+})
+
 export default class MessageController {
     private readonly messageService = new MessageService()
 
@@ -65,6 +71,18 @@ export default class MessageController {
         response.status(201).success(message)
     }
 
+    public async update({ request, response }: HttpContextContract) {
+        const validated = await request.validate({
+            schema: updateMessageSchema
+        })
+
+        const messageId = request.param('id')
+
+        const message = await this.messageService.updateMessage(messageId, validated)
+
+        response.success(message)
+    }
+
     public async destroy({ request, response }: HttpContextContract) {
         const id = request.param("id")
 
@@ -77,7 +95,7 @@ export default class MessageController {
     public async rate({ request, response, auth }: HttpContextContract) {
         const { message_id, up } = request.all()
 
-		const user_id = auth.user?.id ?? ''
+        const user_id = auth.user?.id ?? ''
 
         const rating = await this.messageService.rateMessage(message_id, user_id, up)
 
