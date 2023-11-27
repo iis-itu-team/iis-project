@@ -56,7 +56,7 @@
 
 <h3>Roz¹íøení</h3>
 <p>podrobné statistiky u¾ivatelù (pozitivní hodnocení, negativní hodnocení, poèet skupin, poèet správ, poèet hodnocení správ ostatných, hodnocení správ u¾ivetele)</p>
-<p>podpora markdown formátovania pre správy</p>
+<p>podpora markdown formátování pro zprávy</p>
 
 <h3>Video</h3>
 
@@ -64,12 +64,25 @@
 
 
 <h2>Implementace</h2>
-<p>Prípady u¾ití u¾ivatele jsou implementovány v "/backend/app/Services/UserService.ts"</p>
-<p>Prípady u¾ití pre skupiny jsou implementovány v "/backend/app/Services/GroupService.ts"</p>
-<p> "/backend/app/Services/RequestService.ts"</p>
-<p> "/backend/app/Services/ThreadService.ts"</p>
-<p> "/backend/app/Services/MessageService.ts"</p>
-
+<h3>Pøípady u¾ití / manipulace s daty jsou implementováný pomocí url routes:</h3>
+<p>
+	Pro manipulaci se <strong>skupinami</strong> slou¾í url route <strong>/groups</strong> a <strong>/groups/:id/kick</strong>, které prostøednictvím kontroleru
+	<strong>GroupControler</strong> (v /backend/app/Controlers/GroupControler.ts) a slu¾by <strong>GroupService</strong>
+	(v /backend/app/Services/GroupService.ts) umo¾òuje vypsat konkrétní skupinu nebo nìkolik skupin, ulo¾it, upravit, smazat skupinu a vyhodit u¾ivatele ze skupiny.
+	Pro tyto funkce je nadefinován autorizaèní middleware <strong>group-auth</strong> (v /backend/app/Middleware/GroupAuth.ts)
+</p>
+<p>
+	Pro manipulaci s <strong>po¾adavky o pøístup do skupin</strong> slou¾í url route <strong>/groups/:group_id/requests/:request_id</strong>, <strong>/requests/:id/status</strong> a <strong>/requests</strong>, které prostøednictvím kontroleru
+	<strong>GroupRequestControler</strong> (v /backend/app/Controlers/GroupRequestControler.ts) a slu¾by <strong>RequestService</strong>
+	(v /backend/app/Services/GroupService.ts) umo¾òuje vytvoøit po¾adavek o pøístup, smazat, mìnit tento po¾adavek a vypsat ve¹keré po¾adavky.
+	Pro tyto funkce se opìt vyu¾ívá autorizaèní middleware <strong>group-auth</strong> (v /backend/app/Middleware/GroupAuth.ts) nebo práva kontroluje pøímo kontroler.
+</p>
+<p>
+	Pro manipulaci s <strong>vlákny</strong> slou¾í url route <strong>/threads</strong> a <strong>/groups/:group_id/threads</strong>, které prostøednictvím kontroleru
+	<strong>ThreadControler</strong> (v /backend/app/Controlers/GroupRequestControler.ts) a slu¾by <strong>RequestService</strong>
+	(v /backend/app/Services/GroupService.ts) umo¾òuje vytvoøit po¾adavek o pøístup, smazat, mìnit tento po¾adavek a vypsat ve¹keré po¾adavky.
+	Pro tyto funkce se opìt vyu¾ívá autorizaèní middleware <strong>group-auth</strong> (v /backend/app/Middleware/GroupAuth.ts) nebo práva kontroluje pøímo kontroler.
+</p>
 
 <h3>Databáze</h3>
 
