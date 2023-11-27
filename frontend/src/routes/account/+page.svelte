@@ -136,9 +136,10 @@
 		}
 
 		await client.delete<ResponseFormat<void>>(`/users/${$currentUser?.id}`);
-
-		goto('/');
 		alert('Your account was deleted');
+		$currentUser = null;
+		await invalidateAll();
+		goto('/register');
 	};
 </script>
 
