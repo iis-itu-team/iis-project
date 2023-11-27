@@ -139,31 +139,45 @@ export default class MessageService {
         // only can update messages if
         // - admin / owns the message
         // - group manage access
-        if (currentUser.role !== Role.ADMIN &&
-            message.ownerId !== currentUser.id) {
-            // query group and membership of the user
-            const group = await Group.query()
-                .join('group_members', (query) => {
-                    query.on('groups.id', 'group_members.group_id')
-                        .andOnVal('group_members.user_id', currentUser.id)
-                })
-                .first()
+        // query group and membership of the user
+        const currentUserRole = (await Database.from("group_members")
+            .where("user_id", currentUser.id)
+            .where("group_id", message.groupId)
+            .select("group_role")
+            .first())?.group_role
 
-            if (group?.$extras.group_role === null ||
-                (group?.$extras.group_role !== GroupRole.ADMIN &&
-                    group?.$extras.group_role !== GroupRole.MOD)) {
-                throw new HttpException(401, "not_allowed", "Not allowed to update messages.")
+        // mod cannot update messages of admin
+        // query membership of the owner of the message
+        const userRole = (await Database.from("group_members")
+            .where("user_id", message.ownerId)
+            .where("group_id", message.groupId)
+            .select("group_role")
+            .first())?.group_role
+
+        const check = () => {
+            if (!currentUserRole) {
+                return false;
             }
 
-            // mod cannot update messages of admin
-            // query membership of the owner of the message
-            const membership = await Database.from("group_members")
-                .where("user_id", message.ownerId)
-                .where("group_id", group.id)
-                .select("group_role")
-                .first()
+            if (currentUser.role === Role.ADMIN || currentUser.id === message.ownerId) {
+                return true;
+            }
 
-            console.log(membership)
+            if (currentUserRole === GroupRole.ADMIN &&
+                (userRole === GroupRole.MOD || userRole === GroupRole.MEMBER || userRole === null)) {
+                return true;
+            }
+
+            if (currentUserRole === GroupRole.MOD &&
+                (userRole === GroupRole.MEMBER || userRole === null)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        if (!check()) {
+            throw new HttpException(401, "not_allowed", "Cannot update this message.")
         }
 
         message.merge(input)
@@ -178,26 +192,52 @@ export default class MessageService {
             throw HttpException.notFound("message", id)
         }
 
-        // only can delete messages if
+        // only can update messages if
         // - admin / owns the message
         // - group manage access
-        if (currentUser.role !== Role.ADMIN &&
-            message.ownerId !== currentUser.id) {
-            // query group and membership of the user
-            const group = await Group.query()
-                .leftJoin('group_members', (query) => {
-                    query.on('groups.id', 'group_members.group_id')
-                        .andOnVal('group_members.user_id', currentUser.id)
-                })
-                .first()
+        // query group and membership of the user
+        const currentUserRole = (await Database.from("group_members")
+            .where("user_id", currentUser.id)
+            .where("group_id", message.groupId)
+            .select("group_role")
+            .first())?.group_role
 
-            if (group?.$extras.group_role === null ||
-                (group?.$extras.group_role !== GroupRole.ADMIN &&
-                    group?.$extras.group_role !== GroupRole.MOD)) {
-                throw new HttpException(401, "not_allowed", "Not allowed to update messages.")
+        // mod cannot update messages of admin
+        // query membership of the owner of the message
+        const userRole = (await Database.from("group_members")
+            .where("user_id", message.ownerId)
+            .where("group_id", message.groupId)
+            .select("group_role")
+            .first())?.group_role
+
+        const check = () => {
+            if (!currentUserRole) {
+                return false;
             }
+
+            if (currentUser.role === Role.ADMIN || currentUser.id === message.ownerId) {
+                return true;
+            }
+
+            if (currentUserRole === GroupRole.ADMIN &&
+                (userRole === GroupRole.MOD || userRole === GroupRole.MEMBER || userRole === null)) {
+                return true;
+            }
+
+            if (currentUserRole === GroupRole.MOD &&
+                (userRole === GroupRole.MEMBER || userRole === null)) {
+                return true;
+            }
+
+            return false;
         }
 
+        if (!check()) {
+            throw new HttpException(401, "not_allowed", "Cannot update this message.")
+        }
+
+        // drop all ratings
+        await message.related('ratings').detach()
         await message.delete()
     }
 
