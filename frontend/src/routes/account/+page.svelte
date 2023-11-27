@@ -2,19 +2,32 @@
 	import { currentUser, ensureLoggedIn } from '$lib/stores/auth';
 	import { toasts } from 'svelte-toasts';
 	import { client } from '$lib/http/http';
-	import type { User, Message, ResponseFormat } from '$lib/types';
+	import type { User, ResponseFormat } from '$lib/types';
 	import { showCrumbs } from '$lib/stores/breadcrumbs';
 	import { logout } from '$lib/stores/auth';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Form from '$lib/components/Form.svelte';
 	import type { FormFields } from '$lib/types/form';
+	import UserStatistics from '$lib/components/UserStatistics.svelte';
+	import type { Statistics } from '$lib/types/user';
+	import { errorInfoFromResponse } from '$lib/common/error';
+	import Error from '../+error.svelte';
 
 	showCrumbs(false);
 
 	onMount(() => {
 		ensureLoggedIn();
 	});
+
+	const statistics = client
+		.get<ResponseFormat<Statistics>>(`/users/${$currentUser?.id}/statistics`)
+		.then((res) => {
+			if (res.status !== 200) {
+				throw errorInfoFromResponse(res);
+			}
+			return res.data.data!;
+		});
 
 	const fields: FormFields = {
 		email: {
@@ -116,68 +129,17 @@
 		goto('/');
 	};
 
-	let groups_count = 0;
-	let threads_count = 0;
-	let messages_count = 0;
-	let score = 0;
-
-	let group_last = '';
-	let thread_last = '';
-
-	const getStatistics = async () => {
-		const res = await client.get<ResponseFormat<Message[]>>(`/statistics/${$currentUser?.id}`, {
-			params: {
-				expand: "owner"
-			}
-    	});
-
-		if (res.status !== 200 || res.data.status !== 'success') {
-			alert("not gucci")
-		}
-
-		groups_count = 0;
-		threads_count = 0;
-		messages_count = 0;
-		score = 0;
-
-		group_last = '';
-		thread_last = '';
-		
-		readMessages(res.data.data)
-	};
-
-	function readMessages(messages: Message[]) {
-		for (let message in messages) {
-			if (group_last !== message.group_id) {
-				group_last = message.group_id;
-				groups_count++;
-			}
-
-			if (thread_last !== message.thread_id) {
-				thread_last = message.thread_id;
-				threads_count++;
-			}
-
-			// TODO: fix rating
-			if (message.rating !== undefined) {
-				score += message.rating;
-			}
-			messages_count++;
-		}
-	};
-
 	const deleteAccount = async () => {
-		if (confirm("Your account will be deleted") == false ) {
-			alert("Account deletion was cancelled by user");
+		if (confirm('Your account will be deleted') == false) {
+			alert('Account deletion was cancelled by user');
 			return;
-		} 
-		
+		}
+
 		await client.delete<ResponseFormat<void>>(`/users/${$currentUser?.id}`);
 
 		// TODO: redirect
-		alert("Your account was deleted")
-	}
-
+		alert('Your account was deleted');
+	};
 </script>
 
 <div class="flex flex-col">
@@ -185,25 +147,28 @@
 		<button class="btn" on:click={handleLogout}>logout</button>
 	</div>
 
-	<div class="max-w-md m-auto p-10">
-		<Form bind:errors {fields} onSubmit={handleSubmit} {defaults} />
-	</div>
-
-	<div class="flex flex-col items-center gap-y-4 p-10">
-		<div class="max-w-md m-auto text-left">
-			<p class="bold text-xl">Statistics:</p>
+	<div class="m-auto">
+		<h2 class="font-semibold text-lg">Account settings</h2>
+		<div class="max-w-md m-auto p-10">
+			<Form bind:errors {fields} onSubmit={handleSubmit} {defaults} />
 		</div>
 
-		<div class="max-w-md m-auto text-left">
-			<p>Groups: {groups_count}</p>
-			<p>Threads: {threads_count}</p>
-			<p>Messages: {messages_count}</p>
-			<p>Rating: {score} </p>
-		</div>
+		<div class="flex flex-col py-4">
+			<h2 class="font-semibold text-lg">Statistics</h2>
 
-		<button class="btn" on:click={getStatistics}>Check for statistics</button>
-	
-		<p>Dangerous Zone</p>
-		<button class="btn" on:click={deleteAccount}>Delete my account</button>
+			{#await statistics}
+				loading...
+			{:then stats}
+				<UserStatistics statistics={stats} />
+			{:catch error}
+				<Error {error} />
+			{/await}
+		</div>
+		<div class="py-4">
+			<h2 class="font-semibold text-lg">Danger zone</h2>
+			<div class="p-8 text-center">
+				<button class="btn" on:click={deleteAccount}>delete my account</button>
+			</div>
+		</div>
 	</div>
 </div>

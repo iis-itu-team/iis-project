@@ -24,3 +24,11 @@ export type RegisterInput = {
     email?: string;
     password?: string;
 }
+
+export type Statistics = {
+    positivelyRated: number
+    negativelyRated: number
+    joinedGroups: number
+    messagesPosted: number
+    ratingsSubmitted: number
+}
