@@ -113,14 +113,15 @@ Route.group(() => {
 
   Route.resource("users", "UserController")
     .only(["index", "show", "update", "destroy"]).middleware({
-      "show": "user-auth",
-      "update": "user-auth",
-      "destroy": "user-auth",
+      "show": "user-auth:access",
+      "update": "user-auth:manage",
+      "destroy": "user-auth:manage",
     })
     .paramFor('users', 'user_id')
 
   // -- User statistics
   Route.get("/users/:user_id/statistics", "UserController.statistics")
+    .middleware("user-auth:access")
 
   // -- Login
   Route.post("/auth/login", "AuthController.login")

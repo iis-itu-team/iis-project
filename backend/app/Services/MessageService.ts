@@ -143,7 +143,7 @@ export default class MessageService {
             message.ownerId !== currentUser.id) {
             // query group and membership of the user
             const group = await Group.query()
-                .leftJoin('group_members', (query) => {
+                .join('group_members', (query) => {
                     query.on('groups.id', 'group_members.group_id')
                         .andOnVal('group_members.user_id', currentUser.id)
                 })
@@ -154,6 +154,16 @@ export default class MessageService {
                     group?.$extras.group_role !== GroupRole.MOD)) {
                 throw new HttpException(401, "not_allowed", "Not allowed to update messages.")
             }
+
+            // mod cannot update messages of admin
+            // query membership of the owner of the message
+            const membership = await Database.from("group_members")
+                .where("user_id", message.ownerId)
+                .where("group_id", group.id)
+                .select("group_role")
+                .first()
+
+            console.log(membership)
         }
 
         message.merge(input)
