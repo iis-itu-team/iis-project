@@ -231,8 +231,42 @@
 
 	$: currentMember = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
-	const getUserRole = (user?: User) => {
-		return data.group?.members?.find((m) => m.id === user?.id)?.group_role ?? 'guest';
+	const getUserRole = (userId?: string) => {
+		console.log(userId);
+		return data.group?.members?.find((m) => m.id === userId)?.group_role ?? 'guest';
+	};
+
+	const canManageMessage = (message: Message) => {
+		// only if admin, or the message is mod / member message
+		// admins can delete messages of each other, why not
+		if ($currentUser?.role === UserRole.ADMIN) {
+			return true;
+		}
+
+		if (data.group?.membership === Membership.GUEST) {
+			return false;
+		}
+
+		if (message.owner_id === $currentUser?.id) {
+			return true;
+		}
+
+		const userRole = getUserRole(message.owner_id);
+
+		// is admin, message belongs to mod / user
+		if (
+			currentMember?.group_role === GroupRole.ADMIN &&
+			(userRole === GroupRole.MOD || userRole === GroupRole.MEMBER)
+		) {
+			return true;
+		}
+
+		// is mod, message belogns to user
+		if (currentMember?.group_role === GroupRole.MOD && userRole === GroupRole.MEMBER) {
+			return true;
+		}
+
+		return false;
 	};
 
 	$: canManage =
@@ -281,7 +315,7 @@
 								<a href={`/users/${message.owner?.id}`} class="text-lg font-semibold nav"
 									>{message.owner?.nickname}</a
 								>
-								<span class="italic">group {getUserRole(message.owner)}</span>
+								<span class="italic">group {getUserRole(message.owner_id)}</span>
 								<span class="text-right">
 									@
 									{new Date(message.date).toLocaleString('en-gb', {
@@ -329,7 +363,7 @@
 								<SvelteMarkdown source={message.content} />
 							{/if}
 						</div>
-						{#if data.group?.membership !== Membership.GUEST && (canManage || message.ownerId === $currentUser?.id)}
+						{#if canManageMessage(message)}
 							<div class="flex flex-row justify-end pt-8 gap-x-4">
 								{#if editing.message?.id === message.id}
 									<button class="btn-no" on:click={stopEditing}>cancel</button>

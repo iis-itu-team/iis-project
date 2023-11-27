@@ -4,10 +4,10 @@ import type { User } from "./user";
 export interface Message {
     id: string
 
-    ownerId: string;
+    owner_id: string;
     owner?: User;
 
-    groupId: string;
+    group_id: string;
     group?: Group;
 
     content: string;
