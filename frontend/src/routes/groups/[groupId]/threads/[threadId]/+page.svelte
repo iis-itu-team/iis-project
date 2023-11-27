@@ -118,6 +118,24 @@
 		}
 	};
 
+	const handleDeleteMessage = async (message: Message) => {
+		const res = await client.delete<ResponseFormat<void>>(`/messages/${message.id}`);
+
+		if (res.status === 200 && res.data.status === 'success') {
+			toasts.add({
+				type: 'success',
+				description: 'Message deleted.'
+			});
+			invalidateAll();
+			return;
+		}
+
+		toasts.add({
+			type: 'error',
+			description: 'Something went wrong.'
+		});
+	};
+
 	$: currentMember = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
 	const getUserRole = (user?: User) => {
@@ -157,7 +175,7 @@
 			{:else}
 				{#each sorted_messages as message}
 					<div
-						class="flex flex-col rounded-sm py-4 last:border-0 border-b border-secondary-light/20"
+						class="flex flex-col rounded-sm p-4 last:border-0 border-b border-secondary-light/20"
 					>
 						<div class="flex flex-row justify-between">
 							<div class="place-self-start">
@@ -198,6 +216,9 @@
 								})}
 							</p>
 						</div>
+						<div class="flex flex-row justify-end pt-8">
+							<button class="btn" on:click={() => handleDeleteMessage(message)}>delete</button>
+						</div>
 					</div>
 				{/each}
 			{/if}
@@ -220,10 +241,8 @@
 					<span class="text-gray-300 text-sm {(content?.length ?? 0) >= 255 && 'text-red-300'}"
 						>{content?.length ?? 0}/255</span
 					>
-					<button
-						on:click={handleSend}
-						disabled={!canSend}
-						class="{canSend ? "btn" : "btn-disabled"}">send</button
+					<button on:click={handleSend} disabled={!canSend} class={canSend ? 'btn' : 'btn-disabled'}
+						>send</button
 					>
 				</div>
 			</div>
