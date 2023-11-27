@@ -116,6 +116,7 @@ Route.group(() => {
       "update": "user-auth",
       "destroy": "user-auth",
     })
+    .paramFor('users', 'user_id')
 
   // -- User statistics
   Route.get("/users/:user_id/statistics", "UserController.statistics")

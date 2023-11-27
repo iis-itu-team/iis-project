@@ -27,7 +27,7 @@ export default class UserController {
     }
 
     public async show({ auth, request, response }: HttpContextContract) {
-        const id = request.param("id")
+        const id = request.param("user_id")
 
         // only allow if the user profile is visible to the logged in user
         const loggedInUser = auth.user as User;
@@ -38,7 +38,7 @@ export default class UserController {
     }
 
     public async update({ request, response }: HttpContextContract) {
-        const id = request.param("id")
+        const id = request.param("user_id")
 
         const validated = await request.validate({ schema: updateUserSchema })
 
@@ -48,7 +48,7 @@ export default class UserController {
     }
 
     public async destroy({ request, response }: HttpContextContract) {
-        const id = request.param("id")
+        const id = request.param("user_id")
 
         await this.userService.deleteUser(id)
 

@@ -8,8 +8,6 @@ export default class UserAuth {
             return
         }
 
-        console.log(auth.user)
-
         if (auth.user?.role == Role.ADMIN) {
             await next()
             return
