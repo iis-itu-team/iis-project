@@ -71,22 +71,22 @@ export default class MessageController {
         response.status(201).success(message)
     }
 
-    public async update({ request, response }: HttpContextContract) {
+    public async update({ auth, request, response }: HttpContextContract) {
         const validated = await request.validate({
             schema: updateMessageSchema
         })
 
         const messageId = request.param('id')
 
-        const message = await this.messageService.updateMessage(messageId, validated)
+        const message = await this.messageService.updateMessage(messageId, validated, auth.user!)
 
         response.success(message)
     }
 
-    public async destroy({ request, response }: HttpContextContract) {
+    public async destroy({ auth, request, response }: HttpContextContract) {
         const id = request.param("id")
 
-        await this.messageService.deleteMessage(id)
+        await this.messageService.deleteMessage(id, auth.user!)
 
         response.success()
     }

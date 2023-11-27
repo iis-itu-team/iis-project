@@ -90,23 +90,24 @@ Route.group(() => {
 
   // /groups/:group_id/threads/:thread_id/messages
   Route.resource("groups.threads.messages", "MessageController")
-    .only(["index", "store"])
+    .only(["index", "store", "update", "destroy"])
     .middleware({
-      "*": "group-auth",
+      "index": "group-auth",
+      "store": ["require-auth", "group-member"],
+      "update": ["require-auth", "group-member"],
+      "destroy": ["require-auth", "group-member"],
     })
 
   // /messages/:messageId/ratings
-  Route.post("/messages/:message_id/ratings", "MessageController.rate").middleware("rating-auth")
+  Route.post("/messages/:message_id/ratings", "MessageController.rate")
+    .middleware("rating-auth")
 
   // /groups/:group_id/messages
-  Route.get("/groups/:group_id/messages", "MessageController.index").middleware("group-auth")
+  Route.get("/groups/:group_id/messages", "MessageController.index")
+    .middleware("group-auth")
 
   // /messages
-  Route.resource("messages", "MessageController")
-    .only(["index", "destroy", "update"]).middleware({
-      "destroy": "require-auth",
-      "update": "require-auth"
-    })
+  Route.get("/messages", "MessageController.index")
 
   // -- Users
 
