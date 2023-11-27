@@ -7,14 +7,10 @@
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
 	import SvelteMarkdown from 'svelte-markdown';
-<<<<<<< Updated upstream
 	import { errorInfoFromResponse } from '$lib/common/error';
-	import { error } from '@sveltejs/kit';
 	import Pagination from '$lib/components/Pagination.svelte';
-=======
-	import { groupRequests } from '$lib/stores/requests';
 	import { Membership } from '$lib/types/group';
->>>>>>> Stashed changes
+	import { error } from '@sveltejs/kit';
 
 	export let data: PageData;
 
@@ -41,12 +37,15 @@
 		// wait for threadId & groupId
 		await invalidateAll();
 
-		const messagesRes = await client.get<ResponseFormat<Message[]>>(`/groups/${data?.groupId}/threads/${data?.threadId}/messages`, {
-			params: {
-				expand: "owner",
-				page: pageCurrent
+		const messagesRes = await client.get<ResponseFormat<Message[]>>(
+			`/groups/${data?.groupId}/threads/${data?.threadId}/messages`,
+			{
+				params: {
+					expand: 'owner',
+					page: pageCurrent
+				}
 			}
-		});
+		);
 
 		if (messagesRes.status !== 200) {
 			throw error(messagesRes.status, errorInfoFromResponse(messagesRes));
@@ -55,7 +54,7 @@
 		pageFirst = messagesRes.data.pagination?.firstPage ?? 0;
 		pageLast = messagesRes.data.pagination?.lastPage ?? 0;
 
-		messages = messagesRes.data.data ?? [];	
+		messages = messagesRes.data.data ?? [];
 
 		if (lastLoad) {
 			lastLoad = false;
@@ -219,7 +218,7 @@
 				type: 'success',
 				description: 'Updated message.'
 			});
-			
+
 			fetchMessagesPromise = fetchMessages();
 			return;
 		}
@@ -267,7 +266,12 @@
 			{#if messages.length == 0}
 				<p class="w-full text-center italic p-4">nothing yet... so empty.</p>
 			{:else}
-				<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchMessagesPromise = fetchMessages()} />
+				<Pagination
+					bind:pageCurrent
+					{pageFirst}
+					{pageLast}
+					updateFunction={() => (fetchMessagesPromise = fetchMessages())}
+				/>
 				{#each sorted_messages as message}
 					<div
 						class="flex flex-col rounded-sm p-4 last:border-0 border-b border-secondary-light/20"
