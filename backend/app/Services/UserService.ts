@@ -151,12 +151,12 @@ export default class UserService {
 
         // count returned by postgres in string, as per https://github.com/brianc/node-pg-types#use
         // force it to a number, might overflow
-        const parseCount = (count: { count: string }[]) => {
-            return parseInt(count[0].count)
+        const parseCount = (count?: { count?: string }[]) => {
+            return count && count.length !== 0 && count[0].count !== undefined ? parseInt(count[0].count) : 0
         }
 
-        const parseSum = (sum: { sum: string }[]) => {
-            return parseInt(sum[0].sum)
+        const parseSum = (sum?: { sum?: string }[]) => {
+            return sum && sum.length !== 0 && sum[0].sum !== undefined ? parseInt(sum[0].sum) : 0
         }
 
         // Messages posted
