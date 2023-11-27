@@ -136,6 +136,45 @@
 		});
 	};
 
+	let editing: {
+		message?: Message;
+		content?: string;
+	};
+	$: editing = {};
+
+	const startEditing = (message: Message) => {
+		editing = {
+			message,
+			content: message.content
+		};
+	};
+
+	const stopEditing = () => {
+		editing = {};
+	};
+
+	const saveEdit = async () => {
+		const res = await client.put<ResponseFormat<Message>>(`/messages/${editing.message?.id}`, {
+			content: editing.content
+		});
+
+		if (res.status === 200 && res.data.status === 'success') {
+			stopEditing();
+
+			toasts.add({
+				type: 'success',
+				description: 'Updated message.'
+			});
+			invalidateAll();
+			return;
+		}
+
+		toasts.add({
+			type: 'error',
+			description: 'Something went wrong.'
+		});
+	};
+
 	$: currentMember = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
 	const getUserRole = (user?: User) => {
@@ -183,6 +222,16 @@
 									>{message.owner?.nickname}</a
 								>
 								<span class="italic">group {getUserRole(message.owner)}</span>
+								<span class="text-right">
+									@
+									{new Date(message.date).toLocaleString('en-gb', {
+										hour: '2-digit',
+										minute: '2-digit',
+										day: '2-digit',
+										month: '2-digit',
+										year: 'numeric'
+									})}
+								</span>
 							</div>
 							<div class="flex flex-row gap-x-2 items-center">
 								<button
@@ -202,22 +251,32 @@
 								</button>
 							</div>
 						</div>
-						<div class="flex text-md justify-between">
-							<div class="message-content">
+						<div class="p-2 message-content">
+							{#if editing.message?.id === message.id}
+								<textarea
+									bind:clientHeight
+									on:input={(e) => {
+										//@ts-ignore
+										scrollHeight = e.target?.scrollHeight;
+									}}
+									style="height: {height}px"
+									class="bg-background-light rounded-md w-full max-h-60 resize-none overflow-hidden"
+									on:keydown={(event) =>
+										event.key == 'Enter' && !event.shiftKey ? saveEdit() : null}
+									bind:value={editing.content}
+								/>
+							{:else}
 								<SvelteMarkdown source={message.content} />
-							</div>
-							<p class="text-right">
-								{new Date(message.date).toLocaleString('en-gb', {
-									hour: '2-digit',
-									minute: '2-digit',
-									day: '2-digit',
-									month: '2-digit',
-									year: 'numeric'
-								})}
-							</p>
+							{/if}
 						</div>
-						<div class="flex flex-row justify-end pt-8">
-							<button class="btn" on:click={() => handleDeleteMessage(message)}>delete</button>
+						<div class="flex flex-row justify-end pt-8 gap-x-4">
+							{#if editing.message?.id === message.id}
+								<button class="btn-no" on:click={stopEditing}>cancel</button>
+								<button class="btn" on:click={saveEdit}>save</button>
+							{:else}
+								<button class="btn" on:click={() => startEditing(message)}>edit</button>
+								<button class="btn" on:click={() => handleDeleteMessage(message)}>delete</button>
+							{/if}
 						</div>
 					</div>
 				{/each}
