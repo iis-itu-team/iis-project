@@ -7,7 +7,8 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.alterTable(this.tableName, (table) => {
       table.enum('role', Object.values(Role)).notNullable().defaultTo(Role.USER).alter({
-        alterType: false
+        alterType: false,
+        alterNullable: true
       })
     })
   }
