@@ -45,6 +45,8 @@ export default class AuthMiddleware {
       }
     }
 
+    guardLastAttempted = guardLastAttempted
+
     return false
   }
 

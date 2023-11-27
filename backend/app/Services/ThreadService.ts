@@ -40,7 +40,7 @@ export default class ThreadService {
                 perPage: threads.perPage,
                 lastPage: threads.lastPage,
                 firstPage: threads.firstPage,
-                currentPage: threads.currentPage
+                currentPage: threads.currentPage,
                 total: threads.total
             }
         }

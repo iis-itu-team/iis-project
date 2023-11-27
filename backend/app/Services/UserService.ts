@@ -1,5 +1,4 @@
 import Database from "@ioc:Adonis/Lucid/Database";
-import { Group } from "@japa/runner";
 import HttpException from "App/Exceptions/HttpException";
 import User from "App/Models/User";
 import Message from "App/Models/Message"
@@ -7,9 +6,7 @@ import { Role } from "types/role";
 import { Visibility } from "types/visibility";
 import GroupService from "./GroupService";
 import MessageService from "./MessageService";
-import { GroupRequestStatus, GroupRequestType } from "types/group-request"
 import GroupRequest from "App/Models/GroupRequest";
-import { GroupRole } from "types/group-role";
 import ThreadService from "./ThreadService";
 
 export type UpdateUserInput = {
