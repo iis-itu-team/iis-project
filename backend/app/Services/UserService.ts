@@ -1,8 +1,11 @@
 import Database from "@ioc:Adonis/Lucid/Database";
+import { Group } from "@japa/runner";
 import HttpException from "App/Exceptions/HttpException";
 import User from "App/Models/User";
+import Message from "App/Models/Message"
 import { Role } from "types/role";
 import { Visibility } from "types/visibility";
+import GroupService from "./GroupService";
 
 export type UpdateUserInput = {
     nickname?: string
@@ -18,6 +21,8 @@ export type CreateUserInput = {
 }
 
 export default class UserService {
+    private readonly groupService = new GroupService()
+
     public async listUsers(loggedInUser?: User) {
         const q = User.query()
 
@@ -138,7 +143,29 @@ export default class UserService {
             throw HttpException.notFound("user", id)
         }
 
-        // todo: delete everything the user owns
+        const parse = (item: { group_id: string }[]): string[] => {
+            return item.map(item => item.group_id);
+        }
+
+        const joinedGroups = parse(await Database.from("users")
+            .where("user_id", id)
+            .join("group_members", "id", "user_id")
+            .groupBy("group_id")
+            .select("group_id")
+        )
+
+        // delete all the user's groups
+        for (let i in joinedGroups) {
+            console.log(joinedGroups[i])
+            await this.groupService.delete(joinedGroups[i])
+        }
+
+        // TODO: only set owner_id to null
+        // delete all the user's messgage
+        await Message.query()
+            .where("owner_id", id)
+            .delete()
+
         await user.delete()
     }
 

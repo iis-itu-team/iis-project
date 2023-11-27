@@ -137,7 +137,7 @@
 
 		await client.delete<ResponseFormat<void>>(`/users/${$currentUser?.id}`);
 
-		// TODO: redirect
+		goto('/');
 		alert('Your account was deleted');
 	};
 </script>
