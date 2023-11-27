@@ -6,6 +6,11 @@ import Message from "App/Models/Message"
 import { Role } from "types/role";
 import { Visibility } from "types/visibility";
 import GroupService from "./GroupService";
+import MessageService from "./MessageService";
+import { GroupRequestStatus, GroupRequestType } from "types/group-request"
+import GroupRequest from "App/Models/GroupRequest";
+import { GroupRole } from "types/group-role";
+import ThreadService from "./ThreadService";
 
 export type UpdateUserInput = {
     nickname?: string
@@ -22,6 +27,8 @@ export type CreateUserInput = {
 
 export default class UserService {
     private readonly groupService = new GroupService()
+    private readonly messageService = new MessageService()
+    private readonly threadService = new ThreadService()
 
     public async listUsers(loggedInUser?: User) {
         const q = User.query()
@@ -139,32 +146,77 @@ export default class UserService {
     public async deleteUser(id: string) {
         const user = await User.find(id)
 
+        console.log("I am going to delete somebody!")
+
         if (!user) {
             throw HttpException.notFound("user", id)
         }
 
-        const parse = (item: { group_id: string }[]): string[] => {
+        const parseGroups = (item: { group_id: string }[]): string[] => {
             return item.map(item => item.group_id);
         }
 
-        const joinedGroups = parse(await Database.from("users")
+        const parseMessages = (item: { id: string }[]): string[] => {
+            return item.map(item => item.id);
+        }
+
+        const parseRequests = (item: { id: string }[]): string[] => {
+            return item.map(item => item.id);
+        }
+    
+        // delete all the user's groups
+        const userGroups = parseGroups(await Database.from("users")
             .where("user_id", id)
             .join("group_members", "id", "user_id")
             .groupBy("group_id")
             .select("group_id")
         )
 
-        // delete all the user's groups
-        for (let i in joinedGroups) {
-            console.log(joinedGroups[i])
-            await this.groupService.delete(joinedGroups[i])
+        for (let i in userGroups) {
+            try {
+                // kick user from all the groups
+                await this.groupService.kick(userGroups[i], user.id)
+            } catch (error) {
+                // delete the whole group if the user is admin
+                await this.groupService.delete(userGroups[i])
+            }
         }
+
+        // delete all the user's threads
+        const userThreads = parseMessages(await Message.query()
+            .where("owner_id", id)
+            .select("id")
+        )
+
+        for (let i in userThreads) {
+            console.log(userThreads[i])
+            await this.threadService.deleteThread(userThreads[i])
+        }
+
+        // delete all the user's requests
+        const userRequests = parseRequests(await GroupRequest.query()
+            .where("user_id", id)
+            .select("id")
+        )
+
+        for (let i in userRequests) {
+            console.log(userRequests[i])
+            await this.messageService.deleteMessage(userRequests[i], user)
+        }
+        
+        // delete all the user's rating
 
         // TODO: only set owner_id to null
         // delete all the user's messgage
-        await Message.query()
+        const userMessages = parseMessages(await Message.query()
             .where("owner_id", id)
-            .delete()
+            .select("id")
+        )
+
+        for (let i in userMessages) {
+            console.log(userMessages[i])
+            await this.messageService.deleteMessage(userMessages[i], user)
+        }
 
         await user.delete()
     }
