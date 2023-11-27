@@ -1,5 +1,4 @@
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
-import { SimplePaginatorMetaKeys } from '@ioc:Adonis/Lucid/Database'
 import { PaginationMeta } from 'types/pagination'
 import { ResponseFormat } from "types/response-format"
 
