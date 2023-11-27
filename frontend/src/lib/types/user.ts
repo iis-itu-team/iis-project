@@ -1,12 +1,12 @@
 import type { Visibility } from "./visibility"
 
 export interface User {
-    id: string
+    id: string;
 
-    nickname: string
-    email: string
-    role: UserRole
-    visibility: Visibility
+    nickname: string;
+    email: string;
+    role: UserRole;
+    visibility: Visibility;
 }
 
 export enum UserRole {
@@ -15,8 +15,8 @@ export enum UserRole {
 }
 
 export type LoginInput = {
-    uid?: string
-    password?: string
+    uid?: string;
+    password?: string;
 }
 
 export type RegisterInput = {
@@ -26,9 +26,10 @@ export type RegisterInput = {
 }
 
 export type Statistics = {
-    positivelyRated: number
-    negativelyRated: number
-    joinedGroups: number
-    messagesPosted: number
-    ratingsSubmitted: number
+    positivelyRated: number;
+    negativelyRated: number;
+    joinedGroups: number;
+    messagesPosted: number;
+    ratingsSubmitted: number;
+    userRating: number;
 }

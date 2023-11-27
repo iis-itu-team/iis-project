@@ -151,46 +151,57 @@ export default class UserService {
 
         // count returned by postgres in string, as per https://github.com/brianc/node-pg-types#use
         // force it to a number, might overflow
-        const parse = (count: { count: string }[]) => {
+        const parseCount = (count: { count: string }[]) => {
             return parseInt(count[0].count)
         }
 
+        const parseSum = (sum: { sum: string }[]) => {
+            return parseInt(sum[0].sum)
+        }
+
         // Messages posted
-        const messagesPosted = parse(await Database.from("messages")
+        const messagesPosted = parseCount(await Database.from("messages")
             .where("owner_id", id)
             .count("id"))
 
         // Positively rated messages posted by user
-        const positivelyRated = parse(await Database.from("messages")
+        const positivelyRated = parseCount(await Database.from("messages")
             .where("owner_id", id)
             .join("user_ratings", "messages.id", "message_id")
             .where("rating", ">", 0)
             .count("user_ratings.id"))
 
-        const ratingsSubmitted = parse(await Database.from("user_ratings")
+        const ratingsSubmitted = parseCount(await Database.from("user_ratings")
             .where("user_id", id)
             .count("id"))
 
         // Negatively rated messages posted by user
-        const negativelyRated = parse(await Database.from("messages")
+        const negativelyRated = parseCount(await Database.from("messages")
             .where("owner_id", id)
             .join("user_ratings", "messages.id", "message_id")
             .where("rating", "<", 0)
             .count("user_ratings.id"))
 
         // Joined groups
-        const joinedGroups = parse(await Database.from("users")
+        const joinedGroups = parseCount(await Database.from("users")
             .where("user_id", id)
             .join("group_members", "id", "user_id")
             .groupBy("user_id")
             .count("user_id"))
+
+        // User rating
+        const userRating = parseSum(await Database.from("user_ratings")
+            .join("messages", "message_id", "messages.id")
+            .where("owner_id", id)
+            .sum("messages.rating"))
 
         return {
             positivelyRated,
             negativelyRated,
             joinedGroups,
             messagesPosted,
-            ratingsSubmitted
+            ratingsSubmitted,
+            userRating
         }
     }
 }
