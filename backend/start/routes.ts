@@ -117,12 +117,8 @@ Route.group(() => {
       "destroy": "require-auth",
     })
 
-  // -- Rate
-  // obsolete - same functionality in /messages/:messageId/ratings
-  //Rout.post("/rate", "MessageController.rate")
-
   // -- User statistics
-  Route.get("/statistics/:user_id", "UserController.statistic")
+  Route.get("/users/:user_id/statistics", "UserController.statistics")
 
   // -- Login
   Route.post("/auth/login", "AuthController.login")

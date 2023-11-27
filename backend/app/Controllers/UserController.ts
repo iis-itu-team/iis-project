@@ -55,10 +55,10 @@ export default class UserController {
         response.success()
     }
 
-    public async statistic( {request, response }: HttpContextContract) {
+    public async statistics({ request, response }: HttpContextContract) {
         const id = request.param("user_id")
-        
-        const data = await this.userService.statisticUser(id)
+
+        const data = await this.userService.getStatistics(id)
 
         response.success(data)
     }

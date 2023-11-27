@@ -1,8 +1,6 @@
 import Database from "@ioc:Adonis/Lucid/Database";
 import HttpException from "App/Exceptions/HttpException";
 import User from "App/Models/User";
-import Message from "App/Models/Message"
-import Group from "App/Models/Group";
 import { Role } from "types/role";
 import { Visibility } from "types/visibility";
 
@@ -144,18 +142,55 @@ export default class UserService {
         await user.delete()
     }
 
-    public async statisticUser(id: string) {
+    public async getStatistics(id: string) {
         const user = await User.findBy("id", id)
 
         if (!user) {
-            console.log("user:", id)
             throw HttpException.notFound("user", id)
         }
 
-        const groups = Group.query().andWhere("owner_id", id)
+        // count returned by postgres in string, as per https://github.com/brianc/node-pg-types#use
+        // force it to a number, might overflow
+        const parse = (count: { count: string }[]) => {
+            return parseInt(count[0].count)
+        }
 
-        const messages = Message.query().andWhere("owner_id", id)
+        // Messages posted
+        const messagesPosted = parse(await Database.from("messages")
+            .where("owner_id", id)
+            .count("id"))
 
-        return messages
+        // Positively rated messages posted by user
+        const positivelyRated = parse(await Database.from("messages")
+            .where("owner_id", id)
+            .join("user_ratings", "messages.id", "message_id")
+            .where("rating", ">", 0)
+            .count("user_ratings.id"))
+
+        const ratingsSubmitted = parse(await Database.from("user_ratings")
+            .where("user_id", id)
+            .count("id"))
+
+        // Negatively rated messages posted by user
+        const negativelyRated = parse(await Database.from("messages")
+            .where("owner_id", id)
+            .join("user_ratings", "messages.id", "message_id")
+            .where("rating", "<", 0)
+            .count("user_ratings.id"))
+
+        // Joined groups
+        const joinedGroups = parse(await Database.from("users")
+            .where("user_id", id)
+            .join("group_members", "id", "user_id")
+            .groupBy("user_id")
+            .count("user_id"))
+
+        return {
+            positivelyRated,
+            negativelyRated,
+            joinedGroups,
+            messagesPosted,
+            ratingsSubmitted
+        }
     }
 }
