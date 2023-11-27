@@ -10,6 +10,7 @@ export async function load({ params }) {
     const user = await client.get<ResponseFormat<User>>(`/users/${userId}`);
 
     if (user.status !== 200) {
+        console.log("err");
         throw error(user.status, errorInfoFromResponse(user));
     }
 

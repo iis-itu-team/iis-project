@@ -13,6 +13,10 @@
 	};
 
 	const hasInfo = $page.error?.hasOwnProperty('status');
+	
+	if (hasInfo) {
+		error = $page.error as ErrorInfo;
+	}
 </script>
 
 <div class="m-auto p-10">
