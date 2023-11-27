@@ -222,7 +222,7 @@
 					>
 					<button
 						on:click={handleSend}
-						disabled={canSend}
+						disabled={!canSend}
 						class="{canSend ? "btn" : "btn-disabled"}">send</button
 					>
 				</div>
