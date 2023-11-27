@@ -1,6 +1,6 @@
 import MessageService from "App/Services/MessageService"
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
-import { schema } from "@ioc:Adonis/Core/Validator"
+import { schema, rules } from "@ioc:Adonis/Core/Validator"
 import { paginationSchema } from "types/pagination"
 
 const listMessagesSchema = schema.create({
@@ -14,7 +14,9 @@ const listMessagesSchema = schema.create({
 
 const createMessageSchema = schema.create({
     ownerId: schema.string(),
-    content: schema.string()
+    content: schema.string([
+        rules.maxLength(255)
+    ])
 })
 
 export default class MessageController {

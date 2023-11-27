@@ -31,6 +31,7 @@ export default class UserService {
                 // if not admin, return protected, public
                 q.where("visibility", Visibility.PROTECTED)
                     .orWhere("visibility", Visibility.PUBLIC)
+                    .orWhere("user_id", loggedInUser.id)
             }
             // if admin, return all
         }
@@ -43,6 +44,10 @@ export default class UserService {
 
         if (!user) {
             throw HttpException.notFound("user", id)
+        }
+
+        if (loggedInUser?.id == user.id) {
+            return user;
         }
 
         if (loggedInUser?.role == Role.ADMIN) {

@@ -90,7 +90,7 @@ export default class GroupRequestController {
         })
 
         const groupId = request.param("group_id")
-        const userId = auth.user?.id
+        const userId = auth.user?.id!
 
         const groupRequest = await this.requestService.createRequest({
             ...validated,
