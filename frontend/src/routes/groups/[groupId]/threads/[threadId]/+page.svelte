@@ -168,19 +168,19 @@
 							</div>
 							<div class="flex flex-row gap-x-2 items-center">
 								<button
-									class="w-8 h-8 p-1 font-bold text-xl border rounded-full border-primary hover:bg-background-light {message.user_rating ===
+									class="w-10 h-10 p-1 font-bold text-xl border rounded-full border-primary hover:bg-background-light {message.user_rating ===
 										'true' && 'bg-primary-light'}"
 									on:click={() => handleUp(message)}
 								>
-									⤋
+									&#x21E7
 								</button>
 								<span class="font-bold w-4 text-center">{message.rating}</span>
 								<button
-									class="w-8 h-8 p-1 font-bold text-xl border rounded-full border-secondary hover:bg-background-light {message.user_rating ===
+									class="w-10 h-10 p-1 font-bold text-xl border rounded-full border-secondary hover:bg-background-light {message.user_rating ===
 										'false' && 'bg-secondary-light'}"
 									on:click={() => handleDown(message)}
 								>
-									⤋
+									&#x21E9
 								</button>
 							</div>
 						</div>
