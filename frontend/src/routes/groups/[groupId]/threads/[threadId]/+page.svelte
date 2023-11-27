@@ -7,11 +7,16 @@
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
 	import SvelteMarkdown from 'svelte-markdown';
+	import { errorInfoFromResponse } from '$lib/common/error';
+	import { error } from '@sveltejs/kit';
+	import Pagination from '$lib/components/Pagination.svelte';
 
 	export let data: PageData;
 
+	let messages: Message[] = [];
+
 	$: sorted_messages =
-		data.messages?.sort((mes1: Message, mes2: Message) => {
+		messages.sort((mes1: Message, mes2: Message) => {
 			let date1 = new Date(mes1.date);
 			let date2 = new Date(mes2.date);
 
@@ -21,6 +26,43 @@
 
 			return date1 > date2 ? 1 : -1;
 		}) ?? [];
+
+	let pageCurrent: number = 1;
+	let pageFirst: number = 0;
+	let pageLast: number = 0;
+	let lastLoad: boolean = true;
+
+	async function fetchMessages() {
+		// wait for threadId & groupId
+		await invalidateAll();
+
+		const messagesRes = await client.get<ResponseFormat<Message[]>>(`/groups/${data?.groupId}/threads/${data?.threadId}/messages`, {
+			params: {
+				expand: "owner",
+				page: pageCurrent
+			}
+		});
+
+		if (messagesRes.status !== 200) {
+			throw error(messagesRes.status, errorInfoFromResponse(messagesRes));
+		}
+
+		pageFirst = messagesRes.data.pagination?.firstPage ?? 0;
+		pageLast = messagesRes.data.pagination?.lastPage ?? 0;
+
+		messages = messagesRes.data.data ?? [];	
+
+		if (lastLoad) {
+			lastLoad = false;
+			pageCurrent = pageLast;
+			// triggers reload
+			fetchMessagesPromise = fetchMessages();
+		} else {
+			pageCurrent = messagesRes.data.pagination?.currentPage ?? 0;
+		}
+	}
+
+	let fetchMessagesPromise = fetchMessages();
 
 	showCrumbs(true);
 	$: setCrumbs([
@@ -44,29 +86,29 @@
 
 	$: validate(content);
 
-	let error: string | undefined = undefined;
+	let errorString: string | undefined = undefined;
 
 	const validate = (content?: string) => {
 		if (!content) {
-			error = undefined;
+			errorString = undefined;
 			return;
 		}
 
 		if (content.trim().length === 0) {
-			error = 'a message cannot be just whitespace';
+			errorString = 'a message cannot be just whitespace';
 			return;
 		}
 
 		if (content.trim().length >= 255) {
-			error = 'too long';
+			errorString = 'too long';
 			return;
 		}
 
-		error = undefined;
+		errorString = undefined;
 	};
 
 	const handleSend = async () => {
-		if (content == undefined || error !== undefined) {
+		if (content == undefined || errorString !== undefined) {
 			return;
 		}
 
@@ -75,7 +117,8 @@
 			ownerId: $currentUser?.id
 		});
 
-		invalidateAll();
+		lastLoad = true;
+		fetchMessagesPromise = fetchMessages();
 
 		content = undefined;
 		height = clientHeight;
@@ -88,7 +131,7 @@
 				up: 'true'
 			})
 			.then(() => {
-				invalidateAll();
+				fetchMessagesPromise = fetchMessages();
 			});
 	}
 
@@ -99,7 +142,7 @@
 				up: 'false'
 			})
 			.then(() => {
-				invalidateAll();
+				fetchMessagesPromise = fetchMessages();
 			});
 	}
 
@@ -126,7 +169,8 @@
 				type: 'success',
 				description: 'Message deleted.'
 			});
-			invalidateAll();
+
+			fetchMessagesPromise = fetchMessages();
 			return;
 		}
 
@@ -165,7 +209,8 @@
 				type: 'success',
 				description: 'Updated message.'
 			});
-			invalidateAll();
+			
+			fetchMessagesPromise = fetchMessages();
 			return;
 		}
 
@@ -189,7 +234,7 @@
 	let scrollHeight: number;
 	$: height = scrollHeight;
 
-	$: canSend = content !== undefined && error === undefined;
+	$: canSend = content !== undefined && errorString === undefined;
 </script>
 
 <div class="flex flex-col gap-y-8">
@@ -206,12 +251,13 @@
 		</div>
 	</div>
 	<div class="flex flex-col gap-y-2 w-full">
-		<p class="text-white font-semibold text-lg">messages ({data.messages?.length}):</p>
+		<p class="text-white font-semibold text-lg">messages ({messages.length}):</p>
 
 		<div class="flex flex-col [&>*:nth-child(odd)]:bg-background-light/10">
-			{#if data.messages?.length == 0}
+			{#if messages.length == 0}
 				<p class="w-full text-center italic p-4">nothing yet... so empty.</p>
 			{:else}
+				<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchMessagesPromise = fetchMessages()} />
 				{#each sorted_messages as message}
 					<div
 						class="flex flex-col rounded-sm p-4 last:border-0 border-b border-secondary-light/20"
@@ -306,8 +352,8 @@
 				</div>
 			</div>
 			<span class="text-md italic text-gray-300">*supports markdown</span>
-			{#if error}
-				<span class="text-red-300">{error}</span>
+			{#if errorString}
+				<span class="text-red-300">{errorString}</span>
 			{/if}
 		{:else}
 			<div class="w-full">

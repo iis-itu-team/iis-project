@@ -14,18 +14,9 @@ export async function load({ params }) {
         throw error(threadRes.status, errorInfoFromResponse(threadRes));
     }
 
-    const messagesRes = await client.get<ResponseFormat<Message[]>>(`/groups/${groupId}/threads/${threadId}/messages`, {
-        params: {
-            expand: "owner"
-        }
-    });
-
-    if (messagesRes.status !== 200) {
-        throw error(messagesRes.status, errorInfoFromResponse(messagesRes));
-    }
-
     return {
-        messages: messagesRes.data.data,
-        thread: threadRes.data.data
+        thread: threadRes.data.data,
+        threadId: threadId,
+        groupId: groupId
     }
 }
