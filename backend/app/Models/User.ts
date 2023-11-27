@@ -35,8 +35,8 @@ export default class User extends BaseModel {
     @hasMany(() => Group)
     public groups: HasMany<typeof Group>
 
-	@hasMany(() => Message)
-	public ratings: HasMany<typeof Message>
+    @hasMany(() => Message)
+    public ratings: HasMany<typeof Message>
 
     @column.dateTime({ autoCreate: true })
     public createdAt: DateTime

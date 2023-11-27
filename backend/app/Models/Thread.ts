@@ -2,6 +2,7 @@ import User from "./User";
 import { BaseModel, BelongsTo, beforeCreate, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
 import generateId from "utils/generate-id";
 import Group from "./Group";
+import { DateTime } from "luxon";
 
 export default class Thread extends BaseModel {
     public static selfAssignPrimaryKey = true;

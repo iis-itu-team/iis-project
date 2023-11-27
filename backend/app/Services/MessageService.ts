@@ -22,7 +22,7 @@ export type ListMessagesInput = {
 } & PaginationInput & ExpandInput
 
 export default class MessageService {
-    public async listMessages({ ownerId, groupId, threadId, page, perPage, expand }: ListMessagesInput) {
+    public async listMessages({ ownerId, groupId, threadId, page, perPage, expand }: ListMessagesInput, currentUser?: User) {
         const q = Message.query()
 
         if (threadId) {
@@ -35,6 +35,16 @@ export default class MessageService {
 
         if (ownerId) {
             q.andWhere("owner_id", ownerId)
+        }
+
+        if (currentUser) {
+            // append a field with the info about his rating
+            q.select("*", Database.from("user_ratings")
+                .select("up")
+                .whereRaw("user_ratings.message_id = messages.id")
+                .where("user_ratings.user_id", currentUser.id)
+                .as("user_rating")
+            )
         }
 
         // preload expand fields
@@ -104,56 +114,56 @@ export default class MessageService {
         await message.delete()
     }
 
-    public async rateMessage(message_id: string, user_id: string, up: string) {
+    public async rateMessage(messageId: string, userId: string, up: string) {
 
-        const message = await Message.find(message_id)
-        
+        const message = await Message.find(messageId)
+
         if (!message) {
-            throw HttpException.notFound("message", message_id)
+            throw HttpException.notFound("message", messageId)
         }
 
-		const message_rating = await Database.from("user_ratings")
-			.select()
-			.where("user_id", "=", user_id)
-			.andWhere("message_id", "=", message_id)
+        const message_rating = await Database.from("user_ratings")
+            .select()
+            .where("user_id", "=", userId)
+            .andWhere("message_id", "=", messageId)
 
-		if (message_rating.length == 0) {
-			await Database.table("user_ratings").insert({
-				user_id: user_id,
-				message_id: message_id,
-				up: up
-			})
-		}
+        if (message_rating.length == 0) {
+            await Database.table("user_ratings").insert({
+                user_id: userId,
+                message_id: messageId,
+                up: up
+            })
+        }
 
-		if (message_rating.length == 1) {
-			await Database.from("user_ratings")
-				.where("user_id", "=", user_id)
-				.andWhere("message_id", "=", message_id)
-				.delete()
+        if (message_rating.length == 1) {
+            await Database.from("user_ratings")
+                .where("user_id", "=", userId)
+                .andWhere("message_id", "=", messageId)
+                .delete()
 
-			if (message_rating.at(0)?.up != up) {
-				await Database.table("user_ratings").insert({
-					user_id: user_id,
-					message_id: message_id,
-					up: up
-				})
-			}
-		}
+            if (message_rating.at(0)?.up != up) {
+                await Database.table("user_ratings").insert({
+                    user_id: userId,
+                    message_id: messageId,
+                    up: up
+                })
+            }
+        }
 
-		let message_ratings = await Database.from("user_ratings")
-			.select()
-			.where("message_id", "=", message_id)
-		
-		let rating_final = 0
-		for (const rate of message_ratings) {
-			if (rate.up == "true") {
-				rating_final += 1
-			} else {
-				rating_final -= 1
-			}
-		}
-		
-		message.rating = rating_final
+        let message_ratings = await Database.from("user_ratings")
+            .select()
+            .where("message_id", "=", messageId)
+
+        let rating_final = 0
+        for (const rate of message_ratings) {
+            if (rate.up == "true") {
+                rating_final += 1
+            } else {
+                rating_final -= 1
+            }
+        }
+
+        message.rating = rating_final
         await message.save()
         return message.rating
     }

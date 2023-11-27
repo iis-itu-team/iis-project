@@ -25,7 +25,7 @@ export default class MessageController {
     // /groups/:group_id/threads/:thread_id/messages
     // /groups/:group_id/messages
     // /messages
-    public async index({ request, response }: HttpContextContract) {
+    public async index({ auth, request, response }: HttpContextContract) {
         const validated = await request.validate({
             schema: listMessagesSchema
         })
@@ -34,13 +34,15 @@ export default class MessageController {
         const groupId = request.param("group_id", validated.groupId)
         const ownerId = request.param("owner_id", validated.ownerId)
 
+        const currentUser = auth.user
+
         const messages = await this.messageService.listMessages({
             ...validated,
             threadId,
             groupId,
             ownerId,
             expand: validated.expand?.split(",") ?? []
-        })
+        }, currentUser)
 
         response.list(messages)
     }
