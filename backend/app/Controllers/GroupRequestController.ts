@@ -20,7 +20,8 @@ const listRequestSchema = schema.create({
 
     me: schema.enum.optional(["true", "false"]),
 
-    expand: schema.string.optional()
+    expand: schema.string.optional(),
+    page: schema.string.optional()
 })
 
 const changeStatusSchema = schema.create({
