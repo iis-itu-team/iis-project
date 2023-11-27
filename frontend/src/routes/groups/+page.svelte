@@ -47,7 +47,7 @@
 	{#await fetchGroupsPromise}
 		<p class="text-center">loading...</p>
 	{:then groups}
-		<a href={`/groups/create`} class="self-center hover:underline hover:cursor-pointer"
+		<a href={`/groups/create`} class="nav self-end"
 			>create a new group</a
 		>
 		<p class="text-white font-semibold text-lg">my groups ({groups?.length ?? 0}):</p>
