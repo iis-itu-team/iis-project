@@ -20,50 +20,67 @@
 	<dt>Autoøi</dt>
 	<dd>Otradovec Martin<!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
 	    <a href="mailto:xotrad00@stud.fit.vutbr.cz">xotrad00@stud.fit.vutbr.cz</a> -
-		popis èinnosti v týmu
+		Vedoucí týmu, FE, BE
 	</dd>
 	<dd>Hubinský Matú¹<!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
 	    <a href="mailto:xhubin04@stud.fit.vutbr.cz">xhubin04@stud.fit.vutbr.cz</a> - 
-		popis èinnosti v týmu
+		FE, BE
 	</dd>
   <dd>Marek Vandík<!-- Nahraïte skuteèným jménem a e-mailem autora a popisem èinnosti -->
 	    <a href="mailto:xvadni01@stud.fit.vutbr.cz">xvandi01@stud.fit.vutbr.cz</a> - 
-		popis èinnosti v týmu
+		FE, BE
 	</dd>
 	<dt>URL aplikace</dt>
-	<dd><a href="http://www.stud.fit.vutbr.cz/~xautor01/IIS">http://www.stud.fit.vutbr.cz/~xautor01/IIS</a></dd>
-	<dd>(pokud má aplikace více vstupních stránek, napi¹te obdobnì dal¹í URL)</dd>
+	<dd><a href="https://iisoc.devport.space/">https://iisoc.devport.space/</a></dd>
 </dl>
 
 <h2>U¾ivatelé systému pro testování</h2>
 <p>Uveïte prosím existující zástupce <strong>v¹ech rolí u¾ivatelù</strong>.</p>
 <table>
-<tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
-<tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
-<tr><td>prodavac</td><td>prodavac</td><td>Prodavaè</td></tr>
-<tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
-</tbody></table>
+	<tbody>
+		<tr>
+			<th>Login</th><th>Heslo</th><th>Role</th>
+		</tr>
+		<tr>
+			<td>admin</td><td>yYraB6B19LJ7BMLYrexx2CL9CK79Lh</td><td>Administrátor</td>
+		</tr>
+		<tr>
+			<td>user1</td><td>Ic0x5VuT9Z4ORwklRWEls1vvvRlDdA</td><td>Registrovaný u¾ivatel</td>
+		</tr>
+		<tr>
+			<td>---</td><td>--</td><td>Neregistrovaný náv¹tìvník </td>
+		</tr>
+	</tbody></table>
 
 <p>(Diagram pøípadù u¾ití není nutné vkládat, pokud IS implementuje role a pøípady u¾ití definované zadáním.)</p> 
+
+<h3>Roz¹íøení</h3>
+<p>podrobné statistiky u¾ivatelù (pozitivní hodnocení, negativní hodnocení, poèet skupin, poèet správ, poèet hodnocení správ ostatných, hodnocení správ u¾ivetele)</p>
+<p>podpora markdown formátovania pre správy</p>
 
 <h3>Video</h3>
 
 <p>Pøilo¾te odkaz na komentované video demostrující pou¾ití informaèního systému. Zamìøte se na pøípady u¾ití definované zadáním (napø. registrace u¾ivatele, správa u¾ivatelù a èinnosti jednotlivých rolí). Video nahrajte napøíklad na VUT Google Drive, kde ho bude mo¾né pøímo spustit z odkazu.</p> 
 
 <h2>Implementace</h2>
-<p>Struèná dokumentace k implementaci, která popisuje, které èásti projektu (napø. PHP skripty) implementují jednotlivé pøípady pou¾ití.</p>
+<p>Prípady u¾ití u¾ivatele jsou implementovány v "/backend/app/Services/UserService.ts"</p>
+<p>Prípady u¾ití pre skupiny jsou implementovány v "/backend/app/Services/GroupService.ts"</p>
+<p> "/backend/app/Services/RequestService.ts"</p>
+<p> "/backend/app/Services/ThreadService.ts"</p>
+<p> "/backend/app/Services/MessageService.ts"</p>
+
 
 <h3>Databáze</h3>
 
-Zde vlo¾te grafické schéma relaèní databáze (tabulek v databázi).
+<img src="assets/database.png" alt="Databáze">
 
 <h2>Instalace</h2>
 
 Struènì popi¹te: 
 <ul>
-<li>postup instalace na server,</li>
-<li>softwarové po¾adavky (verze PHP apod.),</li>
-<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+	<li>postup instalace na server,</li>
+	<li>softwarové po¾adavky (verze PHP apod.),</li>
+	<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
 </ul>
 
 <h2>Známé problémy</h2>
