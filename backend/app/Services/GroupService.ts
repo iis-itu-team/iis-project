@@ -74,7 +74,7 @@ export default class GroupService {
             .first();
     }
 
-    public async list({ page, perPage, userId, loggedInUserId, expand }: ListGroupsInput): Promise<PaginationResult<Group>> {
+    public async list({ page, perPage, userId, loggedInUserId, expand, visibility }: ListGroupsInput): Promise<PaginationResult<Group>> {
         const q = Group.query().distinctOn("groups.id")
 
         // only groups, where the user is a member
@@ -102,6 +102,10 @@ export default class GroupService {
                     .where("user_id", loggedInUserId)
                     .as("membership")
             );
+        }
+
+        if (visibility) {
+            q.where("groups.visibility", "=", visibility)
         }
 
         const res = await q.paginate(page ?? 1, perPage ?? 10)

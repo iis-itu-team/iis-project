@@ -12,7 +12,8 @@ const listGroupSchema = schema.create({
         rules.unsigned()
     ]),
     userId: schema.string.optional(),
-    expand: schema.string.optional()
+    expand: schema.string.optional(),
+	visibility: schema.string.optional()
 })
 
 const getGroupSchema = schema.create({
