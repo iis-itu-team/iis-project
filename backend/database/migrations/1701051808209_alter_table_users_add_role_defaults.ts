@@ -6,7 +6,7 @@ export default class extends BaseSchema {
 
   public async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.enum('role', Object.values(Role)).notNullable().defaultTo(Role.USER).alter({
+      table.enum('role', Object.values(Role)).defaultTo(Role.USER).alter({
         alterType: false,
         alterNullable: true
       })
@@ -15,7 +15,10 @@ export default class extends BaseSchema {
 
   public async down() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.enum('role', Object.values(Role)).defaultTo(null).alter()
+      table.enum('role', Object.values(Role)).defaultTo(null).alter({
+        alterType: false,
+        alterNullable: false
+      })
     })
   }
 }
