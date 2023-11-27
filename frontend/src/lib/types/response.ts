@@ -6,6 +6,7 @@ export interface ResponseFormat<T> {
         lastPage: number,
         firstPage: number,
         currentPage: number,
+        total: number
     }
     error?: any;
     count?: number;

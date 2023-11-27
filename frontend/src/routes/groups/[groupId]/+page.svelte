@@ -64,9 +64,9 @@
 		pageFirst = threadsRes.data.pagination?.firstPage ?? 0;
 		pageLast = threadsRes.data.pagination?.lastPage ?? 0;
 		pageCurrent = threadsRes.data.pagination?.currentPage ?? 0;
+		threadsLength = threadsRes.data.pagination?.total ?? 0;
 
 		const result = threadsRes.data.data ?? [];
-		threadsLength = result.length;
 		return result;
 	};
 

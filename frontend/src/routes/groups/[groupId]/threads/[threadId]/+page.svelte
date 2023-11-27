@@ -31,6 +31,7 @@
 	let pageCurrent: number = 1;
 	let pageFirst: number = 0;
 	let pageLast: number = 0;
+	let messagesTotal: number = 0;
 	let lastLoad: boolean = true;
 
 	async function fetchMessages() {
@@ -53,6 +54,7 @@
 
 		pageFirst = messagesRes.data.pagination?.firstPage ?? 0;
 		pageLast = messagesRes.data.pagination?.lastPage ?? 0;
+		messagesTotal = messagesRes.data.pagination?.total ?? 0;
 
 		messages = messagesRes.data.data ?? [];
 
@@ -293,7 +295,7 @@
 		</div>
 	</div>
 	<div class="flex flex-col gap-y-2 w-full">
-		<p class="text-white font-semibold text-lg">messages ({messages.length}):</p>
+		<p class="text-white font-semibold text-lg">messages ({messagesTotal}):</p>
 
 		<div class="flex flex-col [&>*:nth-child(odd)]:bg-background-light/10">
 			{#if messages.length == 0}
