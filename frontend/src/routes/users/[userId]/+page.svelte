@@ -1,8 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import UserStatistics from '$lib/components/UserStatistics.svelte';
+	import { client } from '$lib/http/http';
+	import { currentUser } from '$lib/stores/auth';
 	import { setCrumbs, showCrumbs } from '$lib/stores/breadcrumbs';
+	import { type ResponseFormat, UserRole, type User } from '$lib/types';
+	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data: PageData;
 
@@ -17,14 +22,77 @@
 			selected: true
 		}
 	]);
+
+	$: isCurrentUser = $currentUser?.id === data.user?.id;
+
+	const handleMakeAdmin = async () => {
+		const res = await client.put<ResponseFormat<User>>(`/users/${data.user.id}`, {
+			role: UserRole.ADMIN
+		});
+
+		if (res.status === 200 && res.data.status === 'success') {
+			toasts.add({
+				type: 'success',
+				description: 'User made an administrator.'
+			});
+			invalidateAll();
+			return;
+		}
+
+		toasts.add({
+			type: 'error',
+			description: 'Something went wrong.'
+		});
+	};
+
+	const handleDeleteUser = async () => {
+		const res = await client.delete<ResponseFormat<void>>(`/users/${data.user.id}`);
+
+		if (res.status === 200 && res.data.status === 'success') {
+			toasts.add({
+				type: 'success',
+				description: 'User deleted.'
+			});
+			invalidateAll();
+			return;
+		}
+
+		toasts.add({
+			type: 'error',
+			description: 'Something went wrong.'
+		});
+	};
 </script>
 
-<div class="m-auto max-w-lg">
-	<h2 class="text-2xl font-semibold">{data.user?.nickname}</h2>
-	<p>{data.user?.email}</p>
+<div class="flex flex-col">
+	{#if isCurrentUser}
+		<div class="flex flex-row justify-end">
+			<a class="nav" href="/account">manage your account</a>
+		</div>
+	{/if}
+	<div class="m-auto max-w-lg">
+		<div>
+			<span class="text-2xl font-semibold">{data.user?.nickname}</span>
+			<span class="italic px-2">{data.user.role}</span>
+		</div>
+		<p>{data.user?.email}</p>
 
-	<div class="py-4">
-		<h2 class="text-lg font-semibold">Statistics:</h2>
-		<UserStatistics statistics={data.statistics} />
+		<div class="py-4">
+			<h2 class="text-lg font-semibold">Statistics</h2>
+			<UserStatistics statistics={data.statistics} />
+		</div>
+
+		<!-- admin controls -->
+		{#if $currentUser?.role === UserRole.ADMIN}
+			<h2 class="font-semibold text-lg">Administration</h2>
+			<div class="flex flex-row gap-x-4 p-4">
+				<button
+					class="btn {data.user.role === UserRole.ADMIN && 'btn-disabled'}"
+					disabled={data.user.role === UserRole.ADMIN}
+					on:click={handleMakeAdmin}>make admin</button
+				>
+				<button class="btn-red" on:click={handleDeleteUser}>delete user</button>
+			</div>
+		{/if}
 	</div>
 </div>

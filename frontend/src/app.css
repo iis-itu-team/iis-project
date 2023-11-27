@@ -13,6 +13,12 @@
         @apply btn;
     }
 
+    .btn-red {
+        @apply py-1 px-3 text-red-500/100 border-red-500 border rounded-sm;
+        @apply hover:bg-red-100/10;
+        @apply h-10;
+    }
+
     .btn-no {
         @apply py-1 px-3 text-gray-300 border-gray-300 border rounded-sm;
         @apply hover:bg-gray-300/10;
@@ -30,6 +36,7 @@
 
     .btn-disabled {
         @apply py-1 px-3 text-red-300/50 border-red-100/25 border rounded-sm border-dashed;
+        @apply hover:bg-inherit hover:cursor-auto;
     }
 
     .checkbox {

@@ -4,7 +4,7 @@ import type { AxiosResponse } from "axios";
 
 export const errorInfoFromResponse = (res: AxiosResponse<ResponseFormat<any>>) => {
     const data = res.data;
-    const message = typeof res.data.error == 'string' ? res.data.error : 'No description provided.';
+    const message = typeof res.data.error == 'string' ? res.data.error : undefined;
 
     return {
         statusCode: res.status,

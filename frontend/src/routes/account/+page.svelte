@@ -167,7 +167,7 @@
 		<div class="py-4">
 			<h2 class="font-semibold text-lg">Danger zone</h2>
 			<div class="p-8 text-center">
-				<button class="btn" on:click={deleteAccount}>delete my account</button>
+				<button class="btn-red" on:click={deleteAccount}>delete my account</button>
 			</div>
 		</div>
 	</div>

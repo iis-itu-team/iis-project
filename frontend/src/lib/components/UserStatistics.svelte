@@ -25,7 +25,7 @@
 			class="border-b border-dotted border-secondary-light/50 flex flex-row gap-x-1 justify-between"
 		>
 			<span>{labels[k] ?? k}</span>
-			<span class="font-semibold">{stat}</span>
+			<span class="font-semibold">{stat ?? 0}</span>
 		</div>
 	{/each}
 </div>

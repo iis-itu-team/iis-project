@@ -6,9 +6,9 @@ import { goto } from "$app/navigation";
 export const client = axios.create({
     baseURL: PUBLIC_API_URL,
     proxy: false,
-    // Only throw an AxiosError when 500 happens
-    validateStatus: (status) => status < 500,
-    withCredentials: true
+    // no errors, everything handled
+    validateStatus: (status) => true,
+    withCredentials: true,
 });
 
 client.interceptors.response.use((response) => {
@@ -16,11 +16,8 @@ client.interceptors.response.use((response) => {
         // reset logged in user
         currentUser.set(null);
 
-        console.log(response.config.url, response.config.url != '/auth/me');
-
         // redirect to login, not on /auth/me
         if (response.config.url != '/auth/me') {
-            console.log('login redirect');
             goto('/login');
         }
     }
