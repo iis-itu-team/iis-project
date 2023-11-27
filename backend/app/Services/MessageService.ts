@@ -87,7 +87,8 @@ export default class MessageService {
                 perPage: messages.perPage,
                 lastPage: messages.lastPage,
                 firstPage: messages.firstPage,
-                currentPage: messages.currentPage
+                currentPage: messages.currentPage,
+                total: messages.total
             }
         }
     }

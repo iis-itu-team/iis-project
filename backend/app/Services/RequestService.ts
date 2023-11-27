@@ -56,7 +56,8 @@ export default class GroupRequestService {
                 perPage: requests.perPage,
                 lastPage: requests.lastPage,
                 firstPage: requests.firstPage,
-                currentPage: requests.currentPage
+                currentPage: requests.currentPage,
+                total: requests.total
             }
         }
     }

@@ -112,7 +112,8 @@ export default class GroupService {
                 perPage: res.perPage,
                 lastPage: res.lastPage,
                 firstPage: res.firstPage,
-                currentPage: res.currentPage
+                currentPage: res.currentPage,
+                total: res.total
             }
         }
     }

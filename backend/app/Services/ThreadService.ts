@@ -41,6 +41,7 @@ export default class ThreadService {
                 lastPage: threads.lastPage,
                 firstPage: threads.firstPage,
                 currentPage: threads.currentPage
+                total: threads.total
             }
         }
     }
