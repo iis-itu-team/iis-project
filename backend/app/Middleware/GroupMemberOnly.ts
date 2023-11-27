@@ -20,7 +20,7 @@ export default class GroupAuth {
 
         // query group and membership of the user
         const group = await Group.query()
-            .leftJoin('group_members', (query) => {
+            .join('group_members', (query) => {
                 query.on('groups.id', 'group_members.group_id')
                     .andOnVal('group_members.user_id', user.id)
             })
