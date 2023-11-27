@@ -7,7 +7,8 @@
 		GroupRole,
 		type GroupRequest,
 		type Member,
-		GroupRequestStatus
+		GroupRequestStatus,
+		Membership
 	} from '$lib/types/group';
 	import { UserRole } from '$lib/types/user';
 	import { toasts } from 'svelte-toasts';
@@ -56,6 +57,40 @@
 				}
 			});
 	});
+
+	const getUserRole = (userId?: string) => {
+		return data.group?.members?.find((m) => m.id === userId)?.group_role ?? 'guest';
+	};
+
+	const canKickUser = (userId: string) => {
+		if ($currentUser?.id === userId) {
+			return false;
+		}
+
+		// can only kick if he's mod, admin and the user is member
+		if ($currentUser?.role === UserRole.ADMIN) {
+			return true;
+		}
+
+		if (data.group?.membership === Membership.GUEST) {
+			return false;
+		}
+
+		const userRole = getUserRole(userId);
+
+		if (
+			currentMember?.group_role === GroupRole.ADMIN &&
+			(userRole === GroupRole.MEMBER || userRole === GroupRole.MOD)
+		) {
+			return true;
+		}
+
+		if (currentMember?.group_role === GroupRole.MOD && userRole === GroupRole.MEMBER) {
+			return true;
+		}
+
+		return false;
+	};
 
 	const handleKick = async (member: Member) => {
 		const res = await client.post<ResponseFormat<void>>(`/groups/${group?.id}/kick`, {
@@ -176,11 +211,6 @@
 		}
 	};
 
-	$: canManage =
-		$currentUser?.role == UserRole.ADMIN ||
-		currentMember?.group_role == GroupRole.ADMIN ||
-		currentMember?.group_role == GroupRole.MOD;
-
 	// can leave only if he's not an admin
 	$: canLeave = currentMember?.group_role !== GroupRole.ADMIN;
 
@@ -249,19 +279,25 @@
 			<div class="flex flex-col gap-y-4">
 				<div class=" grid grid-cols-2 grid-rows-3">
 					{#if $currentUser}
-						<a href={`/users/${$currentUser.id}`} class="nav font-semibold">{$currentUser?.nickname}</a>
+						<div>
+							<a href={`/users/${$currentUser.id}`} class="nav font-semibold"
+								>{$currentUser?.nickname}</a
+							>
+						</div>
 						<span class="italic text-right">{currentMember?.group_role ?? 'guest'}</span>
 					{/if}
 				</div>
-				<div>
+				<div class="[&>*:nth-child(odd)]:bg-background-light/10 p-2 rounded-sm">
 					<span class="font-semibold">members ({otherMembers.length ?? 0}):</span>
 					{#each otherMembers as member}
 						<div class="grid grid-rows-2">
-							<a class="nav" href="/users/{member.id}">{member.nickname}</a>
+							<div>
+								<a class="nav" href="/users/{member.id}">{member.nickname}</a>
+							</div>
 							<span class="text-right italic">{member.group_role}</span>
 							<div class="text-right col-start-2 row-start-2">
-								{#if canManage && member.id !== $currentUser?.id}
-									<button on:click={() => handleKick(member)}>kick</button>
+								{#if canKickUser(member.id)}
+									<button class="btn-red" on:click={() => handleKick(member)}>kick</button>
 								{/if}
 							</div>
 						</div>

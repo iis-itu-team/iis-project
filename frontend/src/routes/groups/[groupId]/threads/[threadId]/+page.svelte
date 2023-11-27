@@ -232,7 +232,6 @@
 	$: currentMember = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
 	const getUserRole = (userId?: string) => {
-		console.log(userId);
 		return data.group?.members?.find((m) => m.id === userId)?.group_role ?? 'guest';
 	};
 
