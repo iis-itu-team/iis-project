@@ -22,7 +22,7 @@
 <div class="m-auto p-10">
 	{#if hasInfo}
 		<span class="text-red-300 font-semibold text-2xl">{error?.statusCode}</span>
-		<span class="py-10 text-lg">Not Found</span>
+		<span class="py-10 text-lg">{error?.statusText}</span>
 	{:else}
 		<span class="text-red-300 font-semibold text-2xl">{$page.status}</span>
 		<span class="py-10 text-lg">{$page.error?.message}</span>

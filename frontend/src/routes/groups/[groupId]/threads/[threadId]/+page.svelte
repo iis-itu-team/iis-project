@@ -7,9 +7,14 @@
 	import { toasts } from 'svelte-toasts';
 	import type { PageData } from './$types';
 	import SvelteMarkdown from 'svelte-markdown';
+<<<<<<< Updated upstream
 	import { errorInfoFromResponse } from '$lib/common/error';
 	import { error } from '@sveltejs/kit';
 	import Pagination from '$lib/components/Pagination.svelte';
+=======
+	import { groupRequests } from '$lib/stores/requests';
+	import { Membership } from '$lib/types/group';
+>>>>>>> Stashed changes
 
 	export let data: PageData;
 
@@ -162,7 +167,9 @@
 	};
 
 	const handleDeleteMessage = async (message: Message) => {
-		const res = await client.delete<ResponseFormat<void>>(`/messages/${message.id}`);
+		const res = await client.delete<ResponseFormat<void>>(
+			`/groups/${data.group?.id}/threads/${data.thread?.id}/messages/${message.id}`
+		);
 
 		if (res.status === 200 && res.data.status === 'success') {
 			toasts.add({
@@ -198,9 +205,12 @@
 	};
 
 	const saveEdit = async () => {
-		const res = await client.put<ResponseFormat<Message>>(`/messages/${editing.message?.id}`, {
-			content: editing.content
-		});
+		const res = await client.put<ResponseFormat<Message>>(
+			`/groups/${data.group?.id}/threads/${data.thread?.id}/messages/${editing.message?.id}`,
+			{
+				content: editing.content
+			}
+		);
 
 		if (res.status === 200 && res.data.status === 'success') {
 			stopEditing();
@@ -223,7 +233,7 @@
 	$: currentMember = data.group?.members?.find((m) => m.id === $currentUser?.id);
 
 	const getUserRole = (user?: User) => {
-		return data.group?.members?.find((m) => m.id === user?.id)?.group_role;
+		return data.group?.members?.find((m) => m.id === user?.id)?.group_role ?? 'guest';
 	};
 
 	$: canManage =
@@ -315,20 +325,22 @@
 								<SvelteMarkdown source={message.content} />
 							{/if}
 						</div>
-						<div class="flex flex-row justify-end pt-8 gap-x-4">
-							{#if editing.message?.id === message.id}
-								<button class="btn-no" on:click={stopEditing}>cancel</button>
-								<button class="btn" on:click={saveEdit}>save</button>
-							{:else}
-								<button class="btn" on:click={() => startEditing(message)}>edit</button>
-								<button class="btn" on:click={() => handleDeleteMessage(message)}>delete</button>
-							{/if}
-						</div>
+						{#if data.group?.membership !== Membership.GUEST && (canManage || message.ownerId === $currentUser?.id)}
+							<div class="flex flex-row justify-end pt-8 gap-x-4">
+								{#if editing.message?.id === message.id}
+									<button class="btn-no" on:click={stopEditing}>cancel</button>
+									<button class="btn" on:click={saveEdit}>save</button>
+								{:else}
+									<button class="btn" on:click={() => startEditing(message)}>edit</button>
+									<button class="btn" on:click={() => handleDeleteMessage(message)}>delete</button>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				{/each}
 			{/if}
 		</div>
-		{#if $currentUser}
+		{#if $currentUser && (data.group?.membership !== Membership.GUEST || canManage)}
 			<div class="flex flex-row gap-x-4 w-full items-end">
 				<textarea
 					bind:clientHeight

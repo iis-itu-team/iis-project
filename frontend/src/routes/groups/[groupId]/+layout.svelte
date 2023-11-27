@@ -176,7 +176,7 @@
 		}
 	};
 
-	$: canKick =
+	$: canManage =
 		$currentUser?.role == UserRole.ADMIN ||
 		currentMember?.group_role == GroupRole.ADMIN ||
 		currentMember?.group_role == GroupRole.MOD;
@@ -213,7 +213,7 @@
 				</div>
 			{/if}
 			<!-- Edit/Delete group button -->
-			{#if currentMember?.group_role == GroupRole.ADMIN}
+			{#if currentMember?.group_role == GroupRole.ADMIN || $currentUser.role === UserRole.ADMIN}
 				<a
 					class="nav {$page.route.id === '/groups/[groupId]/edit' && 'nav-selected'}"
 					href={`/groups/${group?.id}/edit`}>edit group</a
@@ -249,7 +249,7 @@
 			<div class="flex flex-col gap-y-4">
 				<div class=" grid grid-cols-2 grid-rows-3">
 					{#if $currentUser}
-						<span class="font-semibold">{$currentUser?.nickname}</span>
+						<a href={`/users/${$currentUser.id}`} class="nav font-semibold">{$currentUser?.nickname}</a>
 						<span class="italic text-right">{currentMember?.group_role ?? 'guest'}</span>
 					{/if}
 				</div>
@@ -257,10 +257,10 @@
 					<span class="font-semibold">members ({otherMembers.length ?? 0}):</span>
 					{#each otherMembers as member}
 						<div class="grid grid-rows-2">
-							<a href="/users/{member.id}">{member.nickname}</a>
+							<a class="nav" href="/users/{member.id}">{member.nickname}</a>
 							<span class="text-right italic">{member.group_role}</span>
 							<div class="text-right col-start-2 row-start-2">
-								{#if canKick && member.id !== $currentUser?.id}
+								{#if canManage && member.id !== $currentUser?.id}
 									<button on:click={() => handleKick(member)}>kick</button>
 								{/if}
 							</div>
