@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && cp .env build/ && cp bun.lockb build/ && cp package.json build/ && cd build && bun install --production",
+    "start": "cp .env build/ && bun build/index.js",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -27,6 +28,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@sveltejs/adapter-node": "^1.3.1",
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.5.1",
     "svelte-markdown": "^0.4.0",
