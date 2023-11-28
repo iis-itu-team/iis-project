@@ -16,6 +16,7 @@ import GroupRequest from "App/Models/GroupRequest"
 export type ListGroupsInput = PaginationInput & {
     userId?: string
     loggedInUserId?: string
+    visibility?: Visibility
 } & ExpandInput
 
 export type GetGroupInput = {

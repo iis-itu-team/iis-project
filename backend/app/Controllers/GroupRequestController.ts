@@ -6,6 +6,7 @@ import User from "App/Models/User";
 import GroupRequest from "App/Models/GroupRequest";
 import { PaginationResult } from "types/response-format";
 import GroupService from "App/Services/GroupService";
+import { paginationSchema } from "types/pagination";
 
 const createRequestSchema = schema.create({
     type: schema.enum(Object.values(GroupRequestType))
@@ -21,7 +22,8 @@ const listRequestSchema = schema.create({
     me: schema.enum.optional(["true", "false"]),
 
     expand: schema.string.optional(),
-    page: schema.string.optional()
+    
+    ...paginationSchema
 })
 
 const changeStatusSchema = schema.create({

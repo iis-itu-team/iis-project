@@ -5,6 +5,7 @@ export type PaginationMeta = {
     currentPage: number
     lastPage: number
     firstPage: number
+    total: number
 }
 
 export type PaginationInput = {

@@ -1,19 +1,17 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext"
 import GroupService from "App/Services/GroupService"
-import { schema, rules } from "@ioc:Adonis/Core/Validator"
+import { schema } from "@ioc:Adonis/Core/Validator"
 import { Visibility } from "types/visibility";
 import User from "App/Models/User";
+import { paginationSchema } from "types/pagination";
 
 const listGroupSchema = schema.create({
-    perPage: schema.number.optional([
-        rules.unsigned(),
-    ]),
-    page: schema.number.optional([
-        rules.unsigned()
-    ]),
     userId: schema.string.optional(),
     expand: schema.string.optional(),
-	visibility: schema.string.optional()
+
+    visibility: schema.enum.optional(Object.values(Visibility)),
+
+    ...paginationSchema
 })
 
 const getGroupSchema = schema.create({
