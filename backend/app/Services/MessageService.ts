@@ -49,7 +49,8 @@ export default class MessageService {
             // only messages from groups the user can see into
             if (currentUser.role !== Role.ADMIN) {
                 if (!groupId) {
-                    q                        // groups where he is a member
+                    q
+                        // groups where he is a member
                         .whereIn('messages.group_id', Database.from('group_members')
                             .where('user_id', currentUser.id)
                             .whereNotNull('group_role')
@@ -79,7 +80,7 @@ export default class MessageService {
         q.orderBy("messages.id", "asc")
         q.orderBy("messages.date", "asc")
 
-        const messages = await q.paginate(page ?? 1, perPage ?? 10)
+        const messages = await q.select("messages.*").paginate(page ?? 1, perPage ?? 10)
 
         return {
             data: messages.all(),
