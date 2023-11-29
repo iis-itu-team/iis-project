@@ -29,8 +29,6 @@
 	let sentModRequest: GroupRequest | undefined = undefined;
 
 	onMount(() => {
-		ensureLoggedIn();
-
 		client
 			.get<ResponseFormat<GroupRequest[]>>(`/groups/${group?.id}/requests`, {
 				params: {
