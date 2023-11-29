@@ -31,6 +31,7 @@ export type ListMessagesInput = {
 export default class MessageService {
     public async listMessages({ ownerId, groupId, threadId, page, perPage, expand }: ListMessagesInput, currentUser?: User) {
         const q = Message.query()
+            .leftJoin('groups', 'messages.group_id', 'groups.id')
 
         if (threadId) {
             q.where("thread_id", threadId)
@@ -48,8 +49,7 @@ export default class MessageService {
             // only messages from groups the user can see into
             if (currentUser.role !== Role.ADMIN) {
                 if (!groupId) {
-                    q.leftJoin('groups', 'messages.group_id', 'groups.id')
-                        // groups where he is a member
+                    q                        // groups where he is a member
                         .whereIn('messages.group_id', Database.from('group_members')
                             .where('user_id', currentUser.id)
                             .whereNotNull('group_role')
