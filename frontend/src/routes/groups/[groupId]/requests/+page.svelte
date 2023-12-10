@@ -14,7 +14,7 @@
 
 	export let data: PageData;
 
-	$: groupId = data.group.groupId
+	$: groupId = data.group?.id;
 
 	showCrumbs(true);
 	$: setCrumbs([
@@ -72,21 +72,21 @@
 		const res = await client.get<ResponseFormat<GroupRequest[]>>(`/groups/${groupId}/requests`, {
 			params: {
 				page: pageCurrent,
-				expand: ["group", "user"].join(",")
+				expand: ['group', 'user'].join(',')
 			}
 		});
 
 		if (res.status !== 200) {
 			throw error(res.status, errorInfoFromResponse(res));
 		}
-	
+
 		pageCurrent = res.data.pagination?.currentPage ?? 0;
 		pageFirst = res.data.pagination?.firstPage ?? 0;
 		pageLast = res.data.pagination?.lastPage ?? 0;
 		total = res.data.pagination?.total ?? 0;
 
 		return res.data.data ?? [];
-	};
+	}
 
 	let fetchPromise = fetch();
 </script>
@@ -114,9 +114,14 @@
 				</div>
 			</div>
 		{/each}
-		<Pagination bind:pageCurrent={pageCurrent} pageFirst={pageFirst} pageLast={pageLast} updateFunction={() => fetchPromise = fetch()}/>
+		<Pagination
+			bind:pageCurrent
+			{pageFirst}
+			{pageLast}
+			updateFunction={() => (fetchPromise = fetch())}
+		/>
 	{:catch err}
-		<Error error={err}/>
+		<Error error={err} />
 	{/await}
 </div>
 
