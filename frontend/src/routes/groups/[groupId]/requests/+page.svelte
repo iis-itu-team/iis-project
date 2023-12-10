@@ -14,7 +14,7 @@
 
 	export let data: PageData;
 
-	$: groupId = data.groupId
+	$: groupId = data.group.groupId
 
 	showCrumbs(true);
 	$: setCrumbs([
@@ -69,7 +69,7 @@
 		// waits for group id
 		await invalidateAll();
 
-		const res = await client.get<ResponseFormat<GroupRequest[]>>("/groups/${groupId}/requests", {
+		const res = await client.get<ResponseFormat<GroupRequest[]>>(`/groups/${groupId}/requests`, {
 			params: {
 				page: pageCurrent,
 				expand: ["group", "user"].join(",")
